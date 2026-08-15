@@ -33,7 +33,7 @@ const icones: Record<string, string> = {
     {
       soins.map((soin) => (
         <div class:list={['item', { signature: soin.signature }]}>
-          <Accordeon titre={`${soin.nom} — ${soin.sousTitre} · dès ${prixMin(soin)} €`}>
+          <Accordeon titre={soin.nom} sousTitre={`${soin.sousTitre} · dès ${prixMin(soin)} €`}>
             <Fragment slot="icone">
               <svg
                 width="26"
@@ -86,18 +86,15 @@ const icones: Record<string, string> = {
     background: var(--creme);
     border-radius: 18px;
     padding: 0 20px;
-  }
-
-  .item :global(.accordeon) {
-    border-bottom: none;
+    --accordeon-couleur-bordure: transparent;
   }
 
   .item.signature {
     background: var(--vert-profond);
     --accordeon-couleur-titre: var(--creme);
+    --accordeon-couleur-soustitre: var(--or);
     --accordeon-couleur-corps: var(--creme);
     --accordeon-couleur-marque: var(--or);
-    --accordeon-couleur-bordure: var(--vert-clair);
   }
 
   .description {
@@ -128,12 +125,12 @@ const icones: Record<string, string> = {
     white-space: nowrap;
     background: var(--creme-surface);
     border: 1px solid var(--sable);
-    color: var(--encre-douce);
+    color: var(--encre);
   }
 
   .item.signature .tarif {
     background: var(--vert-clair);
-    border-color: var(--or);
+    border-color: var(--vert-clair);
     color: var(--creme);
   }
 
@@ -145,7 +142,7 @@ const icones: Record<string, string> = {
   }
 
   .item.signature .separateur {
-    background: var(--or);
+    background: color-mix(in srgb, var(--or-clair) 40%, transparent);
   }
 
   .prix {

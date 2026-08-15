@@ -1,15 +1,19 @@
 ---
 interface Props {
   titre: string;
+  sousTitre?: string;
 }
 
-const { titre } = Astro.props;
+const { titre, sousTitre } = Astro.props;
 ---
 
 <details class="accordeon">
   <summary>
     <span class="icone" aria-hidden="true"><slot name="icone" /></span>
-    <span class="titre">{titre}</span>
+    <span class="titre-groupe">
+      <span class="titre">{titre}</span>
+      {sousTitre && <span class="sous-titre">{sousTitre}</span>}
+    </span>
     <span class="marque" aria-hidden="true"></span>
   </summary>
   <div class="corps"><slot /></div>
@@ -17,9 +21,9 @@ const { titre } = Astro.props;
 
 <style>
   /*
-   * --accordeon-couleur-{titre,corps,marque,bordure} let a dark item (the
-   * signature soin card) override the four text/border colours from its own
-   * wrapper, same custom-property-extension-point pattern as
+   * --accordeon-couleur-{titre,soustitre,corps,marque,bordure} let a dark
+   * item (the signature soin card) override the five text/border colours
+   * from its own wrapper, same custom-property-extension-point pattern as
    * EnTeteSection's --entete-couleur-surtitre. Defaults are the light
    * treatment used everywhere else.
    */
@@ -49,12 +53,23 @@ const { titre } = Astro.props;
   .icone:empty {
     display: none;
   }
-  .titre {
+  .titre-groupe {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .titre {
     font-family: var(--font-titre), Georgia, serif;
     font-size: 1.15rem;
     color: var(--accordeon-couleur-titre, var(--encre));
+  }
+  .sous-titre {
+    font-family: var(--font-titre), Georgia, serif;
+    font-size: 0.9375rem;
+    font-style: italic;
+    color: var(--accordeon-couleur-soustitre, var(--or-bronze));
   }
   .marque {
     flex: none;

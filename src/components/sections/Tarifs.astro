@@ -1,6 +1,5 @@
 ---
 import { getSection } from '../../lib/content';
-import Frise from '../ui/Frise.astro';
 
 const section = await getSection('tarifs');
 ---
@@ -9,7 +8,6 @@ const section = await getSection('tarifs');
   <span class="losange" aria-hidden="true" />
   <p class="amorce">{section.titre}</p>
   <p class="texte">{section.paragraphes[0]}</p>
-  <Frise />
 </section>
 
 <style>
