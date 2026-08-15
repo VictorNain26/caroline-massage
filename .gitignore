@@ -7,3 +7,5 @@ dist/
 .env.*
 CLAUDE.local.md
 .superpowers/
+test-results/
+playwright-report/
