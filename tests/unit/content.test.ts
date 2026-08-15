@@ -47,8 +47,8 @@ describe('faq', () => {
     lire(`src/content/faq/${f}`),
   );
 
-  it('en compte sept', () => {
-    expect(questions).toHaveLength(7);
+  it('en compte huit', () => {
+    expect(questions).toHaveLength(8);
   });
 
   it('donne des ordres uniques', () => {
@@ -75,6 +75,20 @@ describe('faq', () => {
     expect(
       reponse.includes(chiffreHeure(cabinet.heureFermeture)),
       `src/content/faq/lieu.yaml ne mentionne pas « ${chiffreHeure(cabinet.heureFermeture)} » : corriger la réponse pour reprendre cabinet.yaml#heureFermeture, ou l'inverse`,
+    ).toBe(true);
+  });
+
+  it("garde la réponse « comment prendre rendez-vous » cohérente avec cabinet.yaml", () => {
+    const cabinet = lire('src/content/cabinet.yaml');
+    const reponse = lire('src/content/faq/rendez-vous.yaml').reponse as string;
+
+    expect(
+      reponse.includes(cabinet.telephoneAffiche),
+      `src/content/faq/rendez-vous.yaml ne mentionne pas « ${cabinet.telephoneAffiche} » : corriger la réponse pour reprendre cabinet.yaml#telephoneAffiche, ou l'inverse si le numéro a changé`,
+    ).toBe(true);
+    expect(
+      reponse.includes(cabinet.email),
+      `src/content/faq/rendez-vous.yaml ne mentionne pas « ${cabinet.email} » : corriger la réponse pour reprendre cabinet.yaml#email, ou l'inverse si l'adresse a changé`,
     ).toBe(true);
   });
 });

@@ -18,9 +18,9 @@ describe('getSoins', () => {
 });
 
 describe('getFaq', () => {
-  it('retourne les sept questions triées par ordre croissant', async () => {
+  it('retourne les huit questions triées par ordre croissant', async () => {
     const faq = await getFaq();
-    expect(faq.map((q) => q.ordre)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(faq.map((q) => q.ordre)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 });
 
