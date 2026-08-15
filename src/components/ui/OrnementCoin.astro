@@ -9,7 +9,14 @@ interface Props {
 const { position } = Astro.props;
 ---
 
-<Image src={coin} alt="" width={96} height={96} class={`ornement ${position}`} />
+<Image
+  src={coin}
+  alt=""
+  width={104}
+  height={104}
+  densities={[1, 2]}
+  class={`ornement ${position}`}
+/>
 
 <style>
   /*

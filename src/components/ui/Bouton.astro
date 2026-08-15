@@ -1,20 +1,25 @@
 ---
 interface Props {
   href: string;
-  variante?: 'plein' | 'contour';
+  variante?: 'vert' | 'creme';
 }
 
-const { href, variante = 'plein' } = Astro.props;
+const { href, variante = 'vert' } = Astro.props;
 ---
 
 <a href={href} class={`bouton ${variante}`}><slot /></a>
 
 <style>
+  /*
+   * --bouton-hauteur is the extension point for min-height, since the
+   * design uses a different one per site (nav, mobile menu, hero) — same
+   * pattern as OrnementCoin's custom properties. Default matches the nav.
+   */
   .bouton {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 52px;
+    min-height: var(--bouton-hauteur, 48px);
     padding: 0 24px;
     border-radius: var(--rayon);
     font-weight: 700;
@@ -23,23 +28,23 @@ const { href, variante = 'plein' } = Astro.props;
     text-transform: uppercase;
     text-decoration: none;
   }
-  .plein {
+  .vert {
     background: var(--vert-profond);
     color: var(--creme);
-    border: 1px solid color-mix(in srgb, var(--or) 55%, transparent);
+    border: 1px solid color-mix(in srgb, var(--or-clair) 32%, transparent);
   }
-  .plein:hover {
+  .vert:hover {
     background: var(--vert-clair);
     color: var(--creme);
   }
-  .contour {
-    background: none;
+  .creme {
+    background: var(--creme);
     color: var(--vert-profond);
-    border: 1px solid var(--vert-profond);
+    border: 1px solid color-mix(in srgb, var(--or) 45%, transparent);
   }
-  .contour:hover {
-    background: var(--vert-profond);
-    color: var(--creme);
+  .creme:hover {
+    background: var(--or-clair);
+    color: var(--vert-profond);
   }
   .bouton:focus-visible {
     outline: 2px solid var(--or);
