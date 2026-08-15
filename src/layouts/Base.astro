@@ -1,6 +1,8 @@
 ---
 import { Font } from 'astro:assets';
 import '../styles/tokens.css';
+import { getCabinet, getSoins } from '../lib/content';
+import { construireJsonLd } from '../lib/jsonld';
 
 interface Props {
   title: string;
@@ -8,6 +10,10 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+
+const cabinet = await getCabinet();
+const soins = await getSoins();
+const jsonLd = construireJsonLd(cabinet, soins);
 ---
 <html lang="fr">
   <head>
@@ -15,6 +21,13 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Caroline, Massage Sur-Mesure" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
     <Font cssVariable="--font-titre" preload />
     <Font cssVariable="--font-texte" preload />
     <slot name="head" />

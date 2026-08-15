@@ -1,10 +1,13 @@
 import { defineConfig, fontProviders } from 'astro/config';
 import yaml from '@rollup/plugin-yaml';
 
+import sitemap from '@astrojs/sitemap';
+
 export default defineConfig({
   site: 'https://carolinemassagesurmesure.fr',
   build: { inlineStylesheets: 'auto' },
   vite: { plugins: [yaml()] },
+
   fonts: [
     {
       provider: fontProviders.google(),
@@ -23,4 +26,6 @@ export default defineConfig({
       subsets: ['latin'],
     },
   ],
+
+  integrations: [sitemap()],
 });
