@@ -15,8 +15,15 @@ const { titre } = Astro.props;
 </details>
 
 <style>
+  /*
+   * --accordeon-couleur-{titre,corps,marque,bordure} let a dark item (the
+   * signature soin card) override the four text/border colours from its own
+   * wrapper, same custom-property-extension-point pattern as
+   * EnTeteSection's --entete-couleur-surtitre. Defaults are the light
+   * treatment used everywhere else.
+   */
   .accordeon {
-    border-bottom: 1px solid var(--sable);
+    border-bottom: 1px solid var(--accordeon-couleur-bordure, var(--sable));
   }
   summary {
     display: flex;
@@ -37,14 +44,15 @@ const { titre } = Astro.props;
   .titre {
     font-family: var(--font-titre), Georgia, serif;
     font-size: 1.15rem;
+    color: var(--accordeon-couleur-titre, var(--encre));
   }
   .marque {
     flex: none;
     width: 24px;
     height: 24px;
     border-radius: 999px;
-    border: 1.5px solid var(--or-bronze);
-    color: var(--or-bronze);
+    border: 1.5px solid var(--accordeon-couleur-marque, var(--or-bronze));
+    color: var(--accordeon-couleur-marque, var(--or-bronze));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -57,7 +65,7 @@ const { titre } = Astro.props;
   }
   .corps {
     padding-bottom: 20px;
-    color: var(--encre-douce);
+    color: var(--accordeon-couleur-corps, var(--encre-douce));
     line-height: 1.6;
   }
 

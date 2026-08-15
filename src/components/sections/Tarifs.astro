@@ -1,0 +1,58 @@
+---
+import { getSection } from '../../lib/content';
+import Frise from '../ui/Frise.astro';
+
+const section = await getSection('tarifs');
+---
+
+<section id="tarifs" data-anchor="tarifs" data-surface="light" class="tarifs">
+  <span class="losange" aria-hidden="true" />
+  <p class="amorce">{section.titre}</p>
+  <p class="texte">{section.paragraphes[0]}</p>
+  <Frise />
+</section>
+
+<style>
+  .tarifs {
+    scroll-margin-top: 90px;
+    max-width: 720px;
+    margin: clamp(28px, 4.5cqw, 48px) auto 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: clamp(10px, 1.8cqw, 14px);
+    background: var(--creme-surface);
+    padding: 0 clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+  }
+
+  .losange {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    transform: rotate(45deg);
+    border: 1px solid var(--or);
+    display: block;
+  }
+
+  .amorce {
+    margin: 0;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(21px, 5.2cqw, 28px);
+    line-height: 1.35;
+    color: var(--encre);
+    text-wrap: pretty;
+  }
+
+  .texte {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.7;
+    color: var(--encre-douce);
+    text-wrap: pretty;
+  }
+</style>

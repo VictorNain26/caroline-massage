@@ -1,0 +1,130 @@
+---
+import { getSection, getSoins, type Soin } from '../../lib/content';
+import EnTeteSection from '../ui/EnTeteSection.astro';
+import Accordeon from '../ui/Accordeon.astro';
+
+const section = await getSection('soins');
+const soins = await getSoins();
+
+function prixMin(soin: Soin): number {
+  return Math.min(...soin.tarifs.map((t) => t.prix));
+}
+---
+
+<section id="soins" data-anchor="soins" data-surface="light" class="soins">
+  <EnTeteSection surtitre={section.surtitre ?? ''} titre={section.titre} />
+
+  <div class="liste">
+    {
+      soins.map((soin) => (
+        <div class:list={['item', { signature: soin.signature }]}>
+          <Accordeon titre={`${soin.nom} — ${soin.sousTitre} · dès ${prixMin(soin)} €`}>
+            <p class="description">{soin.description}</p>
+            <div class="tarifs">
+              {soin.tarifs.map((tarif) => (
+                <span class="tarif">
+                  <span>{tarif.duree} min</span>
+                  <span class="separateur" aria-hidden="true" />
+                  <span class="prix">{tarif.prix} €</span>
+                </span>
+              ))}
+            </div>
+          </Accordeon>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .soins {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(28px, 4.5cqw, 48px);
+    background: var(--creme-surface);
+    padding: clamp(96px, 17cqw, 156px) clamp(20px, 5.5cqw, 80px) 0;
+  }
+
+  .liste {
+    max-width: var(--largeur-contenu);
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .item {
+    background: var(--creme);
+    border-radius: 18px;
+    padding: 0 20px;
+  }
+
+  .item :global(.accordeon) {
+    border-bottom: none;
+  }
+
+  .item.signature {
+    background: var(--vert-profond);
+    --accordeon-couleur-titre: var(--creme);
+    --accordeon-couleur-corps: var(--creme);
+    --accordeon-couleur-marque: var(--or);
+    --accordeon-couleur-bordure: var(--vert-clair);
+  }
+
+  .description {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .tarifs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .tarif {
+    min-height: 38px;
+    padding: 0 14px;
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    white-space: nowrap;
+    background: var(--creme-surface);
+    border: 1px solid var(--sable);
+    color: var(--encre-douce);
+  }
+
+  .item.signature .tarif {
+    background: var(--vert-clair);
+    border-color: var(--or);
+    color: var(--creme);
+  }
+
+  .separateur {
+    width: 1px;
+    height: 13px;
+    flex: none;
+    background: var(--sable);
+  }
+
+  .item.signature .separateur {
+    background: var(--or);
+  }
+
+  .prix {
+    color: var(--or-lien);
+  }
+
+  .item.signature .prix {
+    color: var(--or-clair);
+  }
+</style>
