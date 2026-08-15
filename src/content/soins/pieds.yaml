@@ -1,0 +1,12 @@
+nom: "Massage des pieds"
+sousTitre: "seul ou en complément"
+description: >-
+  Ils nous portent toute la journée, et on les oublie presque toujours. Je
+  travaille la voûte plantaire, les talons et les orteils par une pression lente
+  et précise, pour relâcher les tensions et raviver la circulation. Un soin
+  simple dont les effets se ressentent dans tout le corps.
+tarifs:
+  - { duree: 30, prix: 50 }
+  - { duree: 60, prix: 85 }
+signature: false
+ordre: 3
