@@ -10,7 +10,10 @@ Spec : `docs/superpowers/specs/2026-08-15-site-vitrine-caroline-massage-design.m
 - `pnpm dev` — serveur de développement
 - `pnpm check` — typecheck Astro
 - `pnpm lint` — ESLint, zéro warning toléré
-- `pnpm test` — Vitest
+- `pnpm test` — Vitest. **Lancer `pnpm build` d'abord** : deux suites lisent des
+  artefacts de build (le HTML produit, et le magasin de contenu d'Astro). Sans
+  build préalable elles échouent avec un message explicite plutôt qu'un faux
+  vert. La CI enchaîne `build` puis `test` pour cette raison.
 - `pnpm test:a11y` — Playwright + axe sur le build
 - `pnpm build` — build de production dans `dist/`
 - `pnpm deploy` — déploiement Cloudflare, jamais automatique
