@@ -23,7 +23,6 @@ Ces contraintes s'appliquent à **toutes** les tâches, sans être répétées.
 - **Aucune couleur en dur** : uniquement les variables de `src/styles/tokens.css`. Les tailles et les échelles typographiques échappent à cette règle — le design les exprime en `clamp()` propres à chaque section, sans réutilisation, et les tokeniser ajouterait de l'indirection sans partage. Une valeur qui se répète réellement d'une section à l'autre devient un token ; les autres restent littérales, prises du design.
 - **Aucun composant n'appelle `getCollection()`.** Tout passe par `src/lib/content.ts`.
 - **Toute animation est neutralisée sous `prefers-reduced-motion: reduce`.**
-- **Chaque composant de section porte `data-surface="dark"` ou `data-surface="light"`** selon la clarté de son fond. La sonde de la tâche 12 est déclarative : un attribut oublié ne produit pas d'erreur, il produit une barre CTA de la mauvaise couleur.
 - **Zéro warning ESLint.** Un `eslint-disable` n'est jamais un correctif : trouver la forme de code qui ne déclenche pas la règle.
 - **Le formulaire de la section contact n'est pas porté** (spec, section 1).
 - Palette, relevée par fréquence dans le design : or bronze `#96742C`, or `#D4A94C`, crème `#FBF7F0`, encre `#221D17`, sable `#CBB79A`, texte secondaire `#55483C`, surface crème `#EFE6D8`, or clair `#E4C070`, vert profond `#0B3A31`, vert clair `#165046`, corail `#F0907C`, lien `#7A5A24`.
@@ -1399,8 +1398,7 @@ git commit -m "feat(nav): add responsive navigation with accessible mobile panel
 
 Titre `<h1>`, sur-titre et accroche lus depuis `getSection('hero')`, deux boutons (« Prendre rendez-vous » vers
 `#contact`, « Découvrir les soins » vers `#soins`), photo encadrée d'ornements.
-Le fond est `--vert-profond` : marquer la section `data-surface="dark"`, la
-tâche 12 s'en sert.
+Le fond est `--vert-profond`.
 
 - [ ] **Step 2: Porter les animations sous garde-fou**
 
@@ -1591,7 +1589,7 @@ import { getAvis } from '../../lib/content';
 const avis = await getAvis();
 ---
 {avis.length > 0 && (
-  <section id="avis" data-anchor="avis" data-surface="light">
+  <section id="avis" data-anchor="avis">
     <!-- en-tête et cartes -->
   </section>
 )}
@@ -1647,8 +1645,7 @@ formulaire n'est pas porté.
 Deux boutons : `tel:` avec `cabinet.telephoneAffiche` en libellé, et `mailto:`
 avec `cabinet.email`. La section contact du design ne porte **ni horaires ni délai de réponse** :
 sa mention finale est « Aucun paiement en ligne · réponse au plus vite ». Ne pas
-en inventer. Fond `--vert-profond` : marquer
-`data-surface="dark"`.
+en inventer. Fond `--vert-profond`.
 
 - [ ] **Step 2: Porter le pied de page**
 
@@ -1686,119 +1683,26 @@ git commit -m "feat(contact): port contact section without form, add footer"
 
 ---
 
-### Task 12: Barre CTA collante, en déclaratif
+### Task 12: ~~Barre CTA collante~~ — RETIRÉE
 
-**Files:**
-- Create: `src/components/StickyCta.astro`, `src/scripts/sticky-cta.ts`, `src/lib/surface.ts`
-- Modify: `src/layouts/Base.astro`
-- Test: `tests/unit/surface.test.ts`
+Cette tâche décrivait une barre d'appel flottante dont les couleurs s'inversaient
+selon la section survolée. **Elle n'existe pas dans le design.** Vérifié :
+`probeBg`, `data-sticky-cta`, `barBg`, `barFg` et `onDark` apparaissent zéro fois
+dans `design/accueil-page-vert-or.dc.html`, qui ne contient aucun élément en
+`position:fixed`.
 
-**Interfaces:**
-- Consumes: `getCabinet()`, et l'attribut `data-surface` posé sur les sections aux tâches 7 à 11.
-- Produit: `surfaceCourante(entrees: { surface: 'dark' | 'light'; visible: boolean }[]): 'dark' | 'light'`, dans `src/lib/surface.ts`.
+Elle venait du fichier de **scène** du projet Claude Design — celui qui encadre
+la page dans des cadres mobile et desktop pour la revue, et qui superpose une
+barre CTA au cadre mobile pour démontrer une interaction. Le bouton « Rejouer
+l'ouverture », exclu dès la spec comme artefact de maquette, vient du même
+fichier et de la même classe de logique.
 
-**Source:** lignes 715-1080, méthode `probeBg`. Le design y scanne les nœuds sous
-la barre, lit leur `backgroundColor` calculé et en dérive une luminance. C'est
-fragile — cela casse dès qu'une section reçoit une image de fond, un dégradé ou
-un wrapper intermédiaire — et intestable sans DOM réel. On le remplace par du
-déclaratif à rendu identique.
+L'attribut `data-surface`, posé sur les huit sections au fil de leur
+construction, n'existait que pour alimenter cette barre. Il a été retiré avec
+elle : du markup que rien ne lit est un défaut, pas une réserve pour plus tard.
 
-- [ ] **Step 1: Écrire le test qui échoue**
+Ne pas restaurer depuis ce plan.
 
-Fichier `tests/unit/surface.test.ts` :
-
-```ts
-import { describe, it, expect } from 'vitest';
-import { surfaceCourante } from '../../src/lib/surface';
-
-describe('surfaceCourante', () => {
-  it('retourne la surface de la section visible', () => {
-    expect(surfaceCourante([
-      { surface: 'dark', visible: true },
-      { surface: 'light', visible: false },
-    ])).toBe('dark');
-  });
-
-  it('retourne la dernière visible quand plusieurs le sont', () => {
-    expect(surfaceCourante([
-      { surface: 'dark', visible: true },
-      { surface: 'light', visible: true },
-    ])).toBe('light');
-  });
-
-  it('retombe sur light quand rien nest visible', () => {
-    expect(surfaceCourante([
-      { surface: 'dark', visible: false },
-    ])).toBe('light');
-  });
-
-  it('retombe sur light sur une liste vide', () => {
-    expect(surfaceCourante([])).toBe('light');
-  });
-});
-```
-
-- [ ] **Step 2: Lancer le test, constater l'échec**
-
-```bash
-pnpm test tests/unit/surface.test.ts
-```
-
-Attendu : ÉCHEC avec « Cannot find module '../../src/lib/surface' ».
-
-- [ ] **Step 3: Écrire `src/lib/surface.ts`**
-
-```ts
-export type Surface = 'dark' | 'light';
-
-export function surfaceCourante(
-  entrees: { surface: Surface; visible: boolean }[],
-): Surface {
-  const visibles = entrees.filter((e) => e.visible);
-  return visibles.length > 0 ? visibles[visibles.length - 1].surface : 'light';
-}
-```
-
-- [ ] **Step 4: Lancer le test, vérifier qu'il passe**
-
-```bash
-pnpm test tests/unit/surface.test.ts
-```
-
-Attendu : PASS, quatre assertions vertes.
-
-- [ ] **Step 5: Écrire `src/scripts/sticky-cta.ts`**
-
-Un `IntersectionObserver` sur `[data-surface]` avec un `rootMargin` qui ne
-retient que la bande où se trouve la barre. À chaque changement, appeler
-`surfaceCourante()` et poser l'attribut `data-sur` correspondant sur la barre.
-La barre apparaît au-delà de 75 % de la hauteur de fenêtre défilée, et se
-rétracte quand la section `#contact` entre dans le champ — inutile de proposer
-d'appeler quand le bloc de contact est déjà à l'écran.
-
-- [ ] **Step 6: Écrire `src/components/StickyCta.astro`**
-
-Un lien `tel:` unique, dont les couleurs basculent via `[data-sur="dark"]` et
-`[data-sur="light"]` en CSS. La transition d'apparition passe sous
-`@media (prefers-reduced-motion: no-preference)`.
-
-- [ ] **Step 7: Vérifier**
-
-```bash
-pnpm check && pnpm lint && pnpm test && pnpm build
-```
-
-Attendu : quatre commandes en code de sortie 0.
-
-- [ ] **Step 8: Commit**
-
-```bash
-git add src/components/StickyCta.astro src/scripts/sticky-cta.ts \
-  src/lib/surface.ts src/layouts/Base.astro tests/unit/surface.test.ts
-git commit -m "feat(cta): replace luminance probing with declarative surface detection"
-```
-
----
 
 ### Task 13: Pages légales et 404
 
