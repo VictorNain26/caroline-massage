@@ -7,6 +7,7 @@ import Parcours from '../components/sections/Parcours.astro';
 import Cabinet from '../components/sections/Cabinet.astro';
 import Avis from '../components/sections/Avis.astro';
 import Faq from '../components/sections/Faq.astro';
+import Contact from '../components/sections/Contact.astro';
 import Frise from '../components/ui/Frise.astro';
 import { getAvis } from '../lib/content';
 
@@ -27,4 +28,6 @@ const avis = await getAvis();
   {avis.length > 0 && <Frise />}
   <Avis />
   <Faq />
+  <Contact />
+  <Frise />
 </Base>

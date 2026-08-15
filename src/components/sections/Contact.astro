@@ -1,0 +1,124 @@
+---
+import { getSection, getCabinet } from '../../lib/content';
+import Bouton from '../ui/Bouton.astro';
+import OrnementCoin from '../ui/OrnementCoin.astro';
+
+const section = await getSection('contact');
+const cabinet = await getCabinet();
+---
+
+<section id="contact" data-anchor="contact" data-surface="dark" class="contact">
+  <div class="orn orn-hg" style="--orn-taille: clamp(56px, 9cqw, 104px); --orn-retrait: clamp(14px, 3cqw, 28px); --orn-opacite: .85">
+    <OrnementCoin position="haut-gauche" />
+  </div>
+  <div class="orn orn-bd" style="--orn-taille: clamp(56px, 9cqw, 104px); --orn-retrait: clamp(14px, 3cqw, 28px); --orn-opacite: .85">
+    <OrnementCoin position="bas-droite" />
+  </div>
+
+  <div class="conteneur">
+    <div class="entete">
+      <span class="surtitre">{section.surtitre}</span>
+      <h2 class="titre">{section.titre}</h2>
+    </div>
+
+    <p class="accroche">{section.paragraphes[0]}</p>
+
+    <div class="cta" style="--bouton-hauteur: clamp(56px, 9cqw, 62px)">
+      <Bouton href={`tel:${cabinet.telephone}`} variante="creme">{cabinet.telephoneAffiche}</Bouton>
+      <Bouton href={`mailto:${cabinet.email}`} variante="creme">{cabinet.email}</Bouton>
+    </div>
+
+    <p class="mention">Aucun paiement en ligne · réponse au plus vite</p>
+  </div>
+</section>
+
+<style>
+  .contact {
+    position: relative;
+    background: var(--vert-profond);
+    color: var(--creme);
+    padding: clamp(56px, 12cqw, 120px) clamp(20px, 5.5cqw, 80px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(28px, 4.5cqw, 44px);
+  }
+
+  .orn {
+    position: absolute;
+  }
+
+  .orn-hg {
+    top: 0;
+    left: 0;
+  }
+
+  .orn-bd {
+    bottom: 0;
+    right: 0;
+  }
+
+  .conteneur {
+    max-width: 680px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: clamp(18px, 3cqw, 26px);
+  }
+
+  .entete {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .surtitre {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: clamp(13px, 3.2cqw, 15px);
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    /* --sable mesure 6.48:1 sur --vert-profond, au-dessus du plancher 3:1 ;
+       --or-bronze (utilisé par défaut ailleurs) n'y mesure que 2.90:1. */
+    color: var(--sable);
+  }
+
+  .titre {
+    margin: 0;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(32px, 8.2cqw, 56px);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    text-wrap: pretty;
+  }
+
+  .accroche {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(17px, 4.4cqw, 19px);
+    line-height: 1.75;
+    color: var(--creme-surface);
+    text-wrap: pretty;
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 4px;
+  }
+
+  .mention {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--sable);
+  }
+</style>

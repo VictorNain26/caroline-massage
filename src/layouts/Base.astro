@@ -2,6 +2,7 @@
 import { Font } from 'astro:assets';
 import '../styles/tokens.css';
 import Navigation from '../components/Navigation.astro';
+import PiedDePage from '../components/PiedDePage.astro';
 import { getCabinet, getSoins } from '../lib/content';
 import { construireJsonLd } from '../lib/jsonld';
 
@@ -36,6 +37,7 @@ const jsonLd = construireJsonLd(cabinet, soins);
   <body>
     <Navigation />
     <slot />
+    <PiedDePage />
   </body>
 </html>
 
