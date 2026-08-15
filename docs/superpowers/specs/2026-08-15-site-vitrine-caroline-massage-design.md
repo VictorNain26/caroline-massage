@@ -25,15 +25,28 @@ re-synchronisation future ne sera possible.
 
 **Dans le périmètre**
 
-- Page d'accueil, dix sections : hero, soins, parcours, citation, forfaits,
-  cabinet, avis, prendre rendez-vous, FAQ, footer. Les cinq premières sont
-  décrites par le markup Vert Or ; l'existence des cinq dernières est établie par
-  les ancres de navigation et par le PDF, **mais leur mise en page Vert Or reste
-  inconnue** tant que le `.dc.html` complet n'est pas récupéré.
+- Page d'accueil, huit sections ancrées : hero, soins, tarifs, parcours, cabinet,
+  avis, faq, contact. Toutes décrites par le markup Vert Or complet.
 - Page mentions légales (obligation art. 6 LCEN pour une activité professionnelle).
 - Page politique de confidentialité, prévue par le footer du design.
 - Page 404, requise par la configuration de déploiement (section 7).
 - Déploiement sur Cloudflare Workers static assets.
+
+**Retiré du design, décision assumée**
+
+Le design Vert Or contient un formulaire de demande de rendez-vous : prénom
+requis, téléphone, e-mail, plus un sélecteur de soin, de durée et de forfait
+alimentant des champs cachés, et un `access_key` destiné à un service tiers de
+traitement de formulaire. Il n'est pas porté.
+
+Un site statique n'a pas de point de réception : le formulaire imposerait soit un
+sous-traitant tiers recevant les coordonnées des clientes, soit un endpoint
+serveur qui ferait perdre au déploiement son caractère purement statique. Dans
+les deux cas il ferait entrer le projet dans la collecte de données
+personnelles — base légale, durée de conservation, information au point de
+collecte, anti-spam. La section contact conserve donc son titre, ses horaires et
+son délai de réponse, mais la conversion passe par les liens `tel:` et `mailto:`,
+comme dans le reste de la page.
 
 **Hors périmètre, explicitement**
 
@@ -92,7 +105,8 @@ caroline-massage/
 │   ├── content.config.ts
 │   ├── lib/content.ts
 │   ├── layouts/Base.astro
-│   ├── components/sections/     Hero, Parcours, Soins, Tarifs, Contact
+│   ├── components/sections/     Hero, Soins, Tarifs, Parcours,
+│   │                            Cabinet, Avis, Faq, Contact
 │   ├── components/ui/           Bouton, Accordeon, Ornement, StickyCta
 │   ├── scripts/                 intro.ts, sticky-cta.ts
 │   ├── styles/tokens.css
@@ -173,6 +187,15 @@ code : il contient des artefacts propres à l'outil de design.
 3. **Le bouton « Rejouer l'ouverture » n'est pas embarqué.** C'est un outil de
    revue de maquette. L'animation d'ouverture, elle, est conservée.
 
+4. **Le formulaire de la section contact n'est pas porté**, pour les raisons
+   exposées en section 1. Le titre, les horaires, le délai de réponse et les
+   liens `tel:` / `mailto:` / Instagram sont conservés.
+
+**Assets** — le design référence trois fichiers, à récupérer depuis le projet
+Claude Design vers `src/assets/images/` : `caro-ornement-frise.png` (900 × 59, la
+frise séparatrice, utilisée trois fois), `caro-ornement-coin.png` (220 × 220, les
+coins) et `caro-cabinet.jpg` (800 × 1035, la photo du cabinet).
+
 **Tokens** — extraits des styles inline vers `src/styles/tokens.css` :
 vert profond `#0B3A31`, or `#C9A961`, or clair `#D4A94C`, crème `#FBF7F0`,
 sable `#CBB79A`, encre `#221D17`, plus l'échelle typographique. Petrona pour les
@@ -207,8 +230,15 @@ JSON-LD `MassageBusiness`. Ces éléments sont repris dans `Base.astro`, le JSON
   donc sans bandeau de consentement. Aucun script tiers n'est ajouté sans
   arbitrage explicite.
 - **Mentions légales** : page dédiée, atteignable depuis le pied de page.
-- **Aucune donnée personnelle collectée** : pas de formulaire, la conversion est
-  un appel téléphonique. Le périmètre RGPD reste minimal par construction.
+- **Aucune donnée personnelle collectée** : le formulaire du design n'est pas
+  porté (section 1), la conversion passe par `tel:` et `mailto:`. Le périmètre
+  RGPD reste minimal par construction, et aucune protection anti-spam n'est
+  nécessaire. L'adresse e-mail reste exposée en clair dans le lien `mailto:`,
+  donc moissonnable — c'est le prix de la publication d'un contact, et le design
+  l'accepte déjà ailleurs dans la page.
+- **La politique de confidentialité reste au périmètre** malgré l'absence de
+  collecte : le footer du design y renvoie, et l'hébergement produit des journaux
+  serveur qu'il faut mentionner.
 
 ## 7. Déploiement
 
