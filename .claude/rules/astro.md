@@ -19,3 +19,11 @@ paths:
   `@media (prefers-reduced-motion: no-preference)`.
 - Les images passent par `<Image>` de `astro:assets`, avec `width`, `height`
   et `alt` explicites.
+- Le design utilise `cqw` pour ses tailles fluides : on garde `cqw`, jamais
+  `vw`, même sans ancêtre à `container-type`. MDN (référence des unités CSS,
+  section Container query length units) : « If no eligible container is
+  available for the query, the container query length unit defaults to the
+  small viewport unit for that axis (sv*) » — `cqw` retombe sur `svw`, qui vaut
+  `vw` en largeur (le chrome du navigateur ne change que la hauteur), donc
+  aucune régression aujourd'hui, et le bon comportement dès qu'un conteneur
+  apparaît.
