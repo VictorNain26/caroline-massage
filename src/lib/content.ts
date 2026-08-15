@@ -1,10 +1,8 @@
 import { getCollection } from 'astro:content';
 import cabinetData from '../content/cabinet.yaml';
-import forfaitsData from '../content/forfaits.yaml';
 
 export interface Tarif { duree: number; prix: number }
 export interface Soin { id: string; nom: string; sousTitre: string; description: string; tarifs: Tarif[]; signature: boolean; ordre: number }
-export interface Forfait { libelle: string; prix: number; prixBarre: number }
 export interface Question { id: string; question: string; reponse: string; ordre: number }
 export interface Avis { auteur: string; note: number; texte: string; date: string; url: string }
 export interface Bloc { titre: string; texte: string }
@@ -21,10 +19,6 @@ export interface Cabinet {
 
 export async function getCabinet(): Promise<Cabinet> {
   return cabinetData as Cabinet;
-}
-
-export async function getForfaits(): Promise<Forfait[]> {
-  return forfaitsData as Forfait[];
 }
 
 export async function getSoins(): Promise<Soin[]> {

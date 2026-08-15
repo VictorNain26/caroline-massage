@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
   getCabinet,
   getSoins,
-  getForfaits,
   getFaq,
   getAvis,
   getSection,
@@ -54,12 +53,5 @@ describe('getCabinet', () => {
     const cabinet = await getCabinet();
     expect(cabinet.ville).toBe('Carquefou');
     expect(cabinet.telephone).toBe('+33667989710');
-  });
-});
-
-describe('getForfaits', () => {
-  it('retourne les quatre forfaits', async () => {
-    const forfaits = await getForfaits();
-    expect(forfaits).toHaveLength(4);
   });
 });

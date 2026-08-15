@@ -1,4 +1,0 @@
-- { libelle: "3 séances de 60 min", prix: 255, prixBarre: 270 }
-- { libelle: "5 séances de 60 min", prix: 400, prixBarre: 450 }
-- { libelle: "3 séances de 90 min", prix: 370, prixBarre: 390 }
-- { libelle: "5 séances de 90 min", prix: 550, prixBarre: 650 }
