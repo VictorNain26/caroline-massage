@@ -595,7 +595,6 @@ git commit -m "feat(layout): self-host fonts, add design tokens and base layout"
 - Produit, depuis `src/lib/content.ts` :
   - `getCabinet(): Promise<Cabinet>`
   - `getSoins(): Promise<Soin[]>` — triés par `ordre` croissant
-  - `getForfaits(): Promise<Forfait[]>`
   - `getFaq(): Promise<Question[]>` — triées par `ordre` croissant
   - `getAvis(): Promise<Avis[]>` — tableau vide tant qu'aucun avis authentique n'est fourni
   - `getSection(id: string): Promise<Section>` — lève une erreur si l'identifiant n'existe pas, plutôt que de rendre une section muette
@@ -603,7 +602,6 @@ git commit -m "feat(layout): self-host fonts, add design tokens and base layout"
   ```ts
   type Tarif = { duree: number; prix: number };
   type Soin = { id: string; nom: string; sousTitre: string; description: string; tarifs: Tarif[]; signature: boolean; ordre: number };
-  type Forfait = { libelle: string; prix: number; prixBarre: number };
   type Question = { id: string; question: string; reponse: string; ordre: number };
   type Avis = { auteur: string; note: number; texte: string; date: string; url: string };
   type Bloc = { titre: string; texte: string };
@@ -707,17 +705,6 @@ tarifs:
   - { duree: 90, prix: 130 }
 signature: true
 ordre: 5
-```
-
-- [ ] **Step 3: Écrire les forfaits**
-
-Fichier `src/content/forfaits.yaml` :
-
-```yaml
-- { libelle: "3 séances de 60 min", prix: 255, prixBarre: 270 }
-- { libelle: "5 séances de 60 min", prix: 400, prixBarre: 450 }
-- { libelle: "3 séances de 90 min", prix: 370, prixBarre: 390 }
-- { libelle: "5 séances de 90 min", prix: 550, prixBarre: 650 }
 ```
 
 - [ ] **Step 4: Écrire la FAQ**
@@ -862,11 +849,9 @@ collection : une collection à une entrée serait de la cérémonie sans bénéf
 ```ts
 import { getCollection } from 'astro:content';
 import cabinetData from '../content/cabinet.yaml';
-import forfaitsData from '../content/forfaits.yaml';
 
 export interface Tarif { duree: number; prix: number }
 export interface Soin { id: string; nom: string; sousTitre: string; description: string; tarifs: Tarif[]; signature: boolean; ordre: number }
-export interface Forfait { libelle: string; prix: number; prixBarre: number }
 export interface Question { id: string; question: string; reponse: string; ordre: number }
 export interface Avis { auteur: string; note: number; texte: string; date: string; url: string }
 export interface Bloc { titre: string; texte: string }
@@ -883,10 +868,6 @@ export interface Cabinet {
 
 export async function getCabinet(): Promise<Cabinet> {
   return cabinetData as Cabinet;
-}
-
-export async function getForfaits(): Promise<Forfait[]> {
-  return forfaitsData as Forfait[];
 }
 
 export async function getSoins(): Promise<Soin[]> {
@@ -1498,7 +1479,7 @@ git commit -m "feat(hero): port hero section and opening animation with reduced-
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
-- Consumes: `getSection('soins')`, `getSection('tarifs')`, `getSoins()`, `getForfaits()`, `<Accordeon>`, `<EnTeteSection>`.
+- Consumes: `getSection('soins')`, `getSection('tarifs')`, `getSoins()`, `<Accordeon>`, `<EnTeteSection>`.
 - Produit: `<Soins />` et `<Tarifs />`, sans prop.
 
 **Source:** lignes 182-361 (soins) et 362-371 (tarifs).
@@ -1513,8 +1494,16 @@ le traitement à fond vert.
 
 - [ ] **Step 2: Porter la section tarifs**
 
-Les quatre forfaits de `getForfaits()`, avec le prix barré et le prix courant.
-La mention d'économie est calculée : `max(prixBarre - prix)` sur l'ensemble.
+Le design ne publie **aucun tableau de forfaits**. La section `#tarifs`
+(lignes 362-371) contient une amorce et un paragraphe, rien d'autre : « Si
+l'envie de revenir se confirme, on peut prévoir trois ou cinq séances ensemble.
+Le tarif s'allège, et rien ne presse […] Il suffit de m'en parler. » La
+praticienne a délibérément choisi de discuter les forfaits de vive voix plutôt
+que d'afficher une grille.
+
+Rendre donc `getSection('tarifs')` : l'amorce et le paragraphe, séparés par la
+frise ornementale. Ne pas inventer de grille tarifaire, ne pas afficher de prix
+barré, ne pas calculer d'économie.
 
 - [ ] **Step 3: Vérifier que les prix affichés viennent bien du contenu**
 

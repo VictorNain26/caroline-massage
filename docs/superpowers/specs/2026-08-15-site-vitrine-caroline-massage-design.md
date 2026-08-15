@@ -8,20 +8,23 @@ Site vitrine one-page pour une praticienne en massage bien-être à Carquefou. L
 conversion visée est l'appel téléphonique : `tel:0667989710`. Il n'y a ni
 formulaire, ni compte utilisateur, ni base de données.
 
-**Sources du design et du contenu**, toutes versionnées dans `design/` :
+**Sources du design et du contenu**, versionnées dans `design/` :
 
-| Fichier | Apporte |
+| Fichier | Autorité |
 |---|---|
-| `accueil-page-vert-or.dc.html` | Markup et styles réels : nav, hero, soins, tarifs, parcours. Tronqué au-delà (voir plus bas). |
-| `trois-directions-marque.pdf` | Direction crème du 9 août 2026, antérieure à Vert Or. **Mise en page différente** : le hero et la section soins ne concordent pas (accordéons contre cartes, titres distincts). Sert uniquement d'inventaire des sections et de confirmation du contenu — jamais de référence visuelle. |
-| `contenu-client.docx` | Contenu rédactionnel intégral, découpé par section. |
-| `assets/` | Images sources non compressées. |
+| `accueil-page-vert-or.dc.html` | **Seule référence visuelle.** Markup et styles complets des huit sections, 1080 lignes, plus la logique d'interaction. |
+| `contenu-client.docx` | Contenu rédactionnel de la cliente, découpé par section. |
 
-Le fichier `.dc.html` provient du projet Claude Design
-`6069b7a5-682e-42da-8370-d3b6bdc9babf`. Il pèse 258 Ko parce que ses images sont
-inlinées en base64, au-delà du plafond de lecture de 256 KiB du MCP : la fin est
-donc coupée. Tant que les images n'y sont pas dé-inlinées vers `uploads/`, aucune
-re-synchronisation future ne sera possible.
+Le `.dc.html` provient du projet Claude Design
+`6069b7a5-682e-42da-8370-d3b6bdc9babf`. Ses images ne sont plus inlinées en
+base64 : il se lit intégralement sous le plafond de 256 KiB du MCP, et la skill
+`sync-design` vérifie ce point à chaque re-synchronisation.
+
+Une direction chromatique antérieure (crème, 9 août 2026) a circulé sous forme
+de PDF. **Elle n'est pas une source** : sa mise en page diffère — cartes contre
+accordéons, titres distincts, et une grille de forfaits que Vert Or ne publie
+pas. Elle a été retirée du dépôt après avoir contaminé une première version de
+cette spec. Ne pas l'y réintroduire.
 
 **Dans le périmètre**
 
@@ -66,7 +69,7 @@ rend ce branchement possible sans toucher aux composants.
 | Framework | Astro, build statique | Sortie HTML/CSS, JS uniquement là où un comportement l'exige. Le SEO local est le cœur du besoin. |
 | Styles | CSS natif + variables | Les styles d'un composant `.astro` sont scopés automatiquement. Un design très sur-mesure ne gagne rien à passer par un framework utilitaire. |
 | Contenu | Content Layer, loader `glob()` | Le `loader` est interchangeable : fichiers locaux aujourd'hui, API CMS demain. |
-| Polices | API `fonts` d'Astro, `fontProviders.local()` | Fichiers `.woff2` dans le repo. Aucun appel à `fonts.googleapis.com`. |
+| Polices | API `fonts` d'Astro, `fontProviders.google()` | Astro télécharge et sert les polices depuis le domaine au build. Aucun appel à `fonts.googleapis.com` à l'exécution. |
 | Hébergement | Cloudflare Workers static assets | Requêtes aux assets statiques gratuites et sans plafond, usage commercial autorisé, domaine et TLS inclus. |
 
 Sources : [content-loader-reference](https://docs.astro.build/en/reference/content-loader-reference/),
@@ -148,14 +151,14 @@ statique et il est acceptable pour un site vitrine.
 
 **Contenu modélisé**
 
-- `cabinet.yaml` — téléphone, e-mail, ville, horaires, délai de réponse, Instagram,
+- `cabinet.yaml` — téléphone, e-mail, ville, horaires structurés (jours schema.org,
+  heures ISO), délai de réponse, Instagram,
   SIRET, assurance RC pro, fourchette de prix. Source unique : le JSON-LD, le
   footer et le texte affiché sont tous générés à partir de ce fichier, jamais
   recopiés. Sinon ils divergent à la première modification.
 - `soins/` — cinq fichiers : découverte, ciblé, pieds, thaï à l'huile, signature.
   Nom, sous-titre, description, tarifs (une ou deux durées), et un booléen
   `signature` pour la carte à fond vert du design.
-- `forfaits.yaml` — quatre forfaits, avec prix courant, prix barré et économie.
 - `faq/` — sept questions, chacune un fichier titre + réponse.
 - `avis/` — un fichier par avis. Le design lui-même les marque comme des
   emplacements (`[TEXTE DE L'AVIS — texte intégral, jamais réécrit]`). Cette
