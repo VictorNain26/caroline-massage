@@ -15,8 +15,13 @@ export interface Cabinet {
   instagram: string;
   prixMin: number; prixMax: number;
   // Renseignés par la cliente ; le pied de page et les mentions légales ne
-  // rendent chaque champ que s'il a une valeur (tâche 13).
-  siret?: string; assuranceRcPro?: string; statutJuridique?: string;
+  // rendent chaque champ que s'il a une valeur (tâche 13). siret, rcs et tva
+  // sont les mentions obligatoires listées par
+  // entreprendre.service-public.gouv.fr/vosdroits/F31228 pour une
+  // entreprise individuelle ; assuranceRcPro et statutJuridique sont des
+  // informations complémentaires, non exigées par cette même source.
+  siret?: string; rcs?: string; tva?: string;
+  assuranceRcPro?: string; statutJuridique?: string;
   // URL de la fiche Google Business Profile ; tant qu'elle n'est pas fournie,
   // la section avis ne rend pas le lien "Voir tous les avis sur Google".
   googleAvisUrl?: string;

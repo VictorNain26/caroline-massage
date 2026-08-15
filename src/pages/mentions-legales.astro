@@ -7,10 +7,13 @@ const cabinet = await getCabinet();
 // Renseignées par la cliente ; tant qu'un champ est vide, on affiche un
 // repère visible plutôt qu'un silence — un SIRET manquant doit se remarquer
 // à la relecture, pas passer inaperçu (design, ligne 706 : "[SIRET]").
-const champsEditrice = [
+// Liste et ordre des mentions obligatoires pour une entreprise individuelle :
+// entreprendre.service-public.gouv.fr/vosdroits/F31228.
+const champsObligatoires = [
   { libelle: 'Statut juridique', valeur: cabinet.statutJuridique },
   { libelle: 'Numéro SIRET', valeur: cabinet.siret },
-  { libelle: 'Assurance responsabilité civile professionnelle', valeur: cabinet.assuranceRcPro },
+  { libelle: 'Numéro RCS', valeur: cabinet.rcs },
+  { libelle: 'Numéro de TVA intracommunautaire', valeur: cabinet.tva },
 ];
 ---
 
@@ -24,10 +27,12 @@ const champsEditrice = [
         <span class="surtitre">Informations légales</span>
         <h1 class="titre">Mentions légales</h1>
         <p class="intro">
-          En application de l'article 6-III-1 de la loi n° 2004-575 du 21 juin
-          2004 pour la confiance dans l'économie numérique, les informations
+          En application de l'article 6 de la loi n° 2004-575 du 21 juin 2004
+          pour la confiance dans l'économie numérique, les informations
           suivantes sont mises à la disposition des utilisatrices et
-          utilisateurs de ce site.
+          utilisateurs de ce site. La liste des mentions obligatoires pour
+          une entreprise individuelle suit celle publiée par
+          <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F31228" target="_blank" rel="noopener">entreprendre.service-public.gouv.fr (fiche F31228)</a>.
         </p>
       </header>
 
@@ -41,7 +46,7 @@ const champsEditrice = [
           </p>
           <dl class="champs">
             {
-              champsEditrice.map((champ) => (
+              champsObligatoires.map((champ) => (
                 <div class="champ">
                   <dt>{champ.libelle}</dt>
                   <dd>
@@ -68,20 +73,38 @@ const champsEditrice = [
         </section>
 
         <section class="bloc">
-          <h2>Directrice de la publication</h2>
-          <p>
-            La direction de la publication est assurée par Caroline,
-            éditrice du site, conformément à l'article 6-III-1 de la LCEN
-            applicable aux services édités par une personne physique.
-          </p>
-        </section>
-
-        <section class="bloc">
           <h2>Hébergement</h2>
           <p>
             Le site est hébergé par Cloudflare, Inc., 101 Townsend St, San
             Francisco, CA 94107, États-Unis, sur son offre Cloudflare
             Workers (hébergement d'actifs statiques).
+          </p>
+          <dl class="champs">
+            <div class="champ">
+              <dt>Téléphone de l'hébergeur</dt>
+              <dd><span class="a-completer">à compléter</span></dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="bloc">
+          <h2>Informations complémentaires</h2>
+          <p class="note">
+            Les deux mentions suivantes ne figurent pas dans la liste des
+            mentions obligatoires pour une entreprise individuelle citée
+            ci-dessus ; elles sont données à titre d'information.
+          </p>
+          <dl class="champs">
+            <div class="champ">
+              <dt>Assurance responsabilité civile professionnelle</dt>
+              <dd>
+                {cabinet.assuranceRcPro || <span class="a-completer">à compléter</span>}
+              </dd>
+            </div>
+          </dl>
+          <p>
+            La direction de la publication est assurée par Caroline,
+            éditrice du site.
           </p>
         </section>
       </div>
@@ -158,6 +181,15 @@ const champsEditrice = [
     font-size: clamp(16px, 4.2cqw, 18px);
     line-height: 1.65;
     color: var(--encre);
+  }
+
+  .bloc p + p {
+    margin-top: 16px;
+  }
+
+  .bloc p.note {
+    color: var(--encre-douce);
+    font-size: clamp(14px, 3.8cqw, 15px);
   }
 
   .champs {

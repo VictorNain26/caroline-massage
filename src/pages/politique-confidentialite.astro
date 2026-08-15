@@ -27,9 +27,19 @@ const cabinet = await getCabinet();
           <p>
             Aucun formulaire de réservation n'est proposé sur ce site : les
             rendez-vous se prennent par téléphone ou par e-mail, en dehors de
-            ce site. Aucun cookie n'est déposé, aucun outil d'analyse
-            d'audience n'est installé, et aucune ressource (police,
-            script, image) n'est chargée depuis un domaine tiers.
+            ce site. Ce site lui-même ne dépose aucun cookie, n'installe
+            aucun outil d'analyse d'audience et ne charge aucune ressource
+            (police, script, image) depuis un domaine tiers.
+          </p>
+          <p>
+            Le réseau de l'hébergeur, Cloudflare, ne dépose par défaut aucun
+            cookie non plus ; il peut toutefois en déposer un, technique, si
+            certaines protections sont activées sur le compte (protection
+            anti-bot, détection JavaScript, répartition de charge, salle
+            d'attente) — voir la
+            <a href="https://developers.cloudflare.com/fundamentals/reference/policies-compliances/cloudflare-cookies/" target="_blank" rel="noopener">documentation de Cloudflare sur ses cookies</a>
+            pour le détail, applicable si l'une de ces options venait à être
+            activée sur ce compte.
           </p>
         </section>
 
@@ -42,8 +52,7 @@ const cabinet = await getCabinet();
             la date et l'heure de la requête, la page demandée et le
             navigateur utilisé — à des fins de sécurité et d'exploitation du
             service. Ce site n'a pas accès à ces journaux et ne les
-            exploite d'aucune façon. Pour le détail de ce traitement, se
-            reporter à la politique de confidentialité de Cloudflare.
+            exploite d'aucune façon.
           </p>
         </section>
 
@@ -137,5 +146,9 @@ const cabinet = await getCabinet();
     font-size: clamp(16px, 4.2cqw, 18px);
     line-height: 1.65;
     color: var(--encre);
+  }
+
+  .bloc p + p {
+    margin-top: 16px;
   }
 </style>
