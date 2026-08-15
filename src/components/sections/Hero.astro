@@ -30,7 +30,7 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
   </div>
 
   <div class="contenu">
-    <span class="eyebrow">Cabinet de massage à Carquefou</span>
+    <span class="eyebrow">{section.surtitre}</span>
     <h1 class="titre">{titrePlain}{aAccent && <em class="titre-accent">{accent}</em>}</h1>
     <p class="accroche">{section.paragraphes[0]}</p>
     <div class="cta" style="--bouton-hauteur: clamp(58px, 9.4cqw, 62px)">
@@ -49,8 +49,6 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
     </a>
   </div>
 </section>
-
-<script src="../../scripts/intro.ts"></script>
 
 <style>
   .hero {

@@ -1385,7 +1385,6 @@ git commit -m "feat(nav): add responsive navigation with accessible mobile panel
 
 **Files:**
 - Create: `src/components/sections/Hero.astro`
-- Create: `src/scripts/intro.ts`
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
@@ -1416,15 +1415,13 @@ L'ouverture masque du contenu à l'état initial. Sans ce garde-fou, un visiteur
 mouvement réduit verrait une page vide. À l'état neutralisé, le contenu est
 visible immédiatement, sans transition.
 
-- [ ] **Step 3: Écrire `src/scripts/intro.ts`**
+L'animation d'ouverture est intégralement pilotée en CSS : `animation-delay`
+et `animation-fill-mode: both` suffisent à séquencer le rideau et les éléments
+du hero au chargement, sans aucun script — un déclencheur en JavaScript
+n'aurait aucun sélecteur CSS à activer, la garde-fou vivant déjà dans la media
+query ci-dessus.
 
-Le script se contente d'ajouter une classe sur `<body>` au chargement pour
-déclencher la séquence. Il commence par lire
-`matchMedia('(prefers-reduced-motion: reduce)')` et ne fait rien si la préférence
-est active. Le bouton « Rejouer l'ouverture » du design n'est pas porté : c'est
-un outil de revue de maquette.
-
-- [ ] **Step 4: Vérifier dans les deux états**
+- [ ] **Step 3: Vérifier dans les deux états**
 
 ```bash
 pnpm build && pnpm test
@@ -1433,10 +1430,10 @@ pnpm build && pnpm test
 Puis, manuellement, recharger la page avec le mouvement réduit activé au niveau
 du système et vérifier que tout le contenu du hero est visible immédiatement.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add src/components/sections/Hero.astro src/scripts/intro.ts src/pages/index.astro
+git add src/components/sections/Hero.astro src/pages/index.astro
 git commit -m "feat(hero): port hero section and opening animation with reduced-motion guard"
 ```
 

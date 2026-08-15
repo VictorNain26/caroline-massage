@@ -111,7 +111,7 @@ caroline-massage/
 │   ├── components/sections/     Hero, Soins, Tarifs, Parcours,
 │   │                            Cabinet, Avis, Faq, Contact
 │   ├── components/ui/           Bouton, Accordeon, Ornement, StickyCta
-│   ├── scripts/                 intro.ts, sticky-cta.ts
+│   ├── scripts/                 sticky-cta.ts
 │   ├── styles/tokens.css
 │   └── pages/
 │       ├── index.astro
@@ -208,8 +208,9 @@ titres, Alegreya Sans pour le texte courant.
 
 - Accordéons : `<details>` / `<summary>` natifs. Zéro JS, clavier et lecteurs
   d'écran acquis.
-- Animation d'ouverture (`src/scripts/intro.ts`) et CTA sticky
-  (`src/scripts/sticky-cta.ts`) : ce sont les deux seuls scripts du site.
+- Animation d'ouverture : CSS pur (`animation-delay` + `fill-mode: both`),
+  aucun script. CTA sticky (`src/scripts/sticky-cta.ts`) : seul script du
+  site.
 - `prefers-reduced-motion` : les 19 `@keyframes` du design sont placées sous media
   query. L'ouverture masque du contenu à l'état initial ; sans garde-fou elle est
   bloquante. En mouvement réduit, elle se réduit à un fondu et le contenu reste
