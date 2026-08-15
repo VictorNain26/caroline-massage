@@ -19,6 +19,7 @@ Ces contraintes s'appliquent à **toutes** les tâches, sans être répétées.
 - **Une seule arborescence responsive, mobile-first.** Le prop `isMobile` du design est un artefact de l'outil de maquettage ; il ne doit apparaître nulle part dans le code.
 - **Aucun composant n'appelle `getCollection()`.** Tout passe par `src/lib/content.ts`.
 - **Toute animation est neutralisée sous `prefers-reduced-motion: reduce`.**
+- **Chaque composant de section porte `data-surface="dark"` ou `data-surface="light"`** selon la clarté de son fond. La sonde de la tâche 12 est déclarative : un attribut oublié ne produit pas d'erreur, il produit une barre CTA de la mauvaise couleur.
 - **Zéro warning ESLint.** Un `eslint-disable` n'est jamais un correctif : trouver la forme de code qui ne déclenche pas la règle.
 - **Le formulaire de la section contact n'est pas porté** (spec, section 1).
 - Palette, relevée par fréquence dans le design : or bronze `#96742C`, or `#D4A94C`, crème `#FBF7F0`, encre `#221D17`, sable `#CBB79A`, texte secondaire `#55483C`, surface crème `#EFE6D8`, or clair `#E4C070`, vert profond `#0B3A31`, vert clair `#165046`, corail `#F0907C`, lien `#7A5A24`.
@@ -365,9 +366,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm lint
-      - run: pnpm test
       - run: pnpm build
+      - run: pnpm test
 ```
+
+`build` précède `test` : le test « aucun domaine tiers » de la tâche 2 lit le
+HTML produit dans `dist/`. Dans l'ordre inverse il passerait au vert en local
+après un build manuel et échouerait sur un runner propre.
 
 - [ ] **Step 17: Vérifier que le hook se déclenche**
 
