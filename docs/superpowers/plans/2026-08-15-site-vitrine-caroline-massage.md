@@ -1930,8 +1930,8 @@ en excluant la règle.
 pnpm build && du -ch dist/_astro/*.js | tail -1
 ```
 
-Attendu : le total reste modeste. Trois scripts seulement doivent exister —
-menu, intro, sticky-cta. Si un quatrième apparaît, comprendre d'où il vient
+Attendu : le total reste modeste. Deux scripts seulement doivent exister —
+menu et sticky-cta. Si un troisième apparaît, comprendre d’où il vient
 avant d'aller plus loin.
 
 - [ ] **Step 5: Ajouter le test d'accessibilité à la CI**
