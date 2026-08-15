@@ -1,0 +1,350 @@
+---
+import Bouton from './ui/Bouton.astro';
+
+const liens = [
+  { href: '#soins', label: 'Soins & tarifs' },
+  { href: '#parcours', label: 'Qui suis-je' },
+  { href: '#cabinet', label: 'Le cabinet' },
+  { href: '#faq', label: 'FAQ' },
+];
+---
+
+<header class="entete">
+  <div class="barre">
+    <a href="#hero" aria-label="Retour en haut de page" class="marque">
+      <span class="marque-nom">Caroline</span>
+      <span aria-hidden="true" class="marque-separateur"></span>
+      <span class="marque-baseline">Massage<br />Sur-Mesure</span>
+    </a>
+
+    <nav class="liens-desktop" aria-label="Navigation principale">
+      <ul class="liste-liens">
+        {
+          liens.map((lien) => (
+            <li>
+              <a href={lien.href}>{lien.label}</a>
+            </li>
+          ))
+        }
+        <li>
+          <Bouton href="#contact" variante="vert">Réserver</Bouton>
+        </li>
+      </ul>
+    </nav>
+
+    <button
+      type="button"
+      class="bouton-menu"
+      data-nav-toggle
+      aria-expanded="false"
+      aria-controls="menu-mobile"
+      aria-label="Ouvrir le menu"
+    >
+      <span aria-hidden="true" class="barre-hamburger"></span>
+      <span aria-hidden="true" class="barre-hamburger"></span>
+    </button>
+  </div>
+
+  <dialog id="menu-mobile" class="panneau" data-nav-dialog aria-label="Menu">
+    <div class="panneau-entete">
+      <a href="#hero" aria-label="Retour en haut de page" class="marque marque--panneau">
+        <span class="marque-nom">Caroline</span>
+        <span aria-hidden="true" class="marque-separateur"></span>
+        <span class="marque-baseline">Massage<br />Sur-Mesure</span>
+      </a>
+      <button type="button" class="bouton-fermer" data-nav-close aria-label="Fermer le menu" autofocus>
+        <span aria-hidden="true" class="icone-fermer"></span>
+      </button>
+    </div>
+
+    <nav class="liens-mobile" aria-label="Navigation principale">
+      <ul class="liste-liens-mobile">
+        {
+          liens.map((lien) => (
+            <li>
+              <a href={lien.href}>{lien.label}</a>
+            </li>
+          ))
+        }
+        <li class="element-cta" style="--bouton-hauteur: 56px">
+          <Bouton href="#contact" variante="creme">Réserver</Bouton>
+        </li>
+      </ul>
+    </nav>
+  </dialog>
+</header>
+
+<script src="../scripts/menu.ts"></script>
+
+<style>
+  .entete {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .barre {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 62px;
+    padding: 9px clamp(20px, 5.5vw, 80px);
+    background: var(--creme);
+    border-bottom: 1px solid var(--sable);
+  }
+
+  .marque {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    color: var(--encre);
+    text-decoration: none;
+  }
+
+  .marque:hover {
+    opacity: 0.72;
+  }
+
+  .marque:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 6px;
+  }
+
+  .marque-nom {
+    font: 400 clamp(22px, 5.6vw, 26px) / 1 var(--font-titre), serif;
+    letter-spacing: -0.02em;
+  }
+
+  .marque-separateur {
+    width: 1px;
+    height: clamp(22px, 5vw, 26px);
+    background: var(--or);
+  }
+
+  .marque-baseline {
+    font: 500 9px / 1.5 var(--font-texte), sans-serif;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .liens-desktop {
+    display: none;
+  }
+
+  .liste-liens {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 30px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .liste-liens a {
+    font: 500 15px / 1 var(--font-texte), sans-serif;
+    letter-spacing: 0.02em;
+    color: var(--encre);
+    text-decoration: none;
+  }
+
+  .liste-liens a:hover {
+    color: var(--or-bronze);
+  }
+
+  .liste-liens a:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 3px;
+  }
+
+  .bouton-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    margin: -10px;
+    background: none;
+    border: 0;
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  .bouton-menu:hover {
+    opacity: 0.7;
+  }
+
+  .bouton-menu:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 3px;
+  }
+
+  .barre-hamburger {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: currentColor;
+  }
+
+  .panneau {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    background: color-mix(in srgb, var(--vert-profond) 97%, transparent);
+    border: 0;
+    text-align: left;
+  }
+
+  .panneau::backdrop {
+    background: transparent;
+  }
+
+  @supports (backdrop-filter: blur(6px)) {
+    .panneau {
+      backdrop-filter: blur(6px);
+    }
+  }
+
+  .panneau-entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: calc(clamp(15px, 2.6vw, 34px) + 10px) clamp(15px, 2.6vw, 34px) 10px;
+  }
+
+  .marque--panneau {
+    color: var(--creme);
+  }
+
+  .marque--panneau:hover {
+    opacity: 0.75;
+  }
+
+  .bouton-fermer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    margin: -10px;
+    background: none;
+    border: 0;
+    color: var(--creme);
+    cursor: pointer;
+  }
+
+  .bouton-fermer:hover {
+    opacity: 0.7;
+  }
+
+  .bouton-fermer:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 3px;
+  }
+
+  .icone-fermer {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 22px;
+  }
+
+  .icone-fermer::before,
+  .icone-fermer::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 0;
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: currentColor;
+  }
+
+  .icone-fermer::before {
+    transform: rotate(45deg);
+  }
+
+  .icone-fermer::after {
+    transform: rotate(-45deg);
+  }
+
+  .liens-mobile {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 clamp(15px, 2.6vw, 34px) clamp(24px, 6vw, 40px);
+    overflow-y: auto;
+  }
+
+  .liste-liens-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .liste-liens-mobile li:not(:last-child) {
+    border-bottom: 1px solid color-mix(in srgb, var(--sable) 22%, transparent);
+  }
+
+  .liste-liens-mobile a {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    padding: 16px 0;
+    font: 400 clamp(28px, 7.4vw, 34px) / 1.1 var(--font-titre), serif;
+    color: var(--creme);
+    text-decoration: none;
+  }
+
+  .liste-liens-mobile a:hover {
+    color: var(--or-clair);
+  }
+
+  .liste-liens-mobile a:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 4px;
+  }
+
+  .element-cta {
+    margin-top: clamp(22px, 5vw, 30px);
+  }
+
+  @media (min-width: 900px) {
+    .liens-desktop {
+      display: flex;
+    }
+
+    .bouton-menu {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .marque,
+    .liste-liens a,
+    .bouton-menu,
+    .bouton-fermer,
+    .liste-liens-mobile a {
+      transition: opacity 0.2s ease, color 0.2s ease;
+    }
+  }
+</style>

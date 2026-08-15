@@ -1,6 +1,7 @@
 ---
 import { Font } from 'astro:assets';
 import '../styles/tokens.css';
+import Navigation from '../components/Navigation.astro';
 import { getCabinet, getSoins } from '../lib/content';
 import { construireJsonLd } from '../lib/jsonld';
 
@@ -33,6 +34,7 @@ const jsonLd = construireJsonLd(cabinet, soins);
     <slot name="head" />
   </head>
   <body>
+    <Navigation />
     <slot />
   </body>
 </html>
