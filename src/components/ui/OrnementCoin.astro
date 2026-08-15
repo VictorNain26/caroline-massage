@@ -12,30 +12,40 @@ const { position } = Astro.props;
 <Image src={coin} alt="" width={96} height={96} class={`ornement ${position}`} />
 
 <style>
+  /*
+   * Extension points, set by the consuming section on its own container —
+   * do not add props for these, the design uses a different value per
+   * section (hero, parcours, contact) and props would just relay inline
+   * styles three times over:
+   *   --orn-taille   width of the ornament
+   *   --orn-retrait  inset from the edge it hugs
+   *   --orn-opacite  opacity
+   * Defaults below match the parcours section, the most common case.
+   */
   .ornement {
     position: absolute;
-    width: clamp(48px, 8cqw, 96px);
+    width: var(--orn-taille, clamp(48px, 8cqw, 96px));
     height: auto;
-    opacity: 0.85;
+    opacity: var(--orn-opacite, 0.85);
     pointer-events: none;
   }
   .haut-gauche {
-    top: clamp(12px, 2.6cqw, 26px);
-    left: clamp(12px, 2.6cqw, 26px);
+    top: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    left: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
   }
   .haut-droite {
-    top: clamp(12px, 2.6cqw, 26px);
-    right: clamp(12px, 2.6cqw, 26px);
+    top: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    right: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
     transform: scaleX(-1);
   }
   .bas-gauche {
-    bottom: clamp(12px, 2.6cqw, 26px);
-    left: clamp(12px, 2.6cqw, 26px);
+    bottom: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    left: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
     transform: scaleY(-1);
   }
   .bas-droite {
-    bottom: clamp(12px, 2.6cqw, 26px);
-    right: clamp(12px, 2.6cqw, 26px);
+    bottom: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    right: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
     transform: rotate(180deg);
   }
 </style>
