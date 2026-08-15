@@ -1257,12 +1257,16 @@ git commit -m "feat(seo): generate JSON-LD from cabinet data, add sitemap and ro
   - `<Accordeon titre: string>` — slot pour le corps ; rend `<details>` / `<summary>`.
   - `<EnTeteSection surtitre: string, titre: string>`
 
-- [ ] **Step 1: Récupérer les trois assets du projet design**
+- [ ] **Step 1: Vérifier les trois assets**
 
-Les fichiers `caro-ornement-frise.png` (900 × 59), `caro-ornement-coin.png`
-(220 × 220) et `caro-cabinet.jpg` (800 × 1035) vivent à la racine du projet
-Claude Design `6069b7a5-682e-42da-8370-d3b6bdc9babf`. Les télécharger dans
-`src/assets/images/`, puis vérifier :
+Ils sont déjà présents dans `src/assets/images/` : le contrôleur les a récupérés
+du projet Claude Design, un implémenteur n'ayant pas cet outil. Les ornements
+sont volontairement en définition supérieure à celle des exports du design
+(2234 × 147 et 522 × 522 au lieu de 900 × 59 et 220 × 220) : `<Image>` réduit au
+build, et partir d'une source plus définie ne peut que mieux rendre. La photo du
+cabinet est à sa taille d'origine, 800 × 1035.
+
+Vérifier :
 
 ```bash
 ls -l src/assets/images/
