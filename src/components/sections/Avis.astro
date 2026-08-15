@@ -8,7 +8,7 @@ const cabinet = await getCabinet();
 const note = avis.length > 0 ? avis.reduce((total, a) => total + a.note, 0) / avis.length : 0;
 const noteAffichee = Number.isInteger(note) ? String(note) : note.toFixed(1);
 
-const formateurRelatif = new Intl.RelativeTimeFormat('fr', { numeric: 'auto' });
+const formateurRelatif = new Intl.RelativeTimeFormat('fr', { numeric: 'always' });
 function depuis(date: string): string {
   const mois = Math.round((new Date(date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
   return formateurRelatif.format(mois, 'month');
