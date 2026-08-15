@@ -18,6 +18,7 @@ Ces contraintes s'appliquent à **toutes** les tâches, sans être répétées.
 - **Aucune requête réseau tierce à l'exécution.** Ni `fonts.googleapis.com`, ni `fonts.gstatic.com`, ni CDN. Vérifié par un test automatisé en tâche 2.
 - **Le fichier `design/accueil-page-vert-or.dc.html` est la source de vérité visuelle, jamais du code à recopier.** Il utilise une syntaxe de gabarit propriétaire (`{{ … }}`, `style-hover=`, `<dc-import>`) qui n'a aucun équivalent en HTML.
 - **Une seule arborescence responsive, mobile-first.** Le prop `isMobile` du design est un artefact de l'outil de maquettage ; il ne doit apparaître nulle part dans le code.
+- **Aucune couleur en dur** : uniquement les variables de `src/styles/tokens.css`. Les tailles et les échelles typographiques échappent à cette règle — le design les exprime en `clamp()` propres à chaque section, sans réutilisation, et les tokeniser ajouterait de l'indirection sans partage. Une valeur qui se répète réellement d'une section à l'autre devient un token ; les autres restent littérales, prises du design.
 - **Aucun composant n'appelle `getCollection()`.** Tout passe par `src/lib/content.ts`.
 - **Toute animation est neutralisée sous `prefers-reduced-motion: reduce`.**
 - **Chaque composant de section porte `data-surface="dark"` ou `data-surface="light"`** selon la clarté de son fond. La sonde de la tâche 12 est déclarative : un attribut oublié ne produit pas d'erreur, il produit une barre CTA de la mauvaise couleur.
@@ -1390,7 +1391,7 @@ git commit -m "feat(nav): add responsive navigation with accessible mobile panel
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
-- Consumes: `getSection('hero')`, `getCabinet()`, `<Bouton>`, `<OrnementCoin>`.
+- Consumes: `getSection('hero')`, `getCabinet()`, `formaterHoraires()`, `<Bouton variante="creme">`, `<OrnementCoin>`.
 - Produit: `<Hero />`, sans prop.
 
 **Source:** lignes 129-181 pour le balisage, lignes 46-74 pour les 19 `@keyframes`.
