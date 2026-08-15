@@ -197,7 +197,7 @@ frise séparatrice, utilisée trois fois), `caro-ornement-coin.png` (220 × 220,
 coins) et `caro-cabinet.jpg` (800 × 1035, la photo du cabinet).
 
 **Tokens** — extraits des styles inline vers `src/styles/tokens.css` :
-vert profond `#0B3A31`, or `#C9A961`, or clair `#D4A94C`, crème `#FBF7F0`,
+vert profond `#0B3A31`, or `#D4A94C`, or clair `#E4C070`, crème `#FBF7F0`,
 sable `#CBB79A`, encre `#221D17`, plus l'échelle typographique. Petrona pour les
 titres, Alegreya Sans pour le texte courant.
 
