@@ -607,7 +607,7 @@ git commit -m "feat(layout): self-host fonts, add design tokens and base layout"
   type Avis = { auteur: string; note: number; texte: string; date: string; url: string };
   type Bloc = { titre: string; texte: string };
   type Section = { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[] };
-  type Cabinet = { telephone: string; telephoneAffiche: string; email: string; ville: string; joursOuverture: string[]; heureOuverture: string; heureFermeture: string; delaiReponse: string; instagram: string; prixMin: number; prixMax: number; siret?: string; assuranceRcPro?: string; statutJuridique?: string };
+  type Cabinet = { telephone: string; telephoneAffiche: string; email: string; ville: string; joursOuverture: string[]; heureOuverture: string; heureFermeture: string; instagram: string; prixMin: number; prixMax: number; siret?: string; assuranceRcPro?: string; statutJuridique?: string };
   ```
 
 - [ ] **Step 1: Écrire les données du cabinet**
@@ -622,7 +622,6 @@ ville: "Carquefou"
 joursOuverture: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 heureOuverture: "09:00"
 heureFermeture: "20:00"
-delaiReponse: "48 h"
 instagram: "https://www.instagram.com/caroline_massagesurmesure"
 prixMin: 45
 prixMax: 130
@@ -860,7 +859,7 @@ export interface Section { id: string; surtitre?: string; titre: string; paragra
 export interface Cabinet {
   telephone: string; telephoneAffiche: string; email: string; ville: string;
   joursOuverture: string[]; heureOuverture: string; heureFermeture: string;
-  delaiReponse: string; instagram: string;
+  instagram: string;
   prixMin: number; prixMax: number;
   // Renseignés par la cliente ; le pied de page et les mentions légales ne
   // rendent chaque champ que s'il a une valeur (tâche 13).
@@ -1079,7 +1078,6 @@ const cabinet = {
   joursOuverture: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   heureOuverture: '09:00',
   heureFermeture: '20:00',
-  delaiReponse: '48 h',
   instagram: 'https://www.instagram.com/caroline_massagesurmesure',
   prixMin: 45,
   prixMax: 130,
@@ -1391,46 +1389,17 @@ git commit -m "feat(nav): add responsive navigation with accessible mobile panel
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
-- Consumes: `getSection('hero')`, `getCabinet()`, `formaterHoraires()`, `<Bouton variante="creme">`, `<OrnementCoin>`.
+- Consumes: `getSection('hero')`, `<Bouton variante="creme">`, `<OrnementCoin>`.
 - Produit: `<Hero />`, sans prop.
 
 **Source:** lignes 129-181 pour le balisage, lignes 46-74 pour les 19 `@keyframes`.
 
 - [ ] **Step 1: Porter le balisage du hero**
 
-Titre `<h1>` et accroche lus depuis `getSection('hero')`, mention des horaires
-rendue par `formaterHoraires()`, deux boutons (« Prendre rendez-vous » vers
+Titre `<h1>`, sur-titre et accroche lus depuis `getSection('hero')`, deux boutons (« Prendre rendez-vous » vers
 `#contact`, « Découvrir les soins » vers `#soins`), photo encadrée d'ornements.
 Le fond est `--vert-profond` : marquer la section `data-surface="dark"`, la
 tâche 12 s'en sert.
-
-- [ ] **Step 1b: Écrire le formatteur d'horaires**
-
-Depuis la tâche 4, `cabinet.yaml` ne porte plus de phrase toute faite mais des
-données exploitables : `joursOuverture` (noms schema.org), `heureOuverture` et
-`heureFermeture` en `HH:MM`. Le JSON-LD les consomme déjà ; l'affichage doit en
-dériver aussi, sinon les deux représentations divergent — ce que ce modèle
-existe précisément pour empêcher.
-
-Créer `src/lib/horaires.ts` exposant :
-
-```ts
-export function formaterHoraires(cabinet: Cabinet): string
-```
-
-Elle rend la formulation du design : « du lundi au samedi, 9h – 20h ». Traduire
-les jours schema.org en français, contracter une suite continue en « du X au
-Y », et retirer les minutes quand elles valent `00`. Ce n'est pas une
-bibliothèque d'internationalisation : le site est monolingue et il n'y a qu'un
-cabinet.
-
-Écrire d'abord le test dans `tests/unit/horaires.test.ts` : la suite complète
-lundi-samedi donne « du lundi au samedi, 9h – 20h », et un jour retiré du milieu
-ne doit pas produire une plage continue mensongère. Ce second cas est le seul
-qui justifie la fonction — sans lui, une constante suffirait.
-
-Le composant `Hero` appelle `formaterHoraires(await getCabinet())`. La tâche 11
-réutilise la même fonction : elle n'en écrit pas une seconde.
 
 - [ ] **Step 2: Porter les animations sous garde-fou**
 
@@ -1669,8 +1638,7 @@ git commit -m "feat(sections): port FAQ and conditional reviews section"
 - Produit: `<Contact />` et `<PiedDePage />`, sans prop.
 
 **Source:** lignes 595-713. **Le formulaire n'est pas porté** (spec, section 1) :
-seuls le titre, l'accroche, les deux boutons de contact, les horaires et le
-délai de réponse le sont.
+seuls le surtitre, le titre, l'accroche et les liens de contact le sont.
 
 - [ ] **Step 1: Porter la section contact**
 
@@ -1678,9 +1646,9 @@ Surtitre, titre et accroche lus depuis `getSection('contact')` — l'accroche y 
 déjà été reformulée en tâche 3 pour inviter à appeler ou écrire, puisque le
 formulaire n'est pas porté.
 Deux boutons : `tel:` avec `cabinet.telephoneAffiche` en libellé, et `mailto:`
-avec `cabinet.email`. Sous les boutons, la ligne horaires + délai de réponse :
-les horaires par `formaterHoraires()` de la tâche 7 — ne pas en réécrire une
-variante — et `delaiReponse` depuis `getCabinet()`. Fond `--vert-profond` : marquer
+avec `cabinet.email`. La section contact du design ne porte **ni horaires ni délai de réponse** :
+sa mention finale est « Aucun paiement en ligne · réponse au plus vite ». Ne pas
+en inventer. Fond `--vert-profond` : marquer
 `data-surface="dark"`.
 
 - [ ] **Step 2: Porter le pied de page**
