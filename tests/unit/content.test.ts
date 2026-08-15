@@ -55,6 +55,28 @@ describe('faq', () => {
     const ordres = questions.map((q) => q.ordre);
     expect(new Set(ordres).size).toBe(ordres.length);
   });
+
+  it("garde la réponse « où se situe le cabinet » cohérente avec cabinet.yaml", () => {
+    const cabinet = lire('src/content/cabinet.yaml');
+    const reponse = lire('src/content/faq/lieu.yaml').reponse as string;
+    const chiffreHeure = (heure: string) => {
+      const [h, m] = heure.split(':');
+      return m === '00' ? `${Number(h)}h` : `${Number(h)}h${m}`;
+    };
+
+    expect(
+      reponse.includes(cabinet.ville),
+      `src/content/faq/lieu.yaml ne mentionne pas « ${cabinet.ville} » : corriger la réponse pour reprendre cabinet.yaml#ville, ou l'inverse si la ville a changé`,
+    ).toBe(true);
+    expect(
+      reponse.includes(chiffreHeure(cabinet.heureOuverture)),
+      `src/content/faq/lieu.yaml ne mentionne pas « ${chiffreHeure(cabinet.heureOuverture)} » : corriger la réponse pour reprendre cabinet.yaml#heureOuverture, ou l'inverse`,
+    ).toBe(true);
+    expect(
+      reponse.includes(chiffreHeure(cabinet.heureFermeture)),
+      `src/content/faq/lieu.yaml ne mentionne pas « ${chiffreHeure(cabinet.heureFermeture)} » : corriger la réponse pour reprendre cabinet.yaml#heureFermeture, ou l'inverse`,
+    ).toBe(true);
+  });
 });
 
 describe('sections', () => {
