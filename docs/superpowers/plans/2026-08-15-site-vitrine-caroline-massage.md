@@ -14,6 +14,7 @@
 
 Ces contraintes s'appliquent à **toutes** les tâches, sans être répétées.
 
+- **Doc-first, sans exception.** Aucune clé de configuration, aucune signature d'API, aucun comportement d'outil ne s'écrit de mémoire ni par analogie avec un autre projet. En cas de doute : consulter la doc officielle de la version installée, annoncer la source, et citer URL + champ dans le rapport comme dans le message de commit. « Je crois que ça marche comme ça » est interdit — soit c'est vérifié, soit c'est dit explicitement comme non vérifié. Ce projet ne réutilise aucune convention venue d'ailleurs : ses seules autorités sont sa spec, son design et ce plan.
 - **Aucune requête réseau tierce à l'exécution.** Ni `fonts.googleapis.com`, ni `fonts.gstatic.com`, ni CDN. Vérifié par un test automatisé en tâche 2.
 - **Le fichier `design/accueil-page-vert-or.dc.html` est la source de vérité visuelle, jamais du code à recopier.** Il utilise une syntaxe de gabarit propriétaire (`{{ … }}`, `style-hover=`, `<dc-import>`) qui n'a aucun équivalent en HTML.
 - **Une seule arborescence responsive, mobile-first.** Le prop `isMobile` du design est un artefact de l'outil de maquettage ; il ne doit apparaître nulle part dans le code.
