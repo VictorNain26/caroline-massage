@@ -9,7 +9,6 @@ const cabinet = {
   joursOuverture: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   heureOuverture: '09:00',
   heureFermeture: '20:00',
-  delaiReponse: '48 h',
   instagram: 'https://www.instagram.com/caroline_massagesurmesure',
   prixMin: 45,
   prixMax: 130,

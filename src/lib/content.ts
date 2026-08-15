@@ -10,7 +10,7 @@ export interface Section { id: string; surtitre?: string; titre: string; paragra
 export interface Cabinet {
   telephone: string; telephoneAffiche: string; email: string; ville: string;
   joursOuverture: string[]; heureOuverture: string; heureFermeture: string;
-  delaiReponse: string; instagram: string;
+  instagram: string;
   prixMin: number; prixMax: number;
   // Renseignés par la cliente ; le pied de page et les mentions légales ne
   // rendent chaque champ que s'il a une valeur (tâche 13).
