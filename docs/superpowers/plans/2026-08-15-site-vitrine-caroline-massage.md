@@ -1836,8 +1836,9 @@ en excluant la règle.
 pnpm build && du -ch dist/_astro/*.js | tail -1
 ```
 
-Attendu : le total reste modeste. Deux scripts seulement doivent exister —
-menu et sticky-cta. Si un troisième apparaît, comprendre d’où il vient
+Attendu : le total reste modeste. **Un seul script doit exister — `menu.ts`.**
+L'ouverture est entièrement en CSS et la barre CTA n'existe pas dans le design.
+Si un deuxième apparaît, comprendre d’où il vient
 avant d'aller plus loin.
 
 - [ ] **Step 5: Ajouter le test d'accessibilité à la CI**
