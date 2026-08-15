@@ -11,8 +11,11 @@ paths:
   `body`, des titres et des liens, qui doivent atteindre le markup injecté par
   `<slot />` là où le scoping automatique d'Astro ne va pas. Aucun autre
   composant n'ouvre de bloc global.
-- Aucune couleur, aucune taille de police en dur : uniquement les variables
-  CSS de `tokens.css`.
+- Aucune couleur en dur : uniquement les variables CSS de `tokens.css`. Les
+  tailles échappent à cette règle — le design les exprime en `clamp()` propres
+  à chaque section, sans réutilisation, et les tokeniser ajouterait de
+  l'indirection sans partage. Une valeur qui se répète réellement d'une section
+  à l'autre devient un token ; les autres restent littérales, prises du design.
 - Mobile-first : la déclaration de base vise le mobile, les `@media
   (min-width: …)` ajoutent le desktop.
 - Toute animation est enveloppée dans
