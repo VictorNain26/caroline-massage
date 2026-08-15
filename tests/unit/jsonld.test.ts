@@ -6,7 +6,9 @@ const cabinet = {
   telephoneAffiche: '06 67 98 97 10',
   email: 'contact@carolinemassagesurmesure.fr',
   ville: 'Carquefou',
-  horaires: 'du lundi au samedi, 9h – 20h',
+  joursOuverture: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  heureOuverture: '09:00',
+  heureFermeture: '20:00',
   delaiReponse: '48 h',
   instagram: 'https://www.instagram.com/caroline_massagesurmesure',
   prixMin: 45,
@@ -29,8 +31,20 @@ describe('construireJsonLd', () => {
     expect(ld.telephone).toBe(cabinet.telephone);
   });
 
+  it('reprend la ville du cabinet sans la recopier', () => {
+    const address = ld.address as Record<string, unknown>;
+    expect(address.addressLocality).toBe(cabinet.ville);
+  });
+
   it('dérive la fourchette de prix des données du cabinet', () => {
     expect(ld.priceRange).toBe('45€–130€');
+  });
+
+  it('dérive les horaires structurés des données du cabinet', () => {
+    const openingHoursSpecification = ld.openingHoursSpecification as Record<string, unknown>;
+    expect(openingHoursSpecification.dayOfWeek).toEqual(cabinet.joursOuverture);
+    expect(openingHoursSpecification.opens).toBe(cabinet.heureOuverture);
+    expect(openingHoursSpecification.closes).toBe(cabinet.heureFermeture);
   });
 
   it('liste les soins au catalogue', () => {

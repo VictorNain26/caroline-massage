@@ -6,7 +6,7 @@ export function construireJsonLd(cabinet: Cabinet, soins: Soin[]) {
     '@type': 'MassageBusiness',
     name: 'Caroline, Massage Sur-Mesure',
     description:
-      "Massages sur-mesure : thaï à l'huile, Deep Tissue, massage ciblé, massage des pieds. Soins strictement bien-être, clientèle mixte.",
+      'Massages sur-mesure : thaï à l’huile, Deep Tissue, massage ciblé, massage des pieds. Soins strictement bien-être, clientèle mixte.',
     address: {
       '@type': 'PostalAddress',
       addressLocality: cabinet.ville,
@@ -17,6 +17,12 @@ export function construireJsonLd(cabinet: Cabinet, soins: Soin[]) {
     priceRange: `${cabinet.prixMin}€–${cabinet.prixMax}€`,
     currenciesAccepted: 'EUR',
     sameAs: [cabinet.instagram],
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: cabinet.joursOuverture,
+      opens: cabinet.heureOuverture,
+      closes: cabinet.heureFermeture,
+    },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: 'Soins',

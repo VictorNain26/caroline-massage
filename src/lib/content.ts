@@ -11,7 +11,8 @@ export interface Bloc { titre: string; texte: string }
 export interface Section { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[] }
 export interface Cabinet {
   telephone: string; telephoneAffiche: string; email: string; ville: string;
-  horaires: string; delaiReponse: string; instagram: string;
+  joursOuverture: string[]; heureOuverture: string; heureFermeture: string;
+  delaiReponse: string; instagram: string;
   prixMin: number; prixMax: number;
   // Renseignés par la cliente ; le pied de page et les mentions légales ne
   // rendent chaque champ que s'il a une valeur (tâche 13).
