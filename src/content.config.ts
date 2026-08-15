@@ -45,6 +45,9 @@ const sections = defineCollection({
     blocs: z
       .array(z.object({ titre: z.string(), texte: z.string() }))
       .optional(),
+    entrees: z
+      .array(z.object({ libelle: z.string(), texte: z.string() }))
+      .optional(),
   }),
 });
 

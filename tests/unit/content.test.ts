@@ -79,6 +79,32 @@ describe('faq', () => {
   });
 });
 
+describe('cabinet.yaml de sections', () => {
+  const cabinet = lire('src/content/cabinet.yaml');
+  const section = lire('src/content/sections/cabinet.yaml');
+  const chiffreHeure = (heure: string) => {
+    const [h, m] = heure.split(':');
+    return m === '00' ? `${Number(h)}h` : `${Number(h)}h${m}`;
+  };
+
+  it("garde l'amorce cohérente avec cabinet.yaml", () => {
+    const amorce = section.paragraphes[0] as string;
+
+    expect(
+      amorce.includes(cabinet.ville),
+      `src/content/sections/cabinet.yaml ne mentionne pas « ${cabinet.ville} » dans son amorce : corriger pour reprendre cabinet.yaml#ville, ou l'inverse si la ville a changé`,
+    ).toBe(true);
+    expect(
+      amorce.includes(chiffreHeure(cabinet.heureOuverture)),
+      `src/content/sections/cabinet.yaml ne mentionne pas « ${chiffreHeure(cabinet.heureOuverture)} » dans son amorce : corriger pour reprendre cabinet.yaml#heureOuverture, ou l'inverse`,
+    ).toBe(true);
+    expect(
+      amorce.includes(chiffreHeure(cabinet.heureFermeture)),
+      `src/content/sections/cabinet.yaml ne mentionne pas « ${chiffreHeure(cabinet.heureFermeture)} » dans son amorce : corriger pour reprendre cabinet.yaml#heureFermeture, ou l'inverse`,
+    ).toBe(true);
+  });
+});
+
 describe('sections', () => {
   const attendues = [
     'hero', 'soins', 'tarifs', 'parcours',

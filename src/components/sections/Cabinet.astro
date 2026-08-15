@@ -1,0 +1,148 @@
+---
+import { Image } from 'astro:assets';
+import { getSection } from '../../lib/content';
+import EnTeteSection from '../ui/EnTeteSection.astro';
+import photo from '../../assets/images/caro-cabinet.jpg';
+
+const section = await getSection('cabinet');
+const entrees = section.entrees ?? [];
+---
+
+<section id="cabinet" data-anchor="cabinet" data-surface="light" class="cabinet">
+  <div class="conteneur">
+    <EnTeteSection surtitre={section.surtitre ?? ''} titre={section.titre} />
+
+    <div class="corps">
+      <div class="colonne-texte">
+        <p class="amorce">{section.paragraphes[0]}</p>
+
+        <div class="entrees">
+          {
+            entrees.map((entree) => (
+              <div class="entree">
+                <span class="libelle">{entree.libelle}</span>
+                <span class="valeur">{entree.texte}</span>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="note">
+          <span>{section.paragraphes[1]}</span>
+        </div>
+      </div>
+
+      <div class="colonne-image">
+        <Image
+          src={photo}
+          alt="Table de massage préparée dans le cabinet"
+          width={800}
+          height={1035}
+          class="photo"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cabinet {
+    background: var(--creme);
+    padding: clamp(96px, 17cqw, 156px) clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+  }
+
+  .conteneur {
+    max-width: var(--largeur-contenu);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(28px, 4.5cqw, 48px);
+  }
+
+  .corps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(28px, 4.5cqw, 72px);
+    align-items: stretch;
+  }
+
+  .colonne-texte {
+    flex: 1.618 1 400px;
+    min-width: min(100%, 280px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(22px, 3.6cqw, 32px);
+  }
+
+  .amorce {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(19px, 4.8cqw, 24px);
+    line-height: 1.6;
+    color: var(--encre);
+    text-wrap: pretty;
+  }
+
+  .entrees {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: clamp(18px, 3cqw, 28px) clamp(24px, 4cqw, 44px);
+  }
+
+  .entree {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .libelle {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--or-bronze);
+  }
+
+  .valeur {
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.6;
+    color: var(--encre);
+    text-wrap: pretty;
+  }
+
+  .note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    border-top: 1px solid var(--sable);
+    padding-top: clamp(16px, 2.6cqw, 22px);
+  }
+
+  .note span {
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.6;
+    color: var(--encre-douce);
+    text-wrap: pretty;
+  }
+
+  .colonne-image {
+    flex: 1 1 300px;
+    min-width: min(100%, 260px);
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--creme-surface);
+    display: flex;
+  }
+
+  .photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+  }
+</style>

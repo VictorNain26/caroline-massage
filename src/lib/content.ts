@@ -6,7 +6,8 @@ export interface Soin { id: string; nom: string; sousTitre: string; description:
 export interface Question { id: string; question: string; reponse: string; ordre: number }
 export interface Avis { auteur: string; note: number; texte: string; date: string; url: string }
 export interface Bloc { titre: string; texte: string }
-export interface Section { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[] }
+export interface Entree { libelle: string; texte: string }
+export interface Section { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[]; entrees?: Entree[] }
 export interface Cabinet {
   telephone: string; telephoneAffiche: string; email: string; ville: string;
   joursOuverture: string[]; heureOuverture: string; heureFermeture: string;

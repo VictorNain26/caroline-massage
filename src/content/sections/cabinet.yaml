@@ -2,14 +2,27 @@ surtitre: "Le cabinet"
 titre: "Un cadre pensé pour souffler."
 paragraphes:
   - >-
-    Mon cabinet est ouvert à une clientèle mixte, femmes et hommes. Mes soins
-    sont strictement dédiés au bien-être et à la détente.
+    Un cabinet privé à Carquefou, ouvert du lundi au samedi, de 9h à 20h.
+    Chaque séance commence par cinq à dix minutes d’échange : vos tensions,
+    votre état du jour, ce que vous attendez du soin.
   - >-
-    Le respect de la personne et du corps est une priorité absolue : aucune
-    demande ou attitude inappropriée ne sera tolérée et entraînera l’arrêt
-    immédiat de la séance.
-  - >-
-    Prévoyez 15 minutes de plus, le temps d’arriver tranquillement et de
-    repartir sans précipitation. Paiement sur place : espèces ou carte
-    bancaire. En cas d’annulation ou de report, merci de me prévenir à
-    l’avance.
+    Clientèle mixte, femmes et hommes. Soins exclusivement dédiés au
+    bien-être et à la détente.
+entrees:
+  - libelle: "Où"
+    texte: >-
+      Cabinet privé à Carquefou. L’adresse exacte vous est communiquée à la
+      confirmation du rendez-vous.
+  - libelle: "Accès"
+    texte: >-
+      Transports en commun à proximité, stationnement facile aux alentours.
+  - libelle: "À prévoir"
+    texte: >-
+      Arrivez quinze minutes avant l’heure : le temps de vous poser, et de
+      repartir sans précipitation.
+  - libelle: "Sur place"
+    texte: >-
+      Serviettes fournies. Vous gardez vos sous-vêtements pendant toute la
+      séance.
+  - libelle: "Paiement"
+    texte: "Carte bancaire ou espèces, réglés sur place."
