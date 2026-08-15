@@ -1,0 +1,40 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/tokens.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <Font cssVariable="--font-titre" preload />
+    <Font cssVariable="--font-texte" preload />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  body {
+    margin: 0;
+    background: var(--creme);
+    color: var(--encre);
+    font-family: var(--font-texte), system-ui, sans-serif;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+  }
+  a { color: var(--or-lien); }
+  a:hover { color: var(--encre); }
+</style>

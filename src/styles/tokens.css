@@ -1,0 +1,18 @@
+:root {
+  --vert-profond: #0b3a31;
+  --vert-clair: #165046;
+  --or: #d4a94c;
+  --or-clair: #e4c070;
+  --or-bronze: #96742c;
+  --or-lien: #7a5a24;
+  --creme: #fbf7f0;
+  --creme-surface: #efe6d8;
+  --sable: #cbb79a;
+  --encre: #221d17;
+  --encre-douce: #55483c;
+  --corail: #f0907c;
+
+  --pas: 8px;
+  --rayon: 14px;
+  --largeur-contenu: 1180px;
+}
