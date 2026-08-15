@@ -5,7 +5,14 @@ import Soins from '../components/sections/Soins.astro';
 import Tarifs from '../components/sections/Tarifs.astro';
 import Parcours from '../components/sections/Parcours.astro';
 import Cabinet from '../components/sections/Cabinet.astro';
+import Avis from '../components/sections/Avis.astro';
+import Faq from '../components/sections/Faq.astro';
 import Frise from '../components/ui/Frise.astro';
+import { getAvis } from '../lib/content';
+
+// Le design place la frise décorative dans le même sc-if que les avis
+// (lignes 475-477 du design) : elle n'existe que si la section avis existe.
+const avis = await getAvis();
 ---
 <Base
   title="Massage thaï à l’huile & Deep Tissue | Caroline, massage sur-mesure"
@@ -17,4 +24,7 @@ import Frise from '../components/ui/Frise.astro';
   <Frise />
   <Parcours />
   <Cabinet />
+  {avis.length > 0 && <Frise />}
+  <Avis />
+  <Faq />
 </Base>

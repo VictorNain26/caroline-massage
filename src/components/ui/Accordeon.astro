@@ -26,6 +26,19 @@ const { titre, sousTitre } = Astro.props;
    * from its own wrapper, same custom-property-extension-point pattern as
    * EnTeteSection's --entete-couleur-surtitre. Defaults are the light
    * treatment used everywhere else.
+   *
+   * --accordeon-titre-{police,poids,taille,interligne} and
+   * --accordeon-icone-taille extend that same pattern to typography: the FAQ
+   * accordion (700 clamp(18px,4.6cqw,22px)/1.4 'Alegreya Sans', 26px icon)
+   * diverges from the soins one (500 21px/1.2 'Petrona', 24px icon) on every
+   * one of these axes, but both share the same interactive behaviour
+   * (details/summary, focus-visible, icon rotation) — duplicating that in a
+   * second component would risk the two drifting apart on accessibility, not
+   * just style. Defaults below are the soins treatment, unchanged for
+   * existing callers. The body line-height (1.7 soins / 1.75 FAQ) isn't
+   * parameterised here: it belongs to each section's own slotted paragraph,
+   * same as Soins.astro's `.description`, not to Accordeon's own `.corps`
+   * wrapper.
    */
   .accordeon {
     border-bottom: 1px solid var(--accordeon-couleur-bordure, var(--sable));
@@ -61,7 +74,10 @@ const { titre, sousTitre } = Astro.props;
     gap: 2px;
   }
   .titre {
-    font: 500 21px/1.2 var(--font-titre), Georgia, serif;
+    font:
+      var(--accordeon-titre-poids, 500) var(--accordeon-titre-taille, 21px) /
+      var(--accordeon-titre-interligne, 1.2)
+      var(--accordeon-titre-police, var(--font-titre), Georgia, serif);
     color: var(--accordeon-couleur-titre, var(--encre));
   }
   .sous-titre {
@@ -73,8 +89,8 @@ const { titre, sousTitre } = Astro.props;
   }
   .marque {
     flex: none;
-    width: 24px;
-    height: 24px;
+    width: var(--accordeon-icone-taille, 24px);
+    height: var(--accordeon-icone-taille, 24px);
     border-radius: 999px;
     border: 1.5px solid var(--accordeon-couleur-marque, var(--or-bronze));
     color: var(--accordeon-couleur-marque, var(--or-bronze));
