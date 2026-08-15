@@ -13,7 +13,7 @@ formulaire, ni compte utilisateur, ni base de données.
 | Fichier | Apporte |
 |---|---|
 | `accueil-page-vert-or.dc.html` | Markup et styles réels : nav, hero, soins, tarifs, parcours. Tronqué au-delà (voir plus bas). |
-| `trois-directions-marque.pdf` | Maquette pleine page complète, direction crème. Mise en page identique à Vert Or — seule la palette diffère. Seule source pour cabinet, avis, prendre rendez-vous, FAQ, footer. |
+| `trois-directions-marque.pdf` | Direction crème du 9 août 2026, antérieure à Vert Or. **Mise en page différente** : le hero et la section soins ne concordent pas (accordéons contre cartes, titres distincts). Sert uniquement d'inventaire des sections et de confirmation du contenu — jamais de référence visuelle. |
 | `contenu-client.docx` | Contenu rédactionnel intégral, découpé par section. |
 | `assets/` | Images sources non compressées. |
 
@@ -25,8 +25,11 @@ re-synchronisation future ne sera possible.
 
 **Dans le périmètre**
 
-- Page d'accueil, dix sections dans cet ordre : hero, soins, parcours, citation,
-  forfaits, cabinet, avis, prendre rendez-vous, FAQ, footer.
+- Page d'accueil, dix sections : hero, soins, parcours, citation, forfaits,
+  cabinet, avis, prendre rendez-vous, FAQ, footer. Les cinq premières sont
+  décrites par le markup Vert Or ; l'existence des cinq dernières est établie par
+  les ancres de navigation et par le PDF, **mais leur mise en page Vert Or reste
+  inconnue** tant que le `.dc.html` complet n'est pas récupéré.
 - Page mentions légales (obligation art. 6 LCEN pour une activité professionnelle).
 - Page politique de confidentialité, prévue par le footer du design.
 - Page 404, requise par la configuration de déploiement (section 7).
