@@ -9,7 +9,7 @@ const section = await getSection('parcours');
 const blocs = section.blocs ?? [];
 ---
 
-<section id="parcours" data-anchor="parcours" data-surface="light" class="parcours">
+<section id="parcours" data-anchor="parcours" class="parcours">
   <div class="grille">
     <div class="colonne-image">
       <EnTeteSection surtitre={section.surtitre ?? ''} titre={section.titre} />
@@ -55,7 +55,7 @@ const blocs = section.blocs ?? [];
   </div>
 </section>
 
-<div class="citation" data-surface="dark">
+<div class="citation">
   <div class="orn orn-hg" style="--orn-taille: clamp(48px, 8cqw, 96px); --orn-retrait: clamp(12px, 2.6cqw, 26px); --orn-opacite: .85">
     <OrnementCoin position="haut-gauche" />
   </div>
