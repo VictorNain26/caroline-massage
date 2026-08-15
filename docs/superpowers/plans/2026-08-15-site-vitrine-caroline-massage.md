@@ -33,6 +33,7 @@ Ces contraintes s'appliquent à **toutes** les tâches, sans être répétées.
 - Create: `package.json`, `astro.config.mjs`, `tsconfig.json`, `wrangler.jsonc`, `eslint.config.js`, `vitest.config.ts`
 - Create: `.github/workflows/ci.yml`
 - Create: `CLAUDE.md`, `.claude/settings.json`, `.claude/rules/astro.md`
+- Create: `.claude/hooks/verifier-contraintes.sh`, `.claude/skills/sync-design/SKILL.md`
 - Create: `src/pages/index.astro`
 - Modify: `.gitignore`
 
@@ -223,6 +224,19 @@ Les règles de permission fusionnent entre scopes plutôt que de s'écraser : ce
       "Bash(pnpm deploy)",
       "Bash(wrangler deploy*)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/verifier-contraintes.sh"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -249,7 +263,88 @@ paths:
   et `alt` explicites.
 ```
 
-- [ ] **Step 14: Écrire `.github/workflows/ci.yml`**
+- [ ] **Step 14: Écrire le hook de vérification des contraintes**
+
+Le `CLAUDE.md` ne peut que suggérer : « *CLAUDE.md instructions shape Claude's
+behavior but are not a hard enforcement layer* »
+([memory](https://code.claude.com/docs/en/memory#claude-md-vs-auto-memory)).
+Deux règles de ce projet sont mécaniquement vérifiables — aucune ressource
+tierce, et le prop `isMobile` proscrit. Ce hook donne le retour immédiat pendant
+l'édition ; l'application réelle reste la CI, qui bloque la fusion.
+
+Fichier `.claude/hooks/verifier-contraintes.sh`, rendu exécutable :
+
+```bash
+#!/usr/bin/env bash
+# Retour immédiat sur les deux contraintes dures du projet.
+# Non bloquant : signale sans interrompre. L'application dure est en CI.
+set -uo pipefail
+
+fichier=$(jq -r '.tool_input.file_path // empty')
+[[ -z "$fichier" || ! -f "$fichier" ]] && exit 0
+[[ "$fichier" != *"/src/"* ]] && exit 0
+
+if grep -qE 'fonts\.(googleapis|gstatic)\.com|https?://cdn\.' "$fichier"; then
+  echo "Ressource tierce détectée dans $fichier — le projet ne sert que depuis son domaine." >&2
+fi
+
+if grep -q 'isMobile' "$fichier"; then
+  echo "isMobile détecté dans $fichier — artefact de maquette, une seule arborescence responsive." >&2
+fi
+
+exit 0
+```
+
+```bash
+chmod +x .claude/hooks/verifier-contraintes.sh
+```
+
+- [ ] **Step 15: Écrire la skill de re-synchronisation du design**
+
+Le critère de la doc : « *Create a skill when you keep pasting the same
+instructions, checklist, or multi-step procedure into chat […] a skill's body
+loads only when it's used* » ([skills](https://code.claude.com/docs/en/skills)).
+Re-synchroniser depuis Claude Design est une procédure en cinq étapes qui se
+rejouera à chaque évolution de la maquette.
+
+Fichier `.claude/skills/sync-design/SKILL.md` :
+
+```markdown
+---
+name: sync-design
+description: Re-synchroniser le design depuis le projet Claude Design et identifier ce qui a changé. À utiliser quand la maquette Vert Or a évolué.
+disable-model-invocation: true
+---
+
+# Re-synchroniser le design
+
+Le projet Claude Design est `6069b7a5-682e-42da-8370-d3b6bdc9babf`.
+Le code est la source de vérité ; le design sert à **détecter** un changement,
+jamais à régénérer la page.
+
+## Procédure
+
+1. `DesignSync` méthode `list_files` sur le projet, pour repérer les fichiers
+   ajoutés ou renommés.
+2. `DesignSync` méthode `get_file` sur `Accueil Page Vert Or.dc.html`.
+   **Vérifier `truncated` dans la réponse.** Le plafond de lecture est de
+   256 KiB : si le fichier repasse au-dessus, c'est que des images y ont été
+   réinlinées en base64, et il faut les redéinliner côté design avant tout.
+3. Écrire le contenu dans `design/accueil-page-vert-or.dc.html`, en écrasant.
+4. `git diff design/` — c'est le cœur de la procédure. Le diff textuel montre
+   exactement ce qui a bougé.
+5. Reporter les changements dans les composants concernés. Un changement de
+   couleur ou de typo se répercute dans `src/styles/tokens.css` seul ; une
+   modification de structure touche le composant de section correspondant.
+
+## Ce qu'il ne faut pas faire
+
+- Ne pas recopier la syntaxe du design : `{{ … }}`, `style-hover=`,
+  `<dc-import>` et le prop `isMobile` n'ont pas d'équivalent HTML.
+- Ne pas régénérer une section entière quand seuls quelques mots ont changé.
+```
+
+- [ ] **Step 16: Écrire `.github/workflows/ci.yml`**
 
 ```yaml
 name: CI
@@ -274,7 +369,12 @@ jobs:
       - run: pnpm build
 ```
 
-- [ ] **Step 15: Commit**
+- [ ] **Step 17: Vérifier que le hook se déclenche**
+
+Éditer temporairement `src/pages/index.astro` en y ajoutant une ligne contenant
+`fonts.googleapis.com`, puis constater que le hook le signale. Retirer la ligne.
+
+- [ ] **Step 18: Commit**
 
 ```bash
 git add package.json pnpm-lock.yaml astro.config.mjs tsconfig.json wrangler.jsonc \
@@ -485,6 +585,7 @@ git commit -m "feat: self-host fonts, add design tokens and base layout"
   - `getForfaits(): Promise<Forfait[]>`
   - `getFaq(): Promise<Question[]>` — triées par `ordre` croissant
   - `getAvis(): Promise<Avis[]>` — tableau vide tant qu'aucun avis authentique n'est fourni
+  - `getSection(id: string): Promise<Section>` — lève une erreur si l'identifiant n'existe pas, plutôt que de rendre une section muette
 
   ```ts
   type Tarif = { duree: number; prix: number };
@@ -492,6 +593,8 @@ git commit -m "feat: self-host fonts, add design tokens and base layout"
   type Forfait = { libelle: string; prix: number; prixBarre: number };
   type Question = { id: string; question: string; reponse: string; ordre: number };
   type Avis = { auteur: string; note: number; texte: string; date: string; url: string };
+  type Bloc = { titre: string; texte: string };
+  type Section = { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[] };
   type Cabinet = { telephone: string; telephoneAffiche: string; email: string; ville: string; horaires: string; delaiReponse: string; instagram: string; prixMin: number; prixMax: number; siret?: string; assuranceRcPro?: string; statutJuridique?: string };
   ```
 
@@ -624,6 +727,59 @@ acceptez-vous ? »), `kinesitherapeute.yaml` (« Quelle différence avec un
 kinésithérapeute ? »), `lieu.yaml` (« Où se situe le cabinet ? »). Reprendre les
 réponses mot pour mot depuis le document client.
 
+- [ ] **Step 4b: Écrire les textes de section**
+
+Sans ceci, la couture ne couvrirait que les listes répétées, et le jour du CMS
+la cliente pourrait modifier ses tarifs mais pas ses textes de présentation —
+exactement l'inverse du besoin. Un fichier par section dans
+`src/content/sections/`, contenu repris de `design/contenu-client.docx`.
+
+`hero.yaml` :
+```yaml
+titre: "Mes mains lisent vos tensions."
+paragraphes:
+  - >-
+    Votre corps garde la trace de tout : les longues journées, le stress qui
+    s'accumule, les tensions que vous ne savez plus où loger. Dans mon cabinet,
+    je crée l'espace où elles peuvent enfin se relâcher.
+```
+
+`parcours.yaml` — la seule section à utiliser `blocs`, qui porte les trois `<h3>` du design :
+```yaml
+surtitre: "MON PARCOURS"
+titre: "De l'instinct à la maîtrise."
+paragraphes:
+  - >-
+    Le massage n'est pas venu à moi : il était déjà là. Franco-thaïlandaise,
+    j'ai grandi imprégnée de la culture thaïlandaise et de la philosophie
+    bouddhiste, où prendre soin de l'autre est une seconde nature. Mes premiers
+    gestes remontent à mes six ans, lorsque je massais ma grand-mère. À
+    l'époque, c'était instinctif ; aujourd'hui, c'est devenu ma signature.
+blocs:
+  - titre: "Une expertise forgée à la source."
+    texte: >-
+      Esthéticienne depuis plus de dix ans, j'ai vite ressenti le besoin de
+      revenir à mes racines pour parfaire ma technique. Je me suis formée au
+      Wat Pho, à Bangkok — la référence mondiale du massage thaï. J'y ai appris
+      la rigueur, la précision millénaire du massage traditionnel et le travail
+      spécifique à l'huile.
+  - titre: "Moins de protocole, plus de présence."
+    texte: >-
+      Au-delà des diplômes (BP Esthétique), ce sont mes années de pratique qui
+      ont affiné mon toucher. J'ai laissé de côté les gestes standardisés pour
+      une véritable écoute du muscle. Aujourd'hui, mes mains lisent vos tensions
+      et adaptent la pression et le rythme en temps réel.
+```
+
+Écrire de même `soins.yaml` (surtitre « LES SOINS », titre « Des soins qui
+s'adaptent à vous. »), `tarifs.yaml`, `cabinet.yaml` — attention, dans
+`sections/`, à ne pas confondre avec le singleton `src/content/cabinet.yaml` —
+titre « Un cadre pensé pour souffler. » et les trois paragraphes du document
+client, `avis.yaml` (titre « Ce qu'ils en disent. »), `faq.yaml` (titre « Tout
+ce qu'il faut savoir. ») et `contact.yaml` (surtitre « PRENDRE RENDEZ-VOUS »,
+titre « Votre instant de bien-être. », accroche reformulée pour inviter à
+appeler ou écrire puisque le formulaire n'est pas porté).
+
 - [ ] **Step 5: Écrire `src/content.config.ts`**
 
 C'est le fichier qui déclare **d'où** vient le contenu. Le jour du CMS, seuls les `loader` changent ; les schémas et `lib/content.ts` restent identiques.
@@ -666,7 +822,19 @@ const avis = defineCollection({
   }),
 });
 
-export const collections = { soins, faq, avis };
+const sections = defineCollection({
+  loader: glob({ pattern: '*.yaml', base: './src/content/sections' }),
+  schema: z.object({
+    surtitre: z.string().optional(),
+    titre: z.string(),
+    paragraphes: z.array(z.string()),
+    blocs: z
+      .array(z.object({ titre: z.string(), texte: z.string() }))
+      .optional(),
+  }),
+});
+
+export const collections = { soins, faq, avis, sections };
 ```
 
 - [ ] **Step 6: Écrire la façade `src/lib/content.ts`**
@@ -685,6 +853,8 @@ export interface Soin { id: string; nom: string; sousTitre: string; description:
 export interface Forfait { libelle: string; prix: number; prixBarre: number }
 export interface Question { id: string; question: string; reponse: string; ordre: number }
 export interface Avis { auteur: string; note: number; texte: string; date: string; url: string }
+export interface Bloc { titre: string; texte: string }
+export interface Section { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[] }
 export interface Cabinet {
   telephone: string; telephoneAffiche: string; email: string; ville: string;
   horaires: string; delaiReponse: string; instagram: string;
@@ -719,6 +889,15 @@ export async function getFaq(): Promise<Question[]> {
 export async function getAvis(): Promise<Avis[]> {
   const entrees = await getCollection('avis');
   return entrees.map((e) => e.data);
+}
+
+export async function getSection(id: string): Promise<Section> {
+  const entrees = await getCollection('sections');
+  const entree = entrees.find((e) => e.id === id);
+  // Échouer au build plutôt que rendre une section muette : un titre manquant
+  // passerait inaperçu en production.
+  if (!entree) throw new Error(`Section inconnue : ${id}`);
+  return { id: entree.id, ...entree.data };
 }
 ```
 
@@ -783,6 +962,28 @@ describe('faq', () => {
   it('donne des ordres uniques', () => {
     const ordres = questions.map((q) => q.ordre);
     expect(new Set(ordres).size).toBe(ordres.length);
+  });
+});
+
+describe('sections', () => {
+  const attendues = [
+    'hero', 'soins', 'tarifs', 'parcours',
+    'cabinet', 'avis', 'faq', 'contact',
+  ];
+
+  it('couvre les huit sections ancrées de la page', () => {
+    const presentes = readdirSync('src/content/sections')
+      .filter((f) => f.endsWith('.yaml'))
+      .map((f) => f.replace('.yaml', ''))
+      .sort();
+    expect(presentes).toEqual([...attendues].sort());
+  });
+
+  it('donne un titre non vide à chacune', () => {
+    for (const id of attendues) {
+      const section = lire(`src/content/sections/${id}.yaml`);
+      expect(section.titre, `section ${id}`).toBeTruthy();
+    }
   });
 });
 ```
@@ -1185,14 +1386,14 @@ git commit -m "feat(nav): add responsive navigation with accessible mobile panel
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
-- Consumes: `getCabinet()`, `<Bouton>`, `<OrnementCoin>`.
+- Consumes: `getSection('hero')`, `getCabinet()`, `<Bouton>`, `<OrnementCoin>`.
 - Produit: `<Hero />`, sans prop.
 
 **Source:** lignes 129-181 pour le balisage, lignes 46-74 pour les 19 `@keyframes`.
 
 - [ ] **Step 1: Porter le balisage du hero**
 
-Titre `<h1>` « Mes mains lisent vos tensions. », accroche, mention des horaires
+Titre `<h1>` et accroche lus depuis `getSection('hero')`, mention des horaires
 lue depuis `getCabinet()`, deux boutons (« Prendre rendez-vous » vers
 `#contact`, « Découvrir les soins » vers `#soins`), photo encadrée d'ornements.
 Le fond est `--vert-profond` : marquer la section `data-surface="dark"`, la
@@ -1246,14 +1447,14 @@ git commit -m "feat(hero): port hero section and opening animation with reduced-
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
-- Consumes: `getSoins()`, `getForfaits()`, `<Accordeon>`, `<EnTeteSection>`.
+- Consumes: `getSection('soins')`, `getSection('tarifs')`, `getSoins()`, `getForfaits()`, `<Accordeon>`, `<EnTeteSection>`.
 - Produit: `<Soins />` et `<Tarifs />`, sans prop.
 
 **Source:** lignes 182-361 (soins) et 362-371 (tarifs).
 
 - [ ] **Step 1: Porter la section soins**
 
-Surtitre « LES SOINS », titre « Des soins qui s'adaptent à vous. », puis un
+Surtitre et titre lus depuis `getSection('soins')`, puis un
 `<Accordeon>` par soin issu de `getSoins()`. Le libellé du sommaire suit le
 design : nom, sous-titre, puis « dès N € » calculé comme le minimum des
 `tarifs[].prix` — jamais écrit en dur. Le soin marqué `signature: true` reçoit
@@ -1291,23 +1492,21 @@ git commit -m "feat(soins): port treatments accordions and package pricing"
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
-- Consumes: `<EnTeteSection>`, `<Frise>`, `<Image>` d'`astro:assets`.
+- Consumes: `getSection('parcours')`, `getSection('cabinet')`, `<EnTeteSection>`, `<Frise>`, `<Image>` d'`astro:assets`.
 - Produit: `<Parcours />` et `<Cabinet />`, sans prop.
 
 **Source:** lignes 372-434 (parcours) et 435-479 (cabinet).
 
 - [ ] **Step 1: Porter la section parcours**
 
-Trois blocs `<h3>` : « De l'instinct à la maîtrise. », « Une expertise forgée à
-la source. », « Moins de protocole, plus de présence. » Contenu repris de
-`design/contenu-client.docx`. Ce contenu est éditorial et figé : il vit dans le
-composant, pas dans une collection — le sortir en contenu typé serait de
-l'abstraction sans réutilisation.
+Tout le texte vient de `getSection('parcours')` : le `titre` pour le `<h1>` de
+section, `paragraphes` pour l'accroche, et `blocs` pour les trois `<h3>`
+numérotés du design. Aucun texte en dur dans le composant — c'est ce qui rend la
+couture CMS utile sur toute la page et pas seulement sur les listes.
 
 - [ ] **Step 2: Porter la section cabinet**
 
-Titre « Un cadre pensé pour souffler. », les trois paragraphes du document
-client, et la photo `caro-cabinet.jpg` via `<Image>` avec `width={800}`,
+Titre et paragraphes lus depuis `getSection('cabinet')`, et la photo `caro-cabinet.jpg` via `<Image>` avec `width={800}`,
 `height={1035}` et un `alt` descriptif — pas décoratif ici, la photo porte de
 l'information.
 
@@ -1337,7 +1536,7 @@ git commit -m "feat(sections): port practitioner background and treatment room"
 - Test: `tests/unit/avis.test.ts`
 
 **Interfaces:**
-- Consumes: `getAvis()`, `getFaq()`, `<Accordeon>`, `<EnTeteSection>`.
+- Consumes: `getSection('avis')`, `getSection('faq')`, `getAvis()`, `getFaq()`, `<Accordeon>`, `<EnTeteSection>`.
 - Produit: `<Avis />` et `<Faq />`, sans prop.
 
 **Source:** lignes 480-547 (avis) et 548-594 (faq).
@@ -1394,7 +1593,7 @@ vide, pas de squelette d'attente.
 
 - [ ] **Step 4: Porter la section FAQ**
 
-Titre « Tout ce qu'il faut savoir. », puis un `<Accordeon>` par question de
+Titre lu depuis `getSection('faq')`, puis un `<Accordeon>` par question de
 `getFaq()`. Même primitive que les soins : la cohérence de traitement est déjà
 celle du design.
 
@@ -1425,7 +1624,7 @@ git commit -m "feat(sections): port FAQ and conditional reviews section"
 - Modify: `src/pages/index.astro`, `src/layouts/Base.astro`
 
 **Interfaces:**
-- Consumes: `getCabinet()`, `<Bouton>`, `<OrnementCoin>`.
+- Consumes: `getSection('contact')`, `getCabinet()`, `<Bouton>`, `<OrnementCoin>`.
 - Produit: `<Contact />` et `<PiedDePage />`, sans prop.
 
 **Source:** lignes 595-713. **Le formulaire n'est pas porté** (spec, section 1) :
@@ -1434,9 +1633,9 @@ délai de réponse le sont.
 
 - [ ] **Step 1: Porter la section contact**
 
-Surtitre « PRENDRE RENDEZ-VOUS », titre « Votre instant de bien-être. »,
-accroche adaptée au retrait du formulaire — la version du design invite à
-remplir des champs, il faut la reformuler pour inviter à appeler ou écrire.
+Surtitre, titre et accroche lus depuis `getSection('contact')` — l'accroche y a
+déjà été reformulée en tâche 3 pour inviter à appeler ou écrire, puisque le
+formulaire n'est pas porté.
 Deux boutons : `tel:` avec `cabinet.telephoneAffiche` en libellé, et `mailto:`
 avec `cabinet.email`. Sous les boutons, la ligne horaires + délai de réponse,
 lue depuis `getCabinet()`. Fond `--vert-profond` : marquer
