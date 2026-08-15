@@ -1,17 +1,22 @@
 ---
 import Bouton from './ui/Bouton.astro';
 
+// Préfixés par "/" : ces liens doivent aussi fonctionner depuis les pages
+// secondaires (mentions légales, confidentialité, 404), qui n'ont pas ces
+// ancres. Un navigateur qui suit "/#soins" depuis "/" ne recharge que le
+// fragment (même document) ; depuis une autre page, il revient à l'accueil
+// puis défile jusqu'à l'ancre.
 const liens = [
-  { href: '#soins', label: 'Soins & tarifs' },
-  { href: '#parcours', label: 'Qui suis-je' },
-  { href: '#cabinet', label: 'Le cabinet' },
-  { href: '#faq', label: 'FAQ' },
+  { href: '/#soins', label: 'Soins & tarifs' },
+  { href: '/#parcours', label: 'Qui suis-je' },
+  { href: '/#cabinet', label: 'Le cabinet' },
+  { href: '/#faq', label: 'FAQ' },
 ];
 ---
 
 <header class="entete">
   <div class="barre">
-    <a href="#hero" aria-label="Retour en haut de page" class="marque">
+    <a href="/#hero" aria-label="Retour en haut de page" class="marque">
       <span class="marque-nom">Caroline</span>
       <span aria-hidden="true" class="marque-separateur"></span>
       <span class="marque-baseline">Massage<br />Sur-Mesure</span>
@@ -27,7 +32,7 @@ const liens = [
           ))
         }
         <li>
-          <Bouton href="#contact" variante="vert">Réserver</Bouton>
+          <Bouton href="/#contact" variante="vert">Réserver</Bouton>
         </li>
       </ul>
     </nav>
@@ -47,7 +52,7 @@ const liens = [
 
   <dialog id="menu-mobile" class="panneau" data-nav-dialog aria-label="Menu">
     <div class="panneau-entete">
-      <a href="#hero" aria-label="Retour en haut de page" class="marque marque--panneau">
+      <a href="/#hero" aria-label="Retour en haut de page" class="marque marque--panneau">
         <span class="marque-nom">Caroline</span>
         <span aria-hidden="true" class="marque-separateur"></span>
         <span class="marque-baseline">Massage<br />Sur-Mesure</span>
@@ -67,7 +72,7 @@ const liens = [
           ))
         }
         <li class="element-cta" style="--bouton-hauteur: 56px">
-          <Bouton href="#contact" variante="creme">Réserver</Bouton>
+          <Bouton href="/#contact" variante="creme">Réserver</Bouton>
         </li>
       </ul>
     </nav>

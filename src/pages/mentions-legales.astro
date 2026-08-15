@@ -1,0 +1,204 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCabinet } from '../lib/content';
+
+const cabinet = await getCabinet();
+
+// Renseignées par la cliente ; tant qu'un champ est vide, on affiche un
+// repère visible plutôt qu'un silence — un SIRET manquant doit se remarquer
+// à la relecture, pas passer inaperçu (design, ligne 706 : "[SIRET]").
+const champsEditrice = [
+  { libelle: 'Statut juridique', valeur: cabinet.statutJuridique },
+  { libelle: 'Numéro SIRET', valeur: cabinet.siret },
+  { libelle: 'Assurance responsabilité civile professionnelle', valeur: cabinet.assuranceRcPro },
+];
+---
+
+<Base
+  title="Mentions légales | Caroline, massage sur-mesure"
+  description="Mentions légales du site de Caroline, massage sur-mesure : éditrice, hébergement et directeur de la publication."
+>
+  <main class="page">
+    <div class="conteneur">
+      <header class="entete">
+        <span class="surtitre">Informations légales</span>
+        <h1 class="titre">Mentions légales</h1>
+        <p class="intro">
+          En application de l'article 6-III-1 de la loi n° 2004-575 du 21 juin
+          2004 pour la confiance dans l'économie numérique, les informations
+          suivantes sont mises à la disposition des utilisatrices et
+          utilisateurs de ce site.
+        </p>
+      </header>
+
+      <div class="corps">
+        <section class="bloc">
+          <h2>Éditrice du site</h2>
+          <p>
+            Le site est édité par Caroline, exerçant sous le nom commercial «
+            Caroline, Massage Sur-Mesure », pour une activité de massage
+            bien-être basée à {cabinet.ville}.
+          </p>
+          <dl class="champs">
+            {
+              champsEditrice.map((champ) => (
+                <div class="champ">
+                  <dt>{champ.libelle}</dt>
+                  <dd>
+                    {champ.valeur || <span class="a-completer">à compléter</span>}
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+          <dl class="champs">
+            <div class="champ">
+              <dt>Téléphone</dt>
+              <dd><a href={`tel:${cabinet.telephone}`}>{cabinet.telephoneAffiche}</a></dd>
+            </div>
+            <div class="champ">
+              <dt>E-mail</dt>
+              <dd><a href={`mailto:${cabinet.email}`}>{cabinet.email}</a></dd>
+            </div>
+            <div class="champ">
+              <dt>Adresse</dt>
+              <dd>Cabinet privé à {cabinet.ville}. Adresse exacte communiquée à la confirmation du rendez-vous.</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="bloc">
+          <h2>Directrice de la publication</h2>
+          <p>
+            La direction de la publication est assurée par Caroline,
+            éditrice du site, conformément à l'article 6-III-1 de la LCEN
+            applicable aux services édités par une personne physique.
+          </p>
+        </section>
+
+        <section class="bloc">
+          <h2>Hébergement</h2>
+          <p>
+            Le site est hébergé par Cloudflare, Inc., 101 Townsend St, San
+            Francisco, CA 94107, États-Unis, sur son offre Cloudflare
+            Workers (hébergement d'actifs statiques).
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .page {
+    background: var(--creme);
+    padding: clamp(56px, 12cqw, 100px) clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+  }
+
+  .conteneur {
+    max-width: var(--largeur-contenu);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(36px, 5.5cqw, 56px);
+  }
+
+  .entete {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 66ch;
+  }
+
+  .surtitre {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: clamp(13px, 3.2cqw, 15px);
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--or-lien);
+  }
+
+  .titre {
+    margin: 0;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(30px, 7.6cqw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .intro {
+    margin: 8px 0 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.65;
+    color: var(--encre-douce);
+  }
+
+  .corps {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(28px, 4.5cqw, 40px);
+    max-width: 66ch;
+  }
+
+  .bloc h2 {
+    margin: 0 0 12px;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(21px, 5cqw, 26px);
+    line-height: 1.2;
+  }
+
+  .bloc p {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.65;
+    color: var(--encre);
+  }
+
+  .champs {
+    display: grid;
+    gap: clamp(12px, 2cqw, 16px);
+    margin: 16px 0 0;
+  }
+
+  .champ {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .champ dt {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--or-lien);
+  }
+
+  .champ dd {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.6;
+    color: var(--encre);
+  }
+
+  .a-completer {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--corail);
+    color: var(--encre);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+</style>

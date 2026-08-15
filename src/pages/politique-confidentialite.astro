@@ -1,0 +1,141 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCabinet } from '../lib/content';
+
+const cabinet = await getCabinet();
+---
+
+<Base
+  title="Politique de confidentialité | Caroline, massage sur-mesure"
+  description="Ce site ne collecte aucune donnée personnelle : pas de formulaire, pas de cookie, pas d'outil de mesure d'audience."
+>
+  <main class="page">
+    <div class="conteneur">
+      <header class="entete">
+        <span class="surtitre">Vie privée</span>
+        <h1 class="titre">Politique de confidentialité</h1>
+        <p class="intro">
+          Ce site ne collecte aucune donnée personnelle. Il n'y a ici ni
+          formulaire, ni cookie, ni outil de mesure d'audience, ni script
+          tiers, ni police de caractères chargée depuis un serveur externe.
+        </p>
+      </header>
+
+      <div class="corps">
+        <section class="bloc">
+          <h2>Aucune collecte sur ce site</h2>
+          <p>
+            Aucun formulaire de réservation n'est proposé sur ce site : les
+            rendez-vous se prennent par téléphone ou par e-mail, en dehors de
+            ce site. Aucun cookie n'est déposé, aucun outil d'analyse
+            d'audience n'est installé, et aucune ressource (police,
+            script, image) n'est chargée depuis un domaine tiers.
+          </p>
+        </section>
+
+        <section class="bloc">
+          <h2>Journaux techniques de l'hébergeur</h2>
+          <p>
+            Le site est hébergé par Cloudflare, Inc. Comme tout hébergeur,
+            Cloudflare peut produire des journaux techniques dans le cadre du
+            fonctionnement normal de son réseau — par exemple l'adresse IP,
+            la date et l'heure de la requête, la page demandée et le
+            navigateur utilisé — à des fins de sécurité et d'exploitation du
+            service. Ce site n'a pas accès à ces journaux et ne les
+            exploite d'aucune façon. Pour le détail de ce traitement, se
+            reporter à la politique de confidentialité de Cloudflare.
+          </p>
+        </section>
+
+        <section class="bloc">
+          <h2>Évolution de cette page</h2>
+          <p>
+            Si un formulaire, un cookie ou un outil de mesure d'audience
+            venait à être ajouté au site, cette page serait le premier
+            document mis à jour, avant toute mise en ligne.
+          </p>
+        </section>
+
+        <section class="bloc">
+          <h2>Contact</h2>
+          <p>
+            Pour toute question relative à cette politique, écrire à
+            <a href={`mailto:${cabinet.email}`}>{cabinet.email}</a>.
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .page {
+    background: var(--creme);
+    padding: clamp(56px, 12cqw, 100px) clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+  }
+
+  .conteneur {
+    max-width: var(--largeur-contenu);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(36px, 5.5cqw, 56px);
+  }
+
+  .entete {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 66ch;
+  }
+
+  .surtitre {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: clamp(13px, 3.2cqw, 15px);
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--or-lien);
+  }
+
+  .titre {
+    margin: 0;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(30px, 7.6cqw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .intro {
+    margin: 8px 0 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.65;
+    color: var(--encre-douce);
+  }
+
+  .corps {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(28px, 4.5cqw, 40px);
+    max-width: 66ch;
+  }
+
+  .bloc h2 {
+    margin: 0 0 12px;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(21px, 5cqw, 26px);
+    line-height: 1.2;
+  }
+
+  .bloc p {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.65;
+    color: var(--encre);
+  }
+</style>
