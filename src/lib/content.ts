@@ -17,6 +17,9 @@ export interface Cabinet {
   // Renseignés par la cliente ; le pied de page et les mentions légales ne
   // rendent chaque champ que s'il a une valeur (tâche 13).
   siret?: string; assuranceRcPro?: string; statutJuridique?: string;
+  // URL de la fiche Google Business Profile ; tant qu'elle n'est pas fournie,
+  // la section avis ne rend pas le lien "Voir tous les avis sur Google".
+  googleAvisUrl?: string;
 }
 
 export async function getCabinet(): Promise<Cabinet> {
