@@ -8,14 +8,27 @@ Site vitrine one-page pour une praticienne en massage bien-être à Carquefou. L
 conversion visée est l'appel téléphonique : `tel:0667989710`. Il n'y a ni
 formulaire, ni compte utilisateur, ni base de données.
 
-Le design source est le projet Claude Design `6069b7a5-682e-42da-8370-d3b6bdc9babf`,
-fichiers `Accueil Vert Or.dc.html` (scène de présentation) et
-`Accueil Page Vert Or.dc.html` (la page réelle, 258 Ko).
+**Sources du design et du contenu**, toutes versionnées dans `design/` :
+
+| Fichier | Apporte |
+|---|---|
+| `accueil-page-vert-or.dc.html` | Markup et styles réels : nav, hero, soins, tarifs, parcours. Tronqué au-delà (voir plus bas). |
+| `trois-directions-marque.pdf` | Maquette pleine page complète, direction crème. Mise en page identique à Vert Or — seule la palette diffère. Seule source pour cabinet, avis, prendre rendez-vous, FAQ, footer. |
+| `contenu-client.docx` | Contenu rédactionnel intégral, découpé par section. |
+| `assets/` | Images sources non compressées. |
+
+Le fichier `.dc.html` provient du projet Claude Design
+`6069b7a5-682e-42da-8370-d3b6bdc9babf`. Il pèse 258 Ko parce que ses images sont
+inlinées en base64, au-delà du plafond de lecture de 256 KiB du MCP : la fin est
+donc coupée. Tant que les images n'y sont pas dé-inlinées vers `uploads/`, aucune
+re-synchronisation future ne sera possible.
 
 **Dans le périmètre**
 
-- Page d'accueil : sections hero, parcours, soins, tarifs, contact.
+- Page d'accueil, dix sections dans cet ordre : hero, soins, parcours, citation,
+  forfaits, cabinet, avis, prendre rendez-vous, FAQ, footer.
 - Page mentions légales (obligation art. 6 LCEN pour une activité professionnelle).
+- Page politique de confidentialité, prévue par le footer du design.
 - Page 404, requise par la configuration de déploiement (section 7).
 - Déploiement sur Cloudflare Workers static assets.
 
@@ -83,6 +96,7 @@ caroline-massage/
 │   └── pages/
 │       ├── index.astro
 │       ├── mentions-legales.astro
+│       ├── politique-confidentialite.astro
 │       └── 404.astro
 ├── tests/
 └── docs/superpowers/specs/
@@ -117,13 +131,19 @@ statique et il est acceptable pour un site vitrine.
 
 **Contenu modélisé**
 
-- `cabinet.yaml` — téléphone, adresse, horaires, fourchette de prix. Source
-  unique : le JSON-LD et le texte affiché sont tous deux générés à partir de ce
-  fichier, jamais recopiés. Sinon les deux divergent à la première modification.
-- `soins/` — un fichier par soin (thaï à l'huile, Deep Tissue, ciblé, pieds) :
-  nom, durée, prix, description.
-- `avis/` — un fichier par avis. Cette collection ne contient que des avis
-  authentiques ; à défaut, la section n'est pas affichée. Des avis inventés
+- `cabinet.yaml` — téléphone, e-mail, ville, horaires, délai de réponse, Instagram,
+  SIRET, assurance RC pro, fourchette de prix. Source unique : le JSON-LD, le
+  footer et le texte affiché sont tous générés à partir de ce fichier, jamais
+  recopiés. Sinon ils divergent à la première modification.
+- `soins/` — cinq fichiers : découverte, ciblé, pieds, thaï à l'huile, signature.
+  Nom, sous-titre, description, tarifs (une ou deux durées), et un booléen
+  `signature` pour la carte à fond vert du design.
+- `forfaits.yaml` — quatre forfaits, avec prix courant, prix barré et économie.
+- `faq/` — sept questions, chacune un fichier titre + réponse.
+- `avis/` — un fichier par avis. Le design lui-même les marque comme des
+  emplacements (`[TEXTE DE L'AVIS — texte intégral, jamais réécrit]`). Cette
+  collection ne contient que des avis authentiques repris mot pour mot ; si elle
+  est vide, la section n'est pas rendue. Des avis inventés ou réécrits
   constituent une pratique commerciale trompeuse (art. L121-2 code de la consommation).
 
 ## 5. Traduction du design
@@ -269,10 +289,25 @@ Les animations sont vérifiées manuellement dans les deux états de
 ## 10. Décisions à confirmer avec la cliente
 
 Ces points bloquent du contenu, pas de l'architecture. L'implémentation peut
-démarrer sans eux.
+démarrer sans eux : ils alimentent `cabinet.yaml`, dont la forme est déjà fixée.
 
-1. Les avis clients sont-ils authentiques et publiables ? Sinon la section saute.
-2. Veut-elle des statistiques de fréquentation ?
-3. Adresse postale exacte pour le JSON-LD — le design ne donne que la commune.
-4. Contenu des mentions légales : statut juridique, numéro SIRET, hébergeur,
-   assurance professionnelle.
+**Contradictions entre les sources, à arbitrer**
+
+| Point | `.dc.html` / PDF | `contenu-client.docx` |
+|---|---|---|
+| Ville | Nantes (PDF), Carquefou (JSON-LD) | Nantes |
+| Horaires | 9 h – 20 h | 10 h – 19 h |
+| Adresse | non publiée, « communiquée à la confirmation » | 1 rue des Martyrs, 44100 Nantes |
+| `priceRange` | 45 €–140 € | 45 €–130 € à l'unité |
+
+L'adresse mérite une décision explicite : le design choisit de ne pas la publier,
+ce qui est défendable pour une praticienne exerçant seule, mais un JSON-LD
+`MassageBusiness` sans `streetAddress` est moins performant en référencement
+local. Par défaut, on suit le design — ville seule — jusqu'à décision contraire.
+
+**Autres points à confirmer**
+
+1. Les avis Google sont-ils disponibles ? Sinon la section n'est pas rendue.
+2. Statistiques de fréquentation souhaitées ?
+3. Mentions légales : statut juridique, SIRET, assurance RC pro, hébergeur.
+4. Compte Instagram lié depuis le footer.
