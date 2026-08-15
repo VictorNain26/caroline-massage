@@ -570,7 +570,7 @@ Attendu : des fichiers de police présents dans le répertoire de sortie.
 ```bash
 git add astro.config.mjs src/styles/tokens.css src/layouts/Base.astro \
   src/pages/index.astro tests/unit/no-third-party.test.ts
-git commit -m "feat: self-host fonts, add design tokens and base layout"
+git commit -m "feat(layout): self-host fonts, add design tokens and base layout"
 ```
 
 ---
@@ -1946,7 +1946,7 @@ Dans `.github/workflows/ci.yml`, après l'étape `pnpm build` :
 
 ```bash
 git add playwright.config.ts tests/a11y/axe.spec.ts .github/workflows/ci.yml package.json pnpm-lock.yaml
-git commit -m "test: enforce zero axe violations across all pages in CI"
+git commit -m "test(a11y): enforce zero axe violations across all pages in CI"
 ```
 
 - [ ] **Step 7: Premier déploiement**
