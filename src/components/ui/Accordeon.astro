@@ -8,6 +8,7 @@ const { titre } = Astro.props;
 
 <details class="accordeon">
   <summary>
+    <span class="icone" aria-hidden="true"><slot name="icone" /></span>
     <span class="titre">{titre}</span>
     <span class="marque" aria-hidden="true"></span>
   </summary>
@@ -28,7 +29,6 @@ const { titre } = Astro.props;
   summary {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 16px;
     padding: 20px 0;
     cursor: pointer;
@@ -41,7 +41,17 @@ const { titre } = Astro.props;
     outline: 2px solid var(--or);
     outline-offset: 3px;
   }
+  .icone {
+    flex: none;
+    display: flex;
+    color: var(--or);
+  }
+  .icone:empty {
+    display: none;
+  }
   .titre {
+    flex: 1;
+    min-width: 0;
     font-family: var(--font-titre), Georgia, serif;
     font-size: 1.15rem;
     color: var(--accordeon-couleur-titre, var(--encre));
