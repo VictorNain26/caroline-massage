@@ -1,0 +1,60 @@
+---
+interface Props {
+  href: string;
+  variante?: 'plein' | 'contour';
+}
+
+const { href, variante = 'plein' } = Astro.props;
+---
+
+<a href={href} class={`bouton ${variante}`}><slot /></a>
+
+<style>
+  .bouton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 0 24px;
+    border-radius: var(--rayon);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .plein {
+    background: var(--vert-profond);
+    color: var(--creme);
+    border: 1px solid color-mix(in srgb, var(--or) 55%, transparent);
+  }
+  .plein:hover {
+    background: var(--vert-clair);
+    color: var(--creme);
+  }
+  .contour {
+    background: none;
+    color: var(--vert-profond);
+    border: 1px solid var(--vert-profond);
+  }
+  .contour:hover {
+    background: var(--vert-profond);
+    color: var(--creme);
+  }
+  .bouton:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bouton {
+      transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.25s ease;
+    }
+    .bouton:active {
+      transform: scale(0.985);
+    }
+  }
+</style>

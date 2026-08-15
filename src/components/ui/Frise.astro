@@ -1,0 +1,28 @@
+---
+import { Image } from 'astro:assets';
+import frise from '../../assets/images/caro-ornement-frise.png';
+---
+
+<div class="frise" aria-hidden="true">
+  <Image src={frise} alt="" width={640} height={42} />
+</div>
+
+<style>
+  .frise {
+    position: relative;
+    height: 0;
+    overflow: visible;
+    z-index: 5;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+  }
+  .frise :global(img) {
+    position: absolute;
+    top: 0;
+    transform: translateY(-50%);
+    width: min(640px, 78%);
+    height: auto;
+    display: block;
+  }
+</style>

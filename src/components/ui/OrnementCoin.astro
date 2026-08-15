@@ -1,0 +1,41 @@
+---
+import { Image } from 'astro:assets';
+import coin from '../../assets/images/caro-ornement-coin.png';
+
+interface Props {
+  position: 'haut-gauche' | 'haut-droite' | 'bas-gauche' | 'bas-droite';
+}
+
+const { position } = Astro.props;
+---
+
+<Image src={coin} alt="" width={96} height={96} class={`ornement ${position}`} />
+
+<style>
+  .ornement {
+    position: absolute;
+    width: clamp(48px, 8cqw, 96px);
+    height: auto;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .haut-gauche {
+    top: clamp(12px, 2.6cqw, 26px);
+    left: clamp(12px, 2.6cqw, 26px);
+  }
+  .haut-droite {
+    top: clamp(12px, 2.6cqw, 26px);
+    right: clamp(12px, 2.6cqw, 26px);
+    transform: scaleX(-1);
+  }
+  .bas-gauche {
+    bottom: clamp(12px, 2.6cqw, 26px);
+    left: clamp(12px, 2.6cqw, 26px);
+    transform: scaleY(-1);
+  }
+  .bas-droite {
+    bottom: clamp(12px, 2.6cqw, 26px);
+    right: clamp(12px, 2.6cqw, 26px);
+    transform: rotate(180deg);
+  }
+</style>
