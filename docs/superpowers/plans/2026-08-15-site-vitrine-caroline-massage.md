@@ -798,8 +798,9 @@ appeler ou écrire puisque le formulaire n'est pas porté).
 C'est le fichier qui déclare **d'où** vient le contenu. Le jour du CMS, seuls les `loader` changent ; les schémas et `lib/content.ts` restent identiques.
 
 ```ts
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
 const tarif = z.object({ duree: z.number().int().positive(), prix: z.number().positive() });
 
