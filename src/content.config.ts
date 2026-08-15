@@ -1,4 +1,5 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 
 const tarif = z.object({ duree: z.number().int().positive(), prix: z.number().positive() });
@@ -31,7 +32,7 @@ const avis = defineCollection({
     note: z.number().int().min(1).max(5),
     texte: z.string(),
     date: z.string(),
-    url: z.string().url(),
+    url: z.url(),
   }),
 });
 
