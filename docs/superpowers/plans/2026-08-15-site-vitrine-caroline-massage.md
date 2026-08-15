@@ -525,7 +525,7 @@ Fichier `tests/unit/no-third-party.test.ts` :
 
 ```ts
 import { test, expect } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 function fichiersHtml(dir: string): string[] {
@@ -540,7 +540,10 @@ function fichiersHtml(dir: string): string[] {
 
 test('aucune référence à un domaine tiers dans le HTML produit', () => {
   const interdits = ['fonts.googleapis.com', 'fonts.gstatic.com'];
-  for (const fichier of fichiersHtml('dist')) {
+  expect(existsSync('dist'), 'dist/ est absent — lancer `pnpm build` avant `pnpm test`').toBe(true);
+  const fichiers = fichiersHtml('dist');
+  expect(fichiers.length, 'aucun fichier HTML trouvé dans dist/ — le build a-t-il été lancé ?').toBeGreaterThan(0);
+  for (const fichier of fichiers) {
     const contenu = readFileSync(fichier, 'utf8');
     for (const domaine of interdits) {
       expect(contenu, `${fichier} référence ${domaine}`).not.toContain(domaine);
@@ -548,6 +551,10 @@ test('aucune référence à un domaine tiers dans le HTML produit', () => {
   }
 });
 ```
+
+Les deux assertions avant la boucle ne sont pas décoratives : sans elles, le test
+n'exécute aucune assertion quand `dist/` est vide ou absent, et rapporte vert.
+Un garde-fou qui passe sur une entrée vide ne garde rien.
 
 - [ ] **Step 6: Lancer le test et vérifier qu'il passe**
 
