@@ -48,6 +48,7 @@ const sections = defineCollection({
     entrees: z
       .array(z.object({ libelle: z.string(), texte: z.string() }))
       .optional(),
+    citation: z.object({ texte: z.string(), auteur: z.string() }).optional(),
   }),
 });
 
