@@ -204,8 +204,11 @@ const liens = [
     background: color-mix(in srgb, var(--vert-profond) 97%, transparent);
     border: 0;
     text-align: left;
+    /* touch-action: none deliberately absent — the design needed it against a
+       plain positioned overlay with a live document behind it, but showModal()
+       already renders everything outside this <dialog> inert, and keeping it
+       would risk blocking touch-scroll on .liens-mobile's overflow-y: auto. */
     overscroll-behavior: contain;
-    touch-action: none;
   }
 
   .panneau::backdrop {
