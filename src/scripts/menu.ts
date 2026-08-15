@@ -6,6 +6,7 @@ if (toggle && dialog && closeButton) {
   toggle.addEventListener('click', () => {
     dialog.showModal();
     toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Fermer le menu');
   });
 
   closeButton.addEventListener('click', () => {
@@ -21,6 +22,7 @@ if (toggle && dialog && closeButton) {
   // le clavier a la main).
   dialog.addEventListener('close', () => {
     toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Ouvrir le menu');
     toggle.focus();
   });
 }
