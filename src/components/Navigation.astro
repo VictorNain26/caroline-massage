@@ -194,11 +194,19 @@ const liens = [
     background: currentColor;
   }
 
+  /* `display` reste conditionné à [open]. La feuille de style du navigateur
+     porte `dialog:not([open]) { display: none }` (HTML Standard, § Rendering,
+     "Flow content") : une déclaration `display` d'auteur sur `.panneau` la
+     supplante — origine auteur > origine UA — et le panneau recouvrirait la
+     page en permanence, fermé comme ouvert. */
+  .panneau[open] {
+    display: flex;
+  }
+
   .panneau {
     position: fixed;
     inset: 0;
     z-index: 30;
-    display: flex;
     flex-direction: column;
     width: 100%;
     max-width: none;

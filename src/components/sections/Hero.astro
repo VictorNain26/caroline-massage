@@ -51,9 +51,13 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
 </section>
 
 <style>
+  /* Pas de `width: 100%` ici : le projet n'a pas de remise à zéro
+     `box-sizing: border-box`, donc `width` désigne la boîte de contenu et
+     `100%` + le `padding` ci-dessous débordait la fenêtre de deux fois le
+     padding. Une section de niveau bloc remplit déjà sa largeur disponible. */
   .hero {
+    scroll-margin-top: 90px;
     position: relative;
-    width: 100%;
     min-height: 100cqh;
     display: flex;
     flex-direction: column;

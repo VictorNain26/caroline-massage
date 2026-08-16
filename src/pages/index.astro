@@ -19,15 +19,17 @@ const avis = await getAvis();
   title="Massage thaï à l’huile & Deep Tissue | Caroline, massage sur-mesure"
   description="Massages sur-mesure : thaï à l’huile, Deep Tissue, massage ciblé ou des pieds. Cabinet calme, clientèle mixte, soins strictement bien-être."
 >
-  <Hero />
-  <Soins />
-  <Tarifs />
-  <Frise />
-  <Parcours />
-  <Cabinet />
-  {avis.length > 0 && <Frise />}
-  <Avis />
-  <Faq />
-  <Contact />
-  <Frise />
+  <main>
+    <Hero />
+    <Soins />
+    <Tarifs />
+    <Frise />
+    <Parcours />
+    <Cabinet />
+    {avis.length > 0 && <Frise />}
+    <Avis />
+    <Faq />
+    <Contact />
+    <Frise />
+  </main>
 </Base>

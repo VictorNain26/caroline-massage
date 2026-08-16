@@ -20,6 +20,15 @@ const { href, variante = 'vert' } = Astro.props;
     align-items: center;
     justify-content: center;
     min-height: var(--bouton-hauteur, 48px);
+    /* Garde-fou de reflow (WCAG 2.1 SC 1.4.10) : un libellé insécable — le
+       courriel de la section contact — imposait 377px de largeur minimale et
+       débordait la fenêtre à 320px. `anywhere`, et non `break-word`, parce que
+       seul lui « [introduces] soft wrap opportunities [...] considered when
+       calculating min-content intrinsic sizes » (MDN, overflow-wrap) : c'est
+       la taille intrinsèque qu'il faut faire céder. Sans effet au-delà. */
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-align: center;
     padding: 0 24px;
     border-radius: var(--rayon);
     font-weight: 700;

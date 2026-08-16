@@ -15,7 +15,9 @@ const section = await getSection('tarifs');
     scroll-margin-top: 90px;
     max-width: 720px;
     margin: clamp(28px, 4.5cqw, 48px) auto 0;
-    width: 100%;
+    /* Pas de `width: 100%` : sans remise à zéro `box-sizing: border-box`,
+       `100%` s'ajoutait au `padding` ci-dessous et débordait la fenêtre en
+       dessous de 720px. La largeur automatique donne le même rendu au-delà. */
     display: flex;
     flex-direction: column;
     align-items: center;
