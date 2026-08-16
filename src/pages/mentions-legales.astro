@@ -10,10 +10,15 @@ const cabinet = await getCabinet();
 // Liste et ordre des mentions obligatoires pour une entreprise individuelle :
 // entreprendre.service-public.gouv.fr/vosdroits/F31228.
 const champsObligatoires = [
+  { libelle: 'Nom et prénom', valeur: cabinet.nom },
   { libelle: 'Statut juridique', valeur: cabinet.statutJuridique },
   { libelle: 'Numéro SIRET', valeur: cabinet.siret },
   { libelle: 'Numéro RCS', valeur: cabinet.rcs },
   { libelle: 'Numéro de TVA intracommunautaire', valeur: cabinet.tva },
+  {
+    libelle: "Adresse déclarée de l'éditrice (mention légale)",
+    valeur: cabinet.adresse,
+  },
 ];
 ---
 
@@ -66,10 +71,17 @@ const champsObligatoires = [
               <dd><a href={`mailto:${cabinet.email}`}>{cabinet.email}</a></dd>
             </div>
             <div class="champ">
-              <dt>Adresse</dt>
+              <dt>Lieu de réception de la clientèle (information commerciale)</dt>
               <dd>Cabinet privé à {cabinet.ville}. Adresse exacte communiquée à la confirmation du rendez-vous.</dd>
             </div>
           </dl>
+          <p class="note">
+            Ce lieu de réception ne remplace pas l'adresse déclarée de
+            l'éditrice exigée ci-dessus : la première est une information
+            commerciale (où la clientèle est reçue), la seconde une mention
+            légale d'identification, distincte même lorsque les deux
+            coïncident.
+          </p>
         </section>
 
         <section class="bloc">
@@ -77,7 +89,10 @@ const champsObligatoires = [
           <p>
             Le site est hébergé par Cloudflare, Inc., 101 Townsend St, San
             Francisco, CA 94107, États-Unis, sur son offre Cloudflare
-            Workers (hébergement d'actifs statiques).
+            Workers (hébergement d'actifs statiques). Adresse confirmée par
+            la
+            <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">politique de confidentialité de Cloudflare</a>
+            (section 19, « Contact Information »).
           </p>
           <dl class="champs">
             <div class="champ">

@@ -15,11 +15,15 @@ export interface Cabinet {
   instagram: string;
   prixMin: number; prixMax: number;
   // Renseignés par la cliente ; le pied de page et les mentions légales ne
-  // rendent chaque champ que s'il a une valeur (tâche 13). siret, rcs et tva
-  // sont les mentions obligatoires listées par
+  // rendent chaque champ que s'il a une valeur (tâche 13). nom, adresse,
+  // siret, rcs et tva sont les mentions obligatoires listées par
   // entreprendre.service-public.gouv.fr/vosdroits/F31228 pour une
-  // entreprise individuelle ; assuranceRcPro et statutJuridique sont des
-  // informations complémentaires, non exigées par cette même source.
+  // entreprise individuelle — adresse y désigne l'adresse déclarée de
+  // l'éditrice, une mention légale, à ne pas confondre avec le lieu de
+  // réception de la clientèle (cabinet.ville, une information commerciale) ;
+  // assuranceRcPro et statutJuridique sont des informations complémentaires,
+  // non exigées par cette même source.
+  nom?: string; adresse?: string;
   siret?: string; rcs?: string; tva?: string;
   assuranceRcPro?: string; statutJuridique?: string;
   // URL de la fiche Google Business Profile ; tant qu'elle n'est pas fournie,
