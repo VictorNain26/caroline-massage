@@ -61,7 +61,7 @@ const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop
 <style>
   .pied {
     background: var(--creme-surface);
-    padding: clamp(96px, 17cqw, 156px) clamp(20px, 5.5cqw, 80px) 120px;
+    padding: var(--section-haut) var(--gouttiere) 120px;
     display: flex;
     flex-direction: column;
     gap: clamp(24px, 4cqw, 40px);
@@ -182,7 +182,7 @@ const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop
     align-items: center;
     gap: 10px;
     font-family: var(--font-texte), sans-serif;
-    font-size: clamp(16px, 4.2cqw, 18px);
+    font-size: var(--texte-corps);
     line-height: 1.5;
   }
 

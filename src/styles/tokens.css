@@ -4,6 +4,12 @@
   --or: #d4a94c;
   --or-clair: #e4c070;
   --or-bronze: #96742c;
+  /* L'or du texte, et non `--or-bronze` que la maquette emploie : celui-ci
+     mesure 4,07:1 sur `--creme` et 3,51:1 sur `--creme-surface`, sous le
+     plancher AA de 4,5:1 pour du texte de taille normale. Arbitré par la
+     propriétaire — ne pas le restaurer depuis la maquette lors d'un
+     `sync-design`. Sur fond sombre aucun des deux ne convient (1,99:1 et
+     2,90:1) : une section sombre passe à `--sable`, qui mesure 6,48:1. */
   --or-lien: #7a5a24;
   --creme: #fbf7f0;
   --creme-surface: #efe6d8;
@@ -15,4 +21,20 @@
   --pas: 8px;
   --rayon: 14px;
   --largeur-contenu: 1180px;
+
+  /* Mesures que le design réemploie d'une section à l'autre. Les `cqw` restent
+     résolus sur l'élément qui écrit `var()`, pas ici : une custom property est
+     substituée comme du texte, et « the value is computed where it is needed,
+     not stored » (MDN, Using CSS custom properties). Les rassembler ne change
+     donc aucun rendu.
+     Les `clamp()` propres à une seule section restent littéraux dans leur
+     composant, comme le veut `.claude/rules/astro.md` : sans réemploi, un
+     token n'ajouterait que de l'indirection. */
+  --gouttiere: clamp(20px, 5.5cqw, 80px);
+  --section-haut: clamp(96px, 17cqw, 156px);
+  --section-bas: clamp(80px, 14cqw, 120px);
+  --cadre-retrait: clamp(15px, 2.6cqw, 34px);
+  --ornement-retrait: clamp(12px, 2.6cqw, 26px);
+  --texte-corps: clamp(16px, 4.2cqw, 18px);
+  --texte-surtitre: clamp(13px, 3.2cqw, 15px);
 }

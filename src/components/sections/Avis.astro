@@ -120,7 +120,7 @@ function depuis(date: string): string {
     flex-direction: column;
     gap: clamp(24px, 4cqw, 40px);
     background: var(--creme-surface);
-    padding: clamp(96px, 17cqw, 156px) 0 clamp(80px, 14cqw, 120px);
+    padding: var(--section-haut) 0 var(--section-bas);
   }
 
   /* `border-box` sans quoi le rembourrage s'ajoute au `max-width` : l'en-tête
@@ -128,8 +128,8 @@ function depuis(date: string): string {
      sur la moitié du débord. Le projet n'a pas de remise à zéro globale. */
   .entete {
     box-sizing: border-box;
-    padding: 0 clamp(20px, 5.5cqw, 80px);
-    max-width: calc(var(--largeur-contenu) + 2 * clamp(20px, 5.5cqw, 80px));
+    padding: 0 var(--gouttiere);
+    max-width: calc(var(--largeur-contenu) + 2 * var(--gouttiere));
     margin: 0 auto;
     width: 100%;
     display: flex;
@@ -182,8 +182,8 @@ function depuis(date: string): string {
     overflow-x: auto;
     scrollbar-width: none;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: clamp(20px, 5.5cqw, 80px);
-    padding: 4px clamp(20px, 5.5cqw, 80px) 6px;
+    scroll-padding-inline: var(--gouttiere);
+    padding: 4px var(--gouttiere) 6px;
     align-items: stretch;
   }
 
@@ -360,8 +360,8 @@ function depuis(date: string): string {
      donc à gauche, aligné sur le titre de section. */
   .pied {
     box-sizing: border-box;
-    padding: 0 clamp(20px, 5.5cqw, 80px);
-    max-width: calc(var(--largeur-contenu) + 2 * clamp(20px, 5.5cqw, 80px));
+    padding: 0 var(--gouttiere);
+    max-width: calc(var(--largeur-contenu) + 2 * var(--gouttiere));
     margin: 0 auto;
     width: 100%;
     display: flex;
@@ -421,7 +421,7 @@ function depuis(date: string): string {
     .liste {
       flex-wrap: wrap;
       overflow-x: visible;
-      padding: 4px max(clamp(20px, 5.5cqw, 80px), calc((100% - var(--largeur-contenu)) / 2)) 6px;
+      padding: 4px max(var(--gouttiere), calc((100% - var(--largeur-contenu)) / 2)) 6px;
     }
 
     .carte {

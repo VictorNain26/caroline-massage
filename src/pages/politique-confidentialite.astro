@@ -80,7 +80,7 @@ const cabinet = await getCabinet();
 <style>
   .page {
     background: var(--creme);
-    padding: clamp(56px, 12cqw, 100px) clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+    padding: clamp(56px, 12cqw, 100px) var(--gouttiere) var(--section-bas);
   }
 
   .conteneur {
@@ -101,7 +101,7 @@ const cabinet = await getCabinet();
   .surtitre {
     font-family: var(--font-texte), sans-serif;
     font-weight: 500;
-    font-size: clamp(13px, 3.2cqw, 15px);
+    font-size: var(--texte-surtitre);
     line-height: 1;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -120,7 +120,7 @@ const cabinet = await getCabinet();
   .intro {
     margin: 8px 0 0;
     font-family: var(--font-texte), sans-serif;
-    font-size: clamp(16px, 4.2cqw, 18px);
+    font-size: var(--texte-corps);
     line-height: 1.65;
     color: var(--encre-douce);
   }
@@ -143,7 +143,7 @@ const cabinet = await getCabinet();
   .bloc p {
     margin: 0;
     font-family: var(--font-texte), sans-serif;
-    font-size: clamp(16px, 4.2cqw, 18px);
+    font-size: var(--texte-corps);
     line-height: 1.65;
     color: var(--encre);
   }

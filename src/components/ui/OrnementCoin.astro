@@ -19,16 +19,15 @@ const { position } = Astro.props;
 />
 
 <style>
-  /*
-   * Extension points, set by the consuming section on its own container —
-   * do not add props for these, the design uses a different value per
-   * section (hero, parcours, contact) and props would just relay inline
-   * styles three times over:
-   *   --orn-taille   width of the ornament
-   *   --orn-retrait  inset from the edge it hugs
-   *   --orn-opacite  opacity
-   * Defaults below match the parcours section, the most common case.
-   */
+  /* Points d'extension, posés par la section qui consomme le composant sur
+     son propre conteneur. Ne pas en faire des props : le design donne une
+     valeur différente par section (hero, parcours, contact), et des props ne
+     feraient que relayer trois fois des styles inline.
+       --orn-taille   largeur de l'ornement
+       --orn-retrait  retrait par rapport au bord qu'il longe
+       --orn-opacite  opacité
+     Les valeurs de repli ci-dessous sont celles de parcours, le cas le plus
+     fréquent. */
   .ornement {
     position: absolute;
     width: var(--orn-taille, clamp(48px, 8cqw, 96px));
@@ -37,22 +36,22 @@ const { position } = Astro.props;
     pointer-events: none;
   }
   .haut-gauche {
-    top: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
-    left: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    top: var(--orn-retrait, var(--ornement-retrait));
+    left: var(--orn-retrait, var(--ornement-retrait));
   }
   .haut-droite {
-    top: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
-    right: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    top: var(--orn-retrait, var(--ornement-retrait));
+    right: var(--orn-retrait, var(--ornement-retrait));
     transform: scaleX(-1);
   }
   .bas-gauche {
-    bottom: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
-    left: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    bottom: var(--orn-retrait, var(--ornement-retrait));
+    left: var(--orn-retrait, var(--ornement-retrait));
     transform: scaleY(-1);
   }
   .bas-droite {
-    bottom: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
-    right: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    bottom: var(--orn-retrait, var(--ornement-retrait));
+    right: var(--orn-retrait, var(--ornement-retrait));
     transform: rotate(180deg);
   }
 </style>
