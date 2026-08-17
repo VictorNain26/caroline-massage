@@ -1,6 +1,16 @@
 ---
 import Bouton from './ui/Bouton.astro';
 
+interface Props {
+  // `hero` reproduit le design (lignes 142-162) : superposée au hero, sans
+  // fond ni bouton. Elle défile donc avec lui et n'est plus atteignable une
+  // fois passé le premier écran. `barre` est le repli des pages sans hero,
+  // où une nav transparente sur fond crème serait illisible.
+  variante?: 'hero' | 'barre';
+}
+
+const { variante = 'barre' } = Astro.props;
+
 // Préfixés par "/" : ces liens doivent aussi fonctionner depuis les pages
 // secondaires (mentions légales, confidentialité, 404), qui n'ont pas ces
 // ancres. Un navigateur qui suit "/#soins" depuis "/" ne recharge que le
@@ -14,7 +24,7 @@ const liens = [
 ];
 ---
 
-<header class="entete">
+<header class:list={['entete', `entete--${variante}`]}>
   <div class="barre">
     <a href="/#hero" aria-label="Retour en haut de page" class="marque">
       <span class="marque-nom">Caroline</span>
@@ -31,9 +41,15 @@ const liens = [
             </li>
           ))
         }
-        <li>
-          <Bouton href="/#contact" variante="vert">Réserver</Bouton>
-        </li>
+        {
+          variante === 'barre' && (
+            <li>
+              <Bouton href="/#contact" variante="vert">
+                Réserver
+              </Bouton>
+            </li>
+          )
+        }
       </ul>
     </nav>
 
@@ -82,10 +98,21 @@ const liens = [
 <script src="../scripts/menu.ts"></script>
 
 <style>
-  .entete {
+  .entete--barre {
     position: sticky;
     top: 0;
     z-index: 20;
+  }
+
+  /* Aucun ancêtre positionné : le bloc conteneur est le document, donc ces
+     décalages placent la nav sur le premier écran, alignée sur le cadre
+     décoratif du hero, qui utilise les mêmes clamp(). */
+  .entete--hero {
+    position: absolute;
+    top: clamp(15px, 2.6cqw, 34px);
+    right: clamp(15px, 2.6cqw, 34px);
+    left: clamp(15px, 2.6cqw, 34px);
+    z-index: 2;
   }
 
   .barre {
@@ -94,9 +121,16 @@ const liens = [
     justify-content: space-between;
     gap: 20px;
     min-height: 62px;
+  }
+
+  .entete--barre .barre {
     padding: 9px max(clamp(20px, 5.5cqw, 80px), calc((100% - var(--largeur-contenu)) / 2));
     background: var(--creme);
     border-bottom: 1px solid var(--sable);
+  }
+
+  .entete--hero .barre {
+    padding: 10px clamp(16px, 3cqw, 34px);
   }
 
   .marque {
@@ -112,8 +146,12 @@ const liens = [
     opacity: 0.72;
   }
 
+  /* L'anneau de focus change d'or selon le fond qu'il touche : `--or` mesure
+     2,05:1 sur `--creme` et `--or-lien` 1,99:1 sur `--vert-profond`, chacun
+     sous le plancher de 3:1 du SC 1.4.11, qui couvre les indicateurs de focus.
+     Barre claire → `--or-lien` ; panneau vert → `--or`. */
   .marque:focus-visible {
-    outline: 2px solid var(--or);
+    outline: 2px solid var(--or-lien);
     outline-offset: 6px;
   }
 
@@ -155,12 +193,34 @@ const liens = [
   }
 
   .liste-liens a:hover {
-    color: var(--or-bronze);
+    color: var(--or-lien);
   }
 
   .liste-liens a:focus-visible {
-    outline: 2px solid var(--or);
+    outline: 2px solid var(--or-lien);
     outline-offset: 3px;
+  }
+
+  /* Sur le vert du hero, l'or clair repasse au-dessus du plancher de 3:1 du
+     SC 1.4.11 là où `--or-lien`, calibré pour le fond crème, restait sous la
+     barre. Même logique que le panneau mobile plus bas. */
+  .entete--hero .marque,
+  .entete--hero .bouton-menu {
+    color: var(--creme);
+  }
+
+  .entete--hero .liste-liens a {
+    color: var(--creme-surface);
+  }
+
+  .entete--hero .liste-liens a:hover {
+    color: var(--or-clair);
+  }
+
+  .entete--hero .marque:focus-visible,
+  .entete--hero .liste-liens a:focus-visible,
+  .entete--hero .bouton-menu:focus-visible {
+    outline-color: var(--or);
   }
 
   .bouton-menu {
@@ -183,7 +243,7 @@ const liens = [
   }
 
   .bouton-menu:focus-visible {
-    outline: 2px solid var(--or);
+    outline: 2px solid var(--or-lien);
     outline-offset: 3px;
   }
 
@@ -249,6 +309,10 @@ const liens = [
 
   .marque--panneau:hover {
     opacity: 0.75;
+  }
+
+  .marque--panneau:focus-visible {
+    outline-color: var(--or);
   }
 
   .bouton-fermer {

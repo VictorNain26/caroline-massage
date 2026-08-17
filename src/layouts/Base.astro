@@ -9,9 +9,11 @@ import { construireJsonLd } from '../lib/jsonld';
 interface Props {
   title: string;
   description: string;
+  // Seul l'accueil a un hero sous lequel glisser une nav transparente.
+  nav?: 'hero' | 'barre';
 }
 
-const { title, description } = Astro.props;
+const { title, description, nav = 'barre' } = Astro.props;
 
 const cabinet = await getCabinet();
 const soins = await getSoins();
@@ -35,7 +37,7 @@ const jsonLd = construireJsonLd(cabinet, soins);
     <slot name="head" />
   </head>
   <body>
-    <Navigation />
+    <Navigation variante={nav} />
     <slot />
     <PiedDePage />
   </body>

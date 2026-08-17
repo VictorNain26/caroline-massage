@@ -3,7 +3,7 @@ sousTitre: "le plus complet"
 description: >-
   Mon massage, pensé pour vous, le jour où vous arrivez. On commence par le dos,
   les épaules et la nuque, avant d’envelopper tout le corps, en modulant la
-  pression selon votre état du jour. Pas de cases à cocher — juste ce dont vous
+  pression selon votre état du jour. Pas de cases à cocher, juste ce dont vous
   avez besoin, aujourd’hui.
 tarifs:
   - { duree: 60, prix: 90 }

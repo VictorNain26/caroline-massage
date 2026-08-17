@@ -8,11 +8,11 @@ const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop
 <footer class="pied">
   <div class="conteneur">
     <div class="ligne-marque">
-      <div class="logotype">
+      <a href="/#hero" class="logotype" aria-label="Retour en haut de page">
         <span class="marque">Caroline</span>
         <span class="separateur" aria-hidden="true"></span>
         <span class="sous-marque">Massage<br />Sur-Mesure</span>
-      </div>
+      </a>
       <a
         href={cabinet.instagram}
         target="_blank"
@@ -84,10 +84,25 @@ const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop
     gap: 16px;
   }
 
+  /* Seul chemin de retour vers la navigation depuis le bas de l'accueil : la
+     nav du hero défile hors de vue et le design ne prévoit pas de second
+     menu. Volontairement sans style de lien, pour ne rien changer au rendu. */
   .logotype {
     display: flex;
     align-items: center;
     gap: clamp(12px, 3cqw, 18px);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .logotype:hover {
+    color: inherit;
+    opacity: 0.72;
+  }
+
+  .logotype:focus-visible {
+    outline: 2px solid var(--or-lien);
+    outline-offset: 6px;
   }
 
   .marque {
@@ -133,7 +148,7 @@ const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop
   }
 
   .instagram:focus-visible {
-    outline: 2px solid var(--or);
+    outline: 2px solid var(--or-lien);
     outline-offset: 3px;
   }
 

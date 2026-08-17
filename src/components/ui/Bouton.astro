@@ -55,9 +55,18 @@ const { href, variante = 'vert' } = Astro.props;
     background: var(--or-clair);
     color: var(--vert-profond);
   }
+  /* L'anneau se pose à 3px hors du bouton, donc sur le fond de la section et
+     non sur le bouton. La variante encode déjà ce fond — un bouton vert ne
+     s'emploie que sur fond clair, un bouton crème que sur fond sombre — d'où
+     l'or par variante : `--or` mesure 2,05:1 sur `--creme` et `--or-lien`
+     1,99:1 sur `--vert-profond`, tous deux sous le plancher de 3:1 du
+     SC 1.4.11, qui couvre les indicateurs de focus. */
   .bouton:focus-visible {
     outline: 2px solid var(--or);
     outline-offset: 3px;
+  }
+  .vert:focus-visible {
+    outline-color: var(--or-lien);
   }
   @media (prefers-reduced-motion: no-preference) {
     .bouton {

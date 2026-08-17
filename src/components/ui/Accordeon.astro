@@ -2,17 +2,31 @@
 interface Props {
   titre: string;
   sousTitre?: string;
+  /* Le design n'accroche le prix au sous-titre QUE dans son arbre mobile
+     (ligne 194), là où la carte est repliée et les pastilles de tarif
+     invisibles. Sa carte desktop s'arrête au sous-titre (ligne 289), le prix
+     étant déjà lisible juste en dessous. Ce complément porte donc cet écart
+     de wording, sans qu'aucune des deux formulations soit inventée. */
+  sousTitreComplement?: string;
+  variante?: 'liste' | 'carte-desktop';
 }
 
-const { titre, sousTitre } = Astro.props;
+const { titre, sousTitre, sousTitreComplement, variante = 'liste' } = Astro.props;
 ---
 
-<details class="accordeon">
+<details class:list={['accordeon', variante]}>
   <summary>
     <span class="icone" aria-hidden="true"><slot name="icone" /></span>
     <span class="titre-groupe">
       <span class="titre">{titre}</span>
-      {sousTitre && <span class="sous-titre">{sousTitre}</span>}
+      {
+        sousTitre && (
+          <span class="sous-titre">
+            {sousTitre}
+            {sousTitreComplement && <span class="sous-titre-complement">{sousTitreComplement}</span>}
+          </span>
+        )
+      }
     </span>
     <span class="marque" aria-hidden="true"></span>
   </summary>
@@ -54,8 +68,12 @@ const { titre, sousTitre } = Astro.props;
   summary::-webkit-details-marker {
     display: none;
   }
+  /* Par défaut clair : `--or` n'y mesure que 2,05:1 sur `--creme`, sous le
+     plancher de 3:1 du SC 1.4.11 qui couvre les indicateurs de focus. La carte
+     signature de Soins est vert profond, où `--or-lien` tombe à 1,99:1 — elle
+     repasse le jeton par ce point d'extension, comme pour ses autres couleurs. */
   summary:focus-visible {
-    outline: 2px solid var(--or);
+    outline: 2px solid var(--accordeon-couleur-focus, var(--or-lien));
     outline-offset: 3px;
   }
   .icone {
@@ -113,6 +131,82 @@ const { titre, sousTitre } = Astro.props;
   @media (prefers-reduced-motion: no-preference) {
     .marque {
       transition: transform 0.25s ease;
+    }
+  }
+
+  /*
+   * Variante « carte-desktop » : le design rend la section soins en deux
+   * traitements (accordéons repliés en mobile, lignes 187-280 ; cartes
+   * ouvertes en grille en desktop, lignes 281-360). Ce sont deux ÉTATS d'un
+   * même composant, pas deux composants — le prop isMobile qui les sépare est
+   * une case de l'éditeur Claude Design (ligne 715), pas un signal disponible
+   * au rendu. Un seul arbre, donc, et le point de bascule est ici.
+   *
+   * 768px : c'est la largeur à partir de laquelle deux colonnes de 300px
+   * tiennent réellement dans la grille auto-fit de Soins. En dessous, la
+   * grille retombe d'elle-même sur une colonne et l'accordéon reste la bonne
+   * réponse.
+   *
+   * `::details-content` (Baseline « newly available » depuis septembre 2025,
+   * MDN) est ce qui ouvre le panneau sans JS ni attribut `open`. Là où il
+   * n'est pas supporté, les cartes restent repliées : dégradation vers le
+   * comportement actuel, jamais vers du contenu perdu.
+   *
+   * Réserve assumée : le `summary` reste un widget de divulgation focalisable
+   * au clavier, alors que la carte desktop du design n'en a aucun. Le replier
+   * ne masque rien puisque la règle ci-dessous ignore l'état `open`.
+   */
+  @media (min-width: 768px) {
+    .carte-desktop::details-content {
+      content-visibility: visible;
+    }
+    .carte-desktop summary {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+      padding: 0;
+      cursor: default;
+    }
+    .carte-desktop .marque {
+      display: none;
+    }
+    .carte-desktop .titre-groupe {
+      gap: 4px;
+    }
+    .carte-desktop .titre {
+      font-size: clamp(24px, 6cqw, 30px);
+      line-height: 1.15;
+    }
+    .carte-desktop .sous-titre {
+      font-size: clamp(16px, 4.2cqw, 18px);
+    }
+    /* Le prix disparaît du sous-titre exactement là où les pastilles de tarif
+       deviennent visibles : la même information reste à l'écran, elle change
+       seulement de place. */
+    .carte-desktop .sous-titre-complement {
+      display: none;
+    }
+    /* `flex:1` sur la description du design (ligne 291) : c'est lui qui aligne
+       le filet et les pastilles de tarif en bas de toutes les cartes d'une
+       rangée, quelle que soit la longueur du texte. Il faut la chaîne flex
+       complète pour que la contrainte descende jusqu'au paragraphe slotté. */
+    .carte-desktop,
+    .carte-desktop::details-content,
+    .carte-desktop .corps {
+      display: flex;
+      flex-direction: column;
+    }
+    /* Sur la racine : la carte qui l'accueille est une colonne flex, et c'est
+       ce maillon qui fait descendre la hauteur de la carte jusqu'au
+       paragraphe. */
+    .carte-desktop,
+    .carte-desktop::details-content,
+    .carte-desktop .corps {
+      flex: 1;
+    }
+    .carte-desktop .corps {
+      padding-top: 14px;
+      padding-bottom: 0;
     }
   }
 </style>

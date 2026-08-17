@@ -11,20 +11,27 @@ const section = await getSection('tarifs');
 </section>
 
 <style>
+  /* Le fond court sur toute la largeur : le design ne fait pas de #tarifs une
+     boîte, il le pose dans le même wrapper plein cadre que #soins (ligne 180).
+     C'est le contenu qui est bridé à 720px, pas la surface beige.
+     L'écart au sommet vaut le `gap` de ce wrapper PLUS le `margin-top` propre
+     à #tarifs (design ligne 362) — la scission en deux sections a supprimé le
+     premier, qui ne s'applique qu'entre frères d'un même conteneur flex. */
   .tarifs {
     scroll-margin-top: 90px;
-    max-width: 720px;
-    margin: clamp(28px, 4.5cqw, 48px) auto 0;
-    /* Pas de `width: 100%` : sans remise à zéro `box-sizing: border-box`,
-       `100%` s'ajoutait au `padding` ci-dessous et débordait la fenêtre en
-       dessous de 720px. La largeur automatique donne le même rendu au-delà. */
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: clamp(10px, 1.8cqw, 14px);
     background: var(--creme-surface);
-    padding: 0 clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+    padding: calc(clamp(28px, 4.5cqw, 48px) + clamp(18px, 3cqw, 34px))
+      clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+  }
+
+  .amorce,
+  .texte {
+    max-width: 720px;
   }
 
   .losange {

@@ -27,13 +27,20 @@ const icones: Record<string, string> = {
 ---
 
 <section id="soins" data-anchor="soins" class="soins">
-  <EnTeteSection surtitre={section.surtitre ?? ''} titre={section.titre} />
+  <div class="entete-conteneur">
+    <EnTeteSection surtitre={section.surtitre ?? ''} titre={section.titre} />
+  </div>
 
   <div class="liste">
     {
       soins.map((soin) => (
         <div class:list={['item', { signature: soin.signature }]}>
-          <Accordeon titre={soin.nom} sousTitre={`${soin.sousTitre} · dès ${prixMin(soin)} €`}>
+          <Accordeon
+            titre={soin.nom}
+            sousTitre={soin.sousTitre}
+            sousTitreComplement={` · dès ${prixMin(soin)} €`}
+            variante="carte-desktop"
+          >
             <Fragment slot="icone">
               <svg
                 width="26"
@@ -74,6 +81,14 @@ const icones: Record<string, string> = {
     padding: clamp(96px, 17cqw, 156px) clamp(20px, 5.5cqw, 80px) 0;
   }
 
+  /* Le bloc titre porte la même limite que la liste (design ligne 182) : sans
+     elle il déborde de 180px à gauche des cartes. */
+  .entete-conteneur {
+    max-width: var(--largeur-contenu);
+    margin: 0 auto;
+    width: 100%;
+  }
+
   .liste {
     max-width: var(--largeur-contenu);
     margin: 0 auto;
@@ -96,6 +111,7 @@ const icones: Record<string, string> = {
     --accordeon-couleur-soustitre: var(--or);
     --accordeon-couleur-corps: var(--creme);
     --accordeon-couleur-marque: var(--or);
+    --accordeon-couleur-focus: var(--or);
   }
 
   .description {
@@ -140,6 +156,61 @@ const icones: Record<string, string> = {
     height: 13px;
     flex: none;
     background: var(--sable);
+  }
+
+  /* Grille de cartes ouvertes du design (lignes 281-360). `auto-fit` avec un
+     minimum en `min(100%, 300px)` se replie tout seul sur une colonne sous
+     ~660px : c'est la même déclaration qui sert les deux largeurs. */
+  @media (min-width: 768px) {
+    .liste {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+      gap: clamp(14px, 2.4cqw, 24px);
+    }
+
+    .item {
+      border-radius: 22px;
+      padding: clamp(26px, 5cqw, 34px);
+      box-shadow: 0 14px 34px rgba(11, 58, 49, 0.06);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* `flex:1` du design (ligne 291) : la description absorbe le surplus de
+       hauteur de la carte, donc le filet et les pastilles se calent en bas,
+       à la même ligne sur toute une rangée. */
+    .description {
+      flex: 1;
+    }
+
+    .item svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    /* Le filet du design (`height:1px;background:#CBB79A`) est un élément à
+       part ; en bordure du bloc de tarifs il ne coûte pas de nœud vide. */
+    .tarifs {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--sable);
+    }
+
+    /* Le design traite la carte signature à part (ligne 344) : un filet
+       `--vert-clair` remplace l'ombre portée, qui n'aurait rien à détacher sur
+       le fond sombre. */
+    .item.signature {
+      border: 1px solid var(--vert-clair);
+      box-shadow: none;
+    }
+
+    .item.signature .tarifs {
+      border-top-color: var(--vert-clair);
+    }
+
+    .description {
+      font-size: clamp(16px, 4.2cqw, 18px);
+    }
   }
 
   .item.signature .separateur {
