@@ -1,0 +1,101 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/tokens.css';
+import Navigation from '../components/Navigation.astro';
+import PiedDePage from '../components/PiedDePage.astro';
+import { getCabinet, getSoins } from '../lib/content';
+import { construireJsonLd } from '../lib/jsonld';
+
+interface Props {
+  title: string;
+  description: string;
+  // Seul l'accueil a un hero sous lequel glisser une nav transparente.
+  nav?: 'hero' | 'barre';
+}
+
+const { title, description, nav = 'barre' } = Astro.props;
+
+const cabinet = await getCabinet();
+const soins = await getSoins();
+const jsonLd = construireJsonLd(cabinet, soins);
+---
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Caroline, Massage Sur-Mesure" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <Font cssVariable="--font-titre" preload />
+    <Font cssVariable="--font-texte" preload />
+    <slot name="head" />
+  </head>
+  <body>
+    {/* Les repères (header, nav, main, footer) satisfont déjà le SC 2.4.1 pour
+        qui navigue au lecteur d'écran ; ce lien couvre l'autre moitié du
+        public, au clavier sans lecteur d'écran, qui traverserait sinon toute
+        la navigation. Il ne se montre qu'une fois atteint au clavier. */}
+    <a href="#contenu" class="lien-evitement">Aller au contenu</a>
+    <Navigation variante={nav} />
+    <slot />
+    <PiedDePage />
+  </body>
+</html>
+
+<style is:global>
+  /* Le design fait défiler jusqu'aux ancres en douceur, et retombe sur un saut
+     sec quand le visiteur demande moins d'animation (`smooth` / `auto` selon
+     `reducedMotion()`). Ici la même règle tient en CSS, sans une ligne de
+     script. `scroll-margin-top` sur les sections écarte l'ancre de la barre
+     collante des pages secondaires. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    margin: 0;
+    background: var(--creme);
+    color: var(--encre);
+    font-family: var(--font-texte), system-ui, sans-serif;
+  }
+
+  /* Hors flux tant qu'il n'a pas le focus, jamais `display: none` ni
+     `visibility: hidden`, qui le retireraient de l'ordre de tabulation et le
+     rendraient inatteignable — donc inutile. */
+  .lien-evitement {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 200;
+  }
+
+  .lien-evitement:focus {
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 24px;
+    background: var(--creme);
+    color: var(--vert-profond);
+    border-radius: 0 0 var(--rayon) var(--rayon);
+    outline: 2px solid var(--or-lien);
+    outline-offset: -4px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+  }
+  a { color: var(--or-lien); }
+  a:hover { color: var(--encre); }
+</style>

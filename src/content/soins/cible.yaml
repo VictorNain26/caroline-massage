@@ -1,0 +1,11 @@
+nom: "Massage ciblé"
+sousTitre: "une zone au choix"
+description: >-
+  Dos, nuque, jambes, tête, face avant ou arrière. Je concentre tout le travail
+  sur la zone qui en a besoin pour aller chercher en profondeur ce que le
+  quotidien accumule.
+tarifs:
+  - { duree: 30, prix: 50 }
+  - { duree: 60, prix: 85 }
+signature: false
+ordre: 2

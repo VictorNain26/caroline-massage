@@ -1,0 +1,28 @@
+surtitre: "Le cabinet"
+titre: "Un cadre pensé pour souffler."
+paragraphes:
+  - >-
+    Un cabinet privé à Carquefou, ouvert du lundi au samedi, de 9h à 20h.
+    Chaque séance commence par cinq à dix minutes d’échange : vos tensions,
+    votre état du jour, ce que vous attendez du soin.
+  - >-
+    Clientèle mixte, femmes et hommes. Soins exclusivement dédiés au
+    bien-être et à la détente.
+entrees:
+  - libelle: "Où"
+    texte: >-
+      Cabinet privé à Carquefou. L’adresse exacte vous est communiquée à la
+      confirmation du rendez-vous.
+  - libelle: "Accès"
+    texte: >-
+      Transports en commun à proximité, stationnement facile aux alentours.
+  - libelle: "À prévoir"
+    texte: >-
+      Arrivez quinze minutes avant l’heure : le temps de vous poser, et de
+      repartir sans précipitation.
+  - libelle: "Sur place"
+    texte: >-
+      Serviettes fournies. Vous gardez vos sous-vêtements pendant toute la
+      séance.
+  - libelle: "Paiement"
+    texte: "Carte bancaire ou espèces, réglés sur place."

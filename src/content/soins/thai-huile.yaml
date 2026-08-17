@@ -1,0 +1,11 @@
+nom: "Massage thaï à l’huile"
+sousTitre: "la technique traditionnelle"
+description: >-
+  La précision du thaï traditionnel, enveloppée dans la douceur de l’huile. Je
+  suis le fil de vos tensions, là où elles se cachent vraiment. Les muscles se
+  réchauffent, s’assouplissent, et finissent par lâcher.
+tarifs:
+  - { duree: 60, prix: 90 }
+  - { duree: 90, prix: 130 }
+signature: false
+ordre: 4

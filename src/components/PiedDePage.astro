@@ -1,0 +1,266 @@
+---
+import { getCabinet } from '../lib/content';
+
+const cabinet = await getCabinet();
+const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop();
+---
+
+<footer class="pied">
+  <div class="conteneur">
+    <div class="ligne-marque">
+      <a href="/#hero" class="logotype" aria-label="Retour en haut de page">
+        <span class="marque">Caroline</span>
+        <span class="separateur" aria-hidden="true"></span>
+        <span class="sous-marque">Massage<br />Sur-Mesure</span>
+      </a>
+      <a
+        href={cabinet.instagram}
+        target="_blank"
+        rel="noopener"
+        aria-label="Instagram"
+        title={`@${identifiantInstagram}`}
+        class="instagram"
+      >
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+          <circle cx="12" cy="12" r="4.2"></circle>
+          <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </a>
+    </div>
+
+    <div class="filet" aria-hidden="true"></div>
+
+    <div class="ligne-liens">
+      <div class="contact-liens">
+        <a href={`tel:${cabinet.telephone}`}>{cabinet.telephoneAffiche}</a>
+        <span class="puce" aria-hidden="true"></span>
+        <a href={`mailto:${cabinet.email}`}>{cabinet.email}</a>
+      </div>
+      <div class="legal-liens">
+        <a href="/mentions-legales">Mentions légales</a>
+        <a href="/politique-confidentialite">Politique de confidentialité</a>
+      </div>
+    </div>
+
+    <div class="ligne-legale">
+      {
+        (cabinet.siret || cabinet.assuranceRcPro) && (
+          <span class="mentions">
+            {cabinet.siret}
+            {cabinet.siret && cabinet.assuranceRcPro && <span class="puce-legale" aria-hidden="true" />}
+            {cabinet.assuranceRcPro}
+          </span>
+        )
+      }
+      <span class="copyright">© 2026 Caroline · Massage Sur-Mesure</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .pied {
+    background: var(--creme-surface);
+    padding: clamp(96px, 17cqw, 156px) clamp(20px, 5.5cqw, 80px) 120px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(24px, 4cqw, 40px);
+  }
+
+  .conteneur {
+    max-width: var(--largeur-contenu);
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 3.4cqw, 28px);
+  }
+
+  .ligne-marque {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  /* Seul chemin de retour vers la navigation depuis le bas de l'accueil : la
+     nav du hero défile hors de vue et le design ne prévoit pas de second
+     menu. Volontairement sans style de lien, pour ne rien changer au rendu. */
+  .logotype {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 3cqw, 18px);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Pas d'état de survol : le design ne rend pas ce logotype interactif, et il
+     doit garder exactement son apparence. Le focus, lui, reste indispensable
+     puisqu'il est devenu le retour en haut de page. */
+  .logotype:focus-visible {
+    outline: 2px solid var(--or-lien);
+    outline-offset: 6px;
+  }
+
+  .marque {
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(26px, 6.6cqw, 34px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .separateur {
+    width: 1px;
+    height: clamp(26px, 6cqw, 32px);
+    background: var(--or-bronze);
+  }
+
+  .sous-marque {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: clamp(9px, 2.2cqw, 11px);
+    line-height: 1.5;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .instagram {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 1px solid var(--or);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--or-bronze);
+    text-decoration: none;
+  }
+
+  .instagram:hover {
+    background: var(--creme);
+    color: var(--vert-profond);
+    border-color: var(--creme);
+  }
+
+  .instagram:focus-visible {
+    outline: 2px solid var(--or-lien);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .instagram {
+      transition:
+        background 0.24s ease,
+        color 0.24s ease,
+        border-color 0.24s ease,
+        transform 0.24s ease;
+    }
+    .instagram:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .filet {
+    height: 1px;
+    background: var(--sable);
+  }
+
+  .ligne-liens {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px 28px;
+  }
+
+  .contact-liens {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.5;
+  }
+
+  .contact-liens a,
+  .legal-liens a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .contact-liens a {
+    border-bottom: 1px solid var(--sable);
+  }
+
+  /* Le design fait virer le filet avec le texte (ligne 698) ; sans cette
+     règle, le soulignement restait sable sous un libellé devenu encre. */
+  .contact-liens a:hover {
+    border-bottom-color: var(--encre);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .contact-liens a,
+    .legal-liens a {
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+  }
+
+  .puce {
+    width: 1px;
+    height: 14px;
+    flex: none;
+    background: var(--sable);
+  }
+
+  .legal-liens {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(15px, 3.9cqw, 16px);
+    line-height: 1.5;
+  }
+
+  .ligne-legale {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 24px;
+    font-family: var(--font-texte), sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--encre-douce);
+  }
+
+  /* Le design pose le copyright à droite, face aux mentions légales. Celles-ci
+     ne se rendent que si la cliente a fourni son SIRET : sans elles, le
+     `space-between` n'a plus qu'un enfant et le rejetterait à gauche. */
+  .copyright {
+    margin-left: auto;
+  }
+
+  .puce-legale {
+    display: inline-block;
+    width: 1px;
+    height: 11px;
+    margin: 0 10px;
+    background: var(--sable);
+    vertical-align: middle;
+  }
+
+  @media (min-width: 900px) {
+    .pied {
+      padding-bottom: clamp(48px, 10cqw, 88px);
+    }
+  }
+</style>

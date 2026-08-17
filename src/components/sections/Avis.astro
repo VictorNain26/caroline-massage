@@ -1,0 +1,450 @@
+---
+import { Image } from 'astro:assets';
+import { getAvis, getCabinet, getSection } from '../../lib/content';
+import EnTeteSection from '../ui/EnTeteSection.astro';
+
+const avis = await getAvis();
+const section = await getSection('avis');
+const cabinet = await getCabinet();
+const note = avis.length > 0 ? avis.reduce((total, a) => total + a.note, 0) / avis.length : 0;
+const noteAffichee = Number.isInteger(note) ? String(note) : note.toFixed(1);
+
+const formateurRelatif = new Intl.RelativeTimeFormat('fr', { numeric: 'always' });
+function depuis(date: string): string {
+  const mois = Math.round((new Date(date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
+  // Un avis de moins de deux semaines s'arrondit à zéro et se lirait « il y a
+  // 0 mois » ; le design ne prévoit que des mois, donc on plancher à un.
+  return formateurRelatif.format(Math.min(mois, -1), 'month');
+}
+---
+
+{
+  avis.length > 0 && (
+    <section id="avis" data-anchor="avis" class="avis">
+      <div class="entete">
+        <EnTeteSection surtitre={section.surtitre ?? ''} titre={section.titre} />
+        <div class="badge-google">
+          <span class="lettre-g" aria-hidden="true">
+            G
+          </span>
+          <span class="nom-google">Avis Google</span>
+          <span role="img" aria-label="5 étoiles sur 5" class="etoiles">
+            ★★★★★
+          </span>
+          <span>
+            {noteAffichee} · {avis.length} avis
+          </span>
+        </div>
+      </div>
+
+      <div class="liste">
+        {avis.map((a, rang) => (
+          <div class="carte">
+            <div class="carte-entete">
+              <span class="lettre-g carte-g" aria-hidden="true">
+                G
+              </span>
+              {a.avatar ? (
+                <Image
+                  src={a.avatar}
+                  alt=""
+                  width={52}
+                  height={52}
+                  densities={[1, 2]}
+                  class="avatar avatar-photo"
+                />
+              ) : (
+                <div class:list={['avatar', `avatar-teinte-${rang % 3}`]} aria-hidden="true">
+                  {a.auteur.charAt(0)}
+                </div>
+              )}
+              <div class="identite">
+                <div class="auteur">
+                  {a.profil ? (
+                    <a href={a.profil} class="lien-profil" target="_blank" rel="noopener">
+                      {a.auteur}
+                    </a>
+                  ) : (
+                    a.auteur
+                  )}
+                </div>
+                <div class="meta">
+                  {/* Cinq glyphes systématiquement, comme le design : la rangée
+                      garde la même largeur d'une carte à l'autre et la note se
+                      lit d'un coup d'œil. Le libellé, lui, porte la vraie note. */}
+                  <span role="img" aria-label={`${a.note} étoiles sur 5`} class="etoiles">
+                    {'★'.repeat(a.note)}
+                    {a.note < 5 && <span class="etoiles-vides">{'★'.repeat(5 - a.note)}</span>}
+                  </span>
+                  <span>{depuis(a.date)}</span>
+                </div>
+              </div>
+            </div>
+            <div class="carte-corps">
+              <p class="texte">{a.texte}</p>
+              <a href={a.url} class="lien" target="_blank" rel="noopener">
+                Lire la suite sur Google
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {(cabinet.googleAvisUrl || avis.length > 1) && (
+        <div class="pied">
+          {cabinet.googleAvisUrl && (
+            <a href={cabinet.googleAvisUrl} class="lien-tous" target="_blank" rel="noopener">
+              Voir tous les avis sur Google →
+            </a>
+          )}
+          {/* Repère de position du carrousel, qui n'existe qu'en mobile. Purement
+              décoratif : la liste elle-même reste parcourable au clavier et
+              annoncée telle quelle. */}
+          {avis.length > 1 && (
+            <div class="puces" aria-hidden="true" data-avis-puces>
+              {avis.map((_, rang) => (
+                <span class:list={['puce', { actif: rang === 0 }]} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  )
+}
+
+<style>
+  .avis {
+    scroll-margin-top: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(24px, 4cqw, 40px);
+    background: var(--creme-surface);
+    padding: clamp(96px, 17cqw, 156px) 0 clamp(80px, 14cqw, 120px);
+  }
+
+  /* `border-box` sans quoi le rembourrage s'ajoute au `max-width` : l'en-tête
+     démarrait alors 90px plus à gauche que les cartes, qui se calent, elles,
+     sur la moitié du débord. Le projet n'a pas de remise à zéro globale. */
+  .entete {
+    box-sizing: border-box;
+    padding: 0 clamp(20px, 5.5cqw, 80px);
+    max-width: calc(var(--largeur-contenu) + 2 * clamp(20px, 5.5cqw, 80px));
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .badge-google {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(15px, 3.9cqw, 16px);
+    line-height: 1.4;
+    color: var(--encre-douce);
+  }
+
+  .lettre-g {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    border: 1px solid var(--or-bronze);
+    border-radius: 999px;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--or-bronze);
+  }
+
+  .nom-google {
+    font-weight: 700;
+    color: var(--encre);
+  }
+
+  .etoiles {
+    color: var(--or-bronze);
+    letter-spacing: 0.08em;
+  }
+
+  .liste {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: clamp(14px, 2.4cqw, 22px);
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: clamp(20px, 5.5cqw, 80px);
+    padding: 4px clamp(20px, 5.5cqw, 80px) 6px;
+    align-items: stretch;
+  }
+
+  .liste::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carte {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    width: min(76cqw, 380px);
+    background: var(--creme);
+    border-radius: 22px;
+    padding: clamp(24px, 4.6cqw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .carte-entete {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .carte-g {
+    order: 3;
+    margin-left: auto;
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+    border-color: var(--sable);
+  }
+
+  .avatar {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--vert-profond);
+    color: var(--creme);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  /* Le design fait tourner trois teintes de pastille d'une carte à l'autre
+     (lignes 491, 506, 521) pour que la colonne d'initiales ne soit pas
+     monotone. */
+  .avatar-teinte-1 {
+    background: var(--or);
+    color: var(--vert-profond);
+  }
+
+  .avatar-teinte-2 {
+    background: var(--or-bronze);
+    color: var(--creme);
+  }
+
+  .identite {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  /* L'initiale sert de repli ; dès que Google fournit la photo, elle prend sa
+     place, l'attribution de l'auteur étant exigée par les règles Places. */
+  .avatar-photo {
+    object-fit: cover;
+  }
+
+  .auteur {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 700;
+    font-size: clamp(18px, 4.6cqw, 20px);
+    line-height: 1.2;
+    color: var(--encre);
+  }
+
+  .etoiles-vides {
+    color: var(--sable);
+  }
+
+  /* Comme les autres liens de la section : le soulignement est un filet, pas
+     un `text-decoration`, et la couleur se fait en douceur. */
+  .lien-profil {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+
+  .lien-profil:hover {
+    color: var(--or-lien);
+    border-bottom-color: var(--or-lien);
+  }
+
+  .lien-profil:focus-visible {
+    outline: 2px solid var(--or-lien);
+    outline-offset: 3px;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-texte), sans-serif;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--encre-douce);
+  }
+
+  .carte-corps {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .texte {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(17px, 4.4cqw, 20px);
+    line-height: 1.65;
+    color: var(--encre);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+    line-clamp: 6;
+    overflow: hidden;
+    text-wrap: pretty;
+  }
+
+  .lien {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    margin-top: auto;
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--or-bronze);
+    text-decoration: none;
+    border-bottom: 1px solid var(--sable);
+    padding-bottom: 2px;
+  }
+
+  .puces {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .puce {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--sable);
+  }
+
+  .puce.actif {
+    width: 26px;
+    background: var(--or);
+  }
+
+  /* Le design met ce lien face aux puces du carrousel dans un `space-between`
+     (ligne 535) ; les puces n'existant qu'en mobile, il reste seul et se cale
+     donc à gauche, aligné sur le titre de section. */
+  .pied {
+    box-sizing: border-box;
+    padding: 0 clamp(20px, 5.5cqw, 80px);
+    max-width: calc(var(--largeur-contenu) + 2 * clamp(20px, 5.5cqw, 80px));
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .lien-tous {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: clamp(16px, 4.2cqw, 17px);
+    line-height: 1.4;
+    color: var(--or-bronze);
+    text-decoration: none;
+    border-bottom: 2px solid var(--or-bronze);
+    padding-bottom: 3px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lien-tous {
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+  }
+
+  @media (hover: hover) {
+    .lien-tous:hover {
+      color: var(--encre);
+      border-color: var(--encre);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .puce {
+      transition:
+        width 0.25s ease,
+        background 0.25s ease;
+    }
+    .lien-profil {
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+  }
+
+  @media (min-width: 900px) {
+    /* Gouttière prise sur le design (ligne 486) : le rembourrage de la section
+       tant que la fenêtre est étroite, puis la moitié du débord une fois passé
+       1180px. Un simple `max-width` collait les cartes aux bords entre 900 et
+       1180px, et les désalignait de l'en-tête, qui garde ce rembourrage. */
+    .liste {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      padding: 4px max(clamp(20px, 5.5cqw, 80px), calc((100% - var(--largeur-contenu)) / 2)) 6px;
+    }
+
+    .carte {
+      flex: 1 1 300px;
+      width: auto;
+    }
+
+    /* Plus de carrousel au-delà de 900px : les cartes s'y rangent en grille,
+       il n'y a plus de position à repérer. */
+    .puces {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lien {
+      transition: color 0.2s ease;
+    }
+  }
+
+  @media (hover: hover) {
+    .lien:hover {
+      color: var(--encre);
+    }
+  }
+</style>

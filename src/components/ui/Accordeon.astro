@@ -1,0 +1,236 @@
+---
+interface Props {
+  titre: string;
+  sousTitre?: string;
+  /* Le design n'accroche le prix au sous-titre QUE dans son arbre mobile
+     (ligne 194), là où la carte est repliée et les pastilles de tarif
+     invisibles. Sa carte desktop s'arrête au sous-titre (ligne 289), le prix
+     étant déjà lisible juste en dessous. Ce complément porte donc cet écart
+     de wording, sans qu'aucune des deux formulations soit inventée. */
+  sousTitreComplement?: string;
+  variante?: 'liste' | 'carte-desktop';
+  /* Nom de groupe HTML : les `<details>` qui le partagent ne s'ouvrent qu'un à
+     la fois, « opening one will cause another to close » (MDN, élément
+     details, attribut name). C'est l'accordéon exclusif du design, sans une
+     ligne de script. Sans groupe, chaque panneau reste indépendant. */
+  groupe?: string;
+}
+
+const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = Astro.props;
+---
+
+<details class:list={['accordeon', variante]} name={groupe}>
+  <summary>
+    <span class="icone" aria-hidden="true"><slot name="icone" /></span>
+    <span class="titre-groupe">
+      <span class="titre">{titre}</span>
+      {
+        sousTitre && (
+          <span class="sous-titre">
+            {sousTitre}
+            {sousTitreComplement && <span class="sous-titre-complement">{sousTitreComplement}</span>}
+          </span>
+        )
+      }
+    </span>
+    <span class="marque" aria-hidden="true"></span>
+  </summary>
+  <div class="corps"><slot /></div>
+</details>
+
+<style>
+  /*
+   * --accordeon-couleur-{titre,soustitre,corps,marque,bordure} let a dark
+   * item (the signature soin card) override the five text/border colours
+   * from its own wrapper, same custom-property-extension-point pattern as
+   * EnTeteSection's --entete-couleur-surtitre. Defaults are the light
+   * treatment used everywhere else.
+   *
+   * --accordeon-titre-{police,poids,taille,interligne} and
+   * --accordeon-icone-taille extend that same pattern to typography: the FAQ
+   * accordion (700 clamp(18px,4.6cqw,22px)/1.4 'Alegreya Sans', 26px icon)
+   * diverges from the soins one (500 21px/1.2 'Petrona', 24px icon) on every
+   * one of these axes, but both share the same interactive behaviour
+   * (details/summary, focus-visible, icon rotation) — duplicating that in a
+   * second component would risk the two drifting apart on accessibility, not
+   * just style. Defaults below are the soins treatment, unchanged for
+   * existing callers. The body line-height (1.7 soins / 1.75 FAQ) isn't
+   * parameterised here: it belongs to each section's own slotted paragraph,
+   * same as Soins.astro's `.description`, not to Accordeon's own `.corps`
+   * wrapper.
+   */
+  /* Le filet en entier plutôt que sa seule couleur : les cartes de soins n'en
+     ont aucun dans le design, et un `transparent` laissait malgré tout 1px
+     sous chacune. */
+  .accordeon {
+    border-bottom: var(--accordeon-bordure, 1px solid var(--sable));
+  }
+  /* Espacements paramétrés : le design donne plus d'air aux questions de la FAQ
+     qu'aux cartes de soins repliées, alors que le composant est le même. */
+  summary {
+    display: flex;
+    align-items: center;
+    gap: var(--accordeon-summary-gap, 16px);
+    padding: var(--accordeon-summary-marge, 20px 0);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* Le design dore le titre au survol (lignes 560 et suivantes) : c'est le seul
+     retour visuel avant le clic. `--or-bronze` tient le plancher de 3:1 des
+     grands textes, la question étant en gras d'au moins 18px. */
+  summary:hover .titre {
+    color: var(--or-bronze);
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  /* Par défaut clair : `--or` n'y mesure que 2,05:1 sur `--creme`, sous le
+     plancher de 3:1 du SC 1.4.11 qui couvre les indicateurs de focus. La carte
+     signature de Soins est vert profond, où `--or-lien` tombe à 1,99:1 — elle
+     repasse le jeton par ce point d'extension, comme pour ses autres couleurs. */
+  summary:focus-visible {
+    outline: 2px solid var(--accordeon-couleur-focus, var(--or-lien));
+    outline-offset: 3px;
+  }
+  .icone {
+    flex: none;
+    display: flex;
+    color: var(--or);
+  }
+  .icone:empty {
+    display: none;
+  }
+  .titre-groupe {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .titre {
+    font:
+      var(--accordeon-titre-poids, 500) var(--accordeon-titre-taille, 21px) /
+      var(--accordeon-titre-interligne, 1.2)
+      var(--accordeon-titre-police, var(--font-titre), Georgia, serif);
+    color: var(--accordeon-couleur-titre, var(--encre));
+  }
+  .sous-titre {
+    font-family: var(--font-titre), Georgia, serif;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    font-style: italic;
+    color: var(--accordeon-couleur-soustitre, var(--or-lien));
+  }
+  .marque {
+    flex: none;
+    width: var(--accordeon-icone-taille, 24px);
+    height: var(--accordeon-icone-taille, 24px);
+    border-radius: 999px;
+    border: 1.5px solid var(--accordeon-couleur-marque, var(--or-bronze));
+    color: var(--accordeon-couleur-marque, var(--or-bronze));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Sans taille propre, le « + » héritait du 16px du corps de page là où le
+     design le pose à 18px dans sa pastille. */
+  .marque::before {
+    content: '+';
+    font-size: var(--accordeon-marque-taille, 18px);
+    line-height: 1;
+  }
+  details[open] .marque {
+    transform: rotate(45deg);
+  }
+  .corps {
+    padding-bottom: var(--accordeon-corps-bas, 20px);
+    color: var(--accordeon-couleur-corps, var(--encre-douce));
+    line-height: 1.6;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .marque {
+      transition: transform 0.25s ease;
+    }
+    .titre {
+      transition: color 0.22s ease;
+    }
+  }
+
+  /*
+   * Variante « carte-desktop » : le design rend la section soins en deux
+   * traitements (accordéons repliés en mobile, lignes 187-280 ; cartes
+   * ouvertes en grille en desktop, lignes 281-360). Ce sont deux ÉTATS d'un
+   * même composant, pas deux composants — le prop isMobile qui les sépare est
+   * une case de l'éditeur Claude Design (ligne 715), pas un signal disponible
+   * au rendu. Un seul arbre, donc, et le point de bascule est ici.
+   *
+   * 768px : c'est la largeur à partir de laquelle deux colonnes de 300px
+   * tiennent réellement dans la grille auto-fit de Soins. En dessous, la
+   * grille retombe d'elle-même sur une colonne et l'accordéon reste la bonne
+   * réponse.
+   *
+   * `::details-content` (Baseline « newly available » depuis septembre 2025,
+   * MDN) est ce qui ouvre le panneau sans JS ni attribut `open`. Là où il
+   * n'est pas supporté, les cartes restent repliées : dégradation vers le
+   * comportement actuel, jamais vers du contenu perdu.
+   *
+   * Réserve assumée : le `summary` reste un widget de divulgation focalisable
+   * au clavier, alors que la carte desktop du design n'en a aucun. Le replier
+   * ne masque rien puisque la règle ci-dessous ignore l'état `open`.
+   */
+  @media (min-width: 768px) {
+    .carte-desktop::details-content {
+      content-visibility: visible;
+    }
+    .carte-desktop summary {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+      padding: 0;
+      cursor: default;
+    }
+    .carte-desktop .marque {
+      display: none;
+    }
+    .carte-desktop .titre-groupe {
+      gap: 4px;
+    }
+    .carte-desktop .titre {
+      font-size: clamp(24px, 6cqw, 30px);
+      line-height: 1.15;
+    }
+    .carte-desktop .sous-titre {
+      font-size: clamp(16px, 4.2cqw, 18px);
+    }
+    /* Le prix disparaît du sous-titre exactement là où les pastilles de tarif
+       deviennent visibles : la même information reste à l'écran, elle change
+       seulement de place. */
+    .carte-desktop .sous-titre-complement {
+      display: none;
+    }
+    /* `flex:1` sur la description du design (ligne 291) : c'est lui qui aligne
+       le filet et les pastilles de tarif en bas de toutes les cartes d'une
+       rangée, quelle que soit la longueur du texte. Il faut la chaîne flex
+       complète pour que la contrainte descende jusqu'au paragraphe slotté. */
+    .carte-desktop,
+    .carte-desktop::details-content,
+    .carte-desktop .corps {
+      display: flex;
+      flex-direction: column;
+    }
+    /* Sur la racine : la carte qui l'accueille est une colonne flex, et c'est
+       ce maillon qui fait descendre la hauteur de la carte jusqu'au
+       paragraphe. */
+    .carte-desktop,
+    .carte-desktop::details-content,
+    .carte-desktop .corps {
+      flex: 1;
+    }
+    .carte-desktop .corps {
+      padding-top: 14px;
+      padding-bottom: 0;
+    }
+  }
+</style>

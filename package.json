@@ -1,0 +1,32 @@
+{
+  "name": "caroline-massage",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.2.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@rollup/plugin-yaml": "^5.0.0",
+    "@types/node": "^26.2.0",
+    "eslint": "^10.8.1",
+    "eslint-plugin-astro": "^3.1.0",
+    "sharp": "^0.35.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.123.0",
+    "yaml": "^2.9.0"
+  }
+}

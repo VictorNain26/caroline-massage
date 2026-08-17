@@ -1,0 +1,32 @@
+name: Rafraîchir les avis
+
+# Les avis Google sont lus au build et figés dans le HTML. Les règles Places
+# n'autorisent pas à conserver ce contenu indéfiniment
+# (developers.google.com/maps/documentation/places/web-service/policies), donc
+# ce redéploiement hebdomadaire tient le site à jour et borne la durée pendant
+# laquelle un avis reste figé. Sans identifiants configurés, le build produit
+# simplement zéro avis et la section ne se rend pas.
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  redeployer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ secrets.GOOGLE_PLACE_ID }}
+      - run: pnpm deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -14,9 +14,13 @@
 
 Ces contraintes s'appliquent à **toutes** les tâches, sans être répétées.
 
+- **`design/accueil-page-vert-or.dc.html` prime sur ce plan, sur chaque brief, et sur toute instruction du contrôleur.** Si un brief décrit une mise en page ou une chaîne introuvable dans le `.dc.html`, c'est le design qui gagne : implémenter ce qu'il montre et le signaler dans le rapport. Ce n'est pas de l'insubordination, c'est la consigne. Six fois sur ce projet, du contenu est venu d'une direction de marque abandonnée (un PDF crème, retiré du dépôt) ou du document de travail de la cliente (`design/contenu-client.docx`) là où le design avait tranché autrement — grille de forfaits inexistante, accroche de hero de 230 caractères contre 44, surtitres faux et en capitales, horaires et délai de réponse fictifs, formatteur sans consommateur. Cinq de ces six ont été trouvées par des implémenteurs qui ont refusé d'écrire ce qu'on leur demandait. Le `.docx` reste la source **uniquement** pour ce que le design ne détaille pas ; partout où les deux alimentent le même emplacement, le design fait foi.
+- **Vérifier le rendu, pas seulement les codes de sortie.** `check`, `lint`, `build` et les tests étaient tous verts pendant qu'une frise s'affichait en 0 × 0 pixel, qu'un titre sortait 12 % trop petit et que trois couleurs venaient des mauvais tokens. La fidélité visuelle et l'accessibilité ne se déclarent pas, elles se mesurent.
+- **Doc-first, sans exception.** Aucune clé de configuration, aucune signature d'API, aucun comportement d'outil ne s'écrit de mémoire ni par analogie avec un autre projet. En cas de doute : consulter la doc officielle de la version installée, annoncer la source, et citer URL + champ dans le rapport comme dans le message de commit. « Je crois que ça marche comme ça » est interdit — soit c'est vérifié, soit c'est dit explicitement comme non vérifié. Ce projet ne réutilise aucune convention venue d'ailleurs : ses seules autorités sont sa spec, son design et ce plan.
 - **Aucune requête réseau tierce à l'exécution.** Ni `fonts.googleapis.com`, ni `fonts.gstatic.com`, ni CDN. Vérifié par un test automatisé en tâche 2.
 - **Le fichier `design/accueil-page-vert-or.dc.html` est la source de vérité visuelle, jamais du code à recopier.** Il utilise une syntaxe de gabarit propriétaire (`{{ … }}`, `style-hover=`, `<dc-import>`) qui n'a aucun équivalent en HTML.
 - **Une seule arborescence responsive, mobile-first.** Le prop `isMobile` du design est un artefact de l'outil de maquettage ; il ne doit apparaître nulle part dans le code.
+- **Aucune couleur en dur** : uniquement les variables de `src/styles/tokens.css`. Les tailles et les échelles typographiques échappent à cette règle — le design les exprime en `clamp()` propres à chaque section, sans réutilisation, et les tokeniser ajouterait de l'indirection sans partage. Une valeur qui se répète réellement d'une section à l'autre devient un token ; les autres restent littérales, prises du design.
 - **Aucun composant n'appelle `getCollection()`.** Tout passe par `src/lib/content.ts`.
 - **Toute animation est neutralisée sous `prefers-reduced-motion: reduce`.**
 - **Zéro warning ESLint.** Un `eslint-disable` n'est jamais un correctif : trouver la forme de code qui ne déclenche pas la règle.
@@ -365,9 +369,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm lint
-      - run: pnpm test
       - run: pnpm build
+      - run: pnpm test
 ```
+
+`build` précède `test` : le test « aucun domaine tiers » de la tâche 2 lit le
+HTML produit dans `dist/`. Dans l'ordre inverse il passerait au vert en local
+après un build manuel et échouerait sur un runner propre.
 
 - [ ] **Step 17: Vérifier que le hook se déclenche**
 
@@ -519,7 +527,7 @@ Fichier `tests/unit/no-third-party.test.ts` :
 
 ```ts
 import { test, expect } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 function fichiersHtml(dir: string): string[] {
@@ -534,7 +542,10 @@ function fichiersHtml(dir: string): string[] {
 
 test('aucune référence à un domaine tiers dans le HTML produit', () => {
   const interdits = ['fonts.googleapis.com', 'fonts.gstatic.com'];
-  for (const fichier of fichiersHtml('dist')) {
+  expect(existsSync('dist'), 'dist/ est absent — lancer `pnpm build` avant `pnpm test`').toBe(true);
+  const fichiers = fichiersHtml('dist');
+  expect(fichiers.length, 'aucun fichier HTML trouvé dans dist/ — le build a-t-il été lancé ?').toBeGreaterThan(0);
+  for (const fichier of fichiers) {
     const contenu = readFileSync(fichier, 'utf8');
     for (const domaine of interdits) {
       expect(contenu, `${fichier} référence ${domaine}`).not.toContain(domaine);
@@ -542,6 +553,10 @@ test('aucune référence à un domaine tiers dans le HTML produit', () => {
   }
 });
 ```
+
+Les deux assertions avant la boucle ne sont pas décoratives : sans elles, le test
+n'exécute aucune assertion quand `dist/` est vide ou absent, et rapporte vert.
+Un garde-fou qui passe sur une entrée vide ne garde rien.
 
 - [ ] **Step 6: Lancer le test et vérifier qu'il passe**
 
@@ -564,7 +579,7 @@ Attendu : des fichiers de police présents dans le répertoire de sortie.
 ```bash
 git add astro.config.mjs src/styles/tokens.css src/layouts/Base.astro \
   src/pages/index.astro tests/unit/no-third-party.test.ts
-git commit -m "feat: self-host fonts, add design tokens and base layout"
+git commit -m "feat(layout): self-host fonts, add design tokens and base layout"
 ```
 
 ---
@@ -582,7 +597,6 @@ git commit -m "feat: self-host fonts, add design tokens and base layout"
 - Produit, depuis `src/lib/content.ts` :
   - `getCabinet(): Promise<Cabinet>`
   - `getSoins(): Promise<Soin[]>` — triés par `ordre` croissant
-  - `getForfaits(): Promise<Forfait[]>`
   - `getFaq(): Promise<Question[]>` — triées par `ordre` croissant
   - `getAvis(): Promise<Avis[]>` — tableau vide tant qu'aucun avis authentique n'est fourni
   - `getSection(id: string): Promise<Section>` — lève une erreur si l'identifiant n'existe pas, plutôt que de rendre une section muette
@@ -590,25 +604,25 @@ git commit -m "feat: self-host fonts, add design tokens and base layout"
   ```ts
   type Tarif = { duree: number; prix: number };
   type Soin = { id: string; nom: string; sousTitre: string; description: string; tarifs: Tarif[]; signature: boolean; ordre: number };
-  type Forfait = { libelle: string; prix: number; prixBarre: number };
   type Question = { id: string; question: string; reponse: string; ordre: number };
   type Avis = { auteur: string; note: number; texte: string; date: string; url: string };
   type Bloc = { titre: string; texte: string };
   type Section = { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[] };
-  type Cabinet = { telephone: string; telephoneAffiche: string; email: string; ville: string; horaires: string; delaiReponse: string; instagram: string; prixMin: number; prixMax: number; siret?: string; assuranceRcPro?: string; statutJuridique?: string };
+  type Cabinet = { telephone: string; telephoneAffiche: string; email: string; ville: string; joursOuverture: string[]; heureOuverture: string; heureFermeture: string; instagram: string; prixMin: number; prixMax: number; siret?: string; assuranceRcPro?: string; statutJuridique?: string };
   ```
 
 - [ ] **Step 1: Écrire les données du cabinet**
 
-Fichier `src/content/cabinet.yaml`. Les valeurs `ville` et `horaires` suivent le design ; les contradictions relevées avec le document client sont listées en section 10 de la spec et se corrigent ici, à un seul endroit.
+Fichier `src/content/cabinet.yaml`. Les valeurs `ville` et les horaires suivent le design ; les contradictions relevées avec le document client sont listées en section 10 de la spec et se corrigent ici, à un seul endroit.
 
 ```yaml
 telephone: "+33667989710"
 telephoneAffiche: "06 67 98 97 10"
 email: "contact@carolinemassagesurmesure.fr"
 ville: "Carquefou"
-horaires: "du lundi au samedi, 9h – 20h"
-delaiReponse: "48 h"
+joursOuverture: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+heureOuverture: "09:00"
+heureFermeture: "20:00"
 instagram: "https://www.instagram.com/caroline_massagesurmesure"
 prixMin: 45
 prixMax: 130
@@ -694,17 +708,6 @@ signature: true
 ordre: 5
 ```
 
-- [ ] **Step 3: Écrire les forfaits**
-
-Fichier `src/content/forfaits.yaml` :
-
-```yaml
-- { libelle: "3 séances de 60 min", prix: 255, prixBarre: 270 }
-- { libelle: "5 séances de 60 min", prix: 400, prixBarre: 450 }
-- { libelle: "3 séances de 90 min", prix: 370, prixBarre: 390 }
-- { libelle: "5 séances de 90 min", prix: 550, prixBarre: 650 }
-```
-
 - [ ] **Step 4: Écrire la FAQ**
 
 Sept fichiers dans `src/content/faq/`, un par question, contenu repris de `design/contenu-client.docx` et de la section faq du design (lignes 548-594). Format, ici pour `premiere-seance.yaml` :
@@ -785,8 +788,9 @@ appeler ou écrire puisque le formulaire n'est pas porté).
 C'est le fichier qui déclare **d'où** vient le contenu. Le jour du CMS, seuls les `loader` changent ; les schémas et `lib/content.ts` restent identiques.
 
 ```ts
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
 const tarif = z.object({ duree: z.number().int().positive(), prix: z.number().positive() });
 
@@ -846,18 +850,17 @@ collection : une collection à une entrée serait de la cérémonie sans bénéf
 ```ts
 import { getCollection } from 'astro:content';
 import cabinetData from '../content/cabinet.yaml';
-import forfaitsData from '../content/forfaits.yaml';
 
 export interface Tarif { duree: number; prix: number }
 export interface Soin { id: string; nom: string; sousTitre: string; description: string; tarifs: Tarif[]; signature: boolean; ordre: number }
-export interface Forfait { libelle: string; prix: number; prixBarre: number }
 export interface Question { id: string; question: string; reponse: string; ordre: number }
 export interface Avis { auteur: string; note: number; texte: string; date: string; url: string }
 export interface Bloc { titre: string; texte: string }
 export interface Section { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[] }
 export interface Cabinet {
   telephone: string; telephoneAffiche: string; email: string; ville: string;
-  horaires: string; delaiReponse: string; instagram: string;
+  joursOuverture: string[]; heureOuverture: string; heureFermeture: string;
+  instagram: string;
   prixMin: number; prixMax: number;
   // Renseignés par la cliente ; le pied de page et les mentions légales ne
   // rendent chaque champ que s'il a une valeur (tâche 13).
@@ -866,10 +869,6 @@ export interface Cabinet {
 
 export async function getCabinet(): Promise<Cabinet> {
   return cabinetData as Cabinet;
-}
-
-export async function getForfaits(): Promise<Forfait[]> {
-  return forfaitsData as Forfait[];
 }
 
 export async function getSoins(): Promise<Soin[]> {
@@ -1077,8 +1076,9 @@ const cabinet = {
   telephoneAffiche: '06 67 98 97 10',
   email: 'contact@carolinemassagesurmesure.fr',
   ville: 'Carquefou',
-  horaires: 'du lundi au samedi, 9h – 20h',
-  delaiReponse: '48 h',
+  joursOuverture: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  heureOuverture: '09:00',
+  heureFermeture: '20:00',
   instagram: 'https://www.instagram.com/caroline_massagesurmesure',
   prixMin: 45,
   prixMax: 130,
@@ -1238,12 +1238,16 @@ git commit -m "feat(seo): generate JSON-LD from cabinet data, add sitemap and ro
   - `<Accordeon titre: string>` — slot pour le corps ; rend `<details>` / `<summary>`.
   - `<EnTeteSection surtitre: string, titre: string>`
 
-- [ ] **Step 1: Récupérer les trois assets du projet design**
+- [ ] **Step 1: Vérifier les trois assets**
 
-Les fichiers `caro-ornement-frise.png` (900 × 59), `caro-ornement-coin.png`
-(220 × 220) et `caro-cabinet.jpg` (800 × 1035) vivent à la racine du projet
-Claude Design `6069b7a5-682e-42da-8370-d3b6bdc9babf`. Les télécharger dans
-`src/assets/images/`, puis vérifier :
+Ils sont déjà présents dans `src/assets/images/` : le contrôleur les a récupérés
+du projet Claude Design, un implémenteur n'ayant pas cet outil. Les ornements
+sont volontairement en définition supérieure à celle des exports du design
+(2234 × 147 et 522 × 522 au lieu de 900 × 59 et 220 × 220) : `<Image>` réduit au
+build, et partir d'une source plus définie ne peut que mieux rendre. La photo du
+cabinet est à sa taille d'origine, 800 × 1035.
+
+Vérifier :
 
 ```bash
 ls -l src/assets/images/
@@ -1382,22 +1386,19 @@ git commit -m "feat(nav): add responsive navigation with accessible mobile panel
 
 **Files:**
 - Create: `src/components/sections/Hero.astro`
-- Create: `src/scripts/intro.ts`
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
-- Consumes: `getSection('hero')`, `getCabinet()`, `<Bouton>`, `<OrnementCoin>`.
+- Consumes: `getSection('hero')`, `<Bouton variante="creme">`, `<OrnementCoin>`.
 - Produit: `<Hero />`, sans prop.
 
 **Source:** lignes 129-181 pour le balisage, lignes 46-74 pour les 19 `@keyframes`.
 
 - [ ] **Step 1: Porter le balisage du hero**
 
-Titre `<h1>` et accroche lus depuis `getSection('hero')`, mention des horaires
-lue depuis `getCabinet()`, deux boutons (« Prendre rendez-vous » vers
+Titre `<h1>`, sur-titre et accroche lus depuis `getSection('hero')`, deux boutons (« Prendre rendez-vous » vers
 `#contact`, « Découvrir les soins » vers `#soins`), photo encadrée d'ornements.
-Le fond est `--vert-profond` : marquer la section `data-surface="dark"`, la
-tâche 12 s'en sert.
+Le fond est `--vert-profond`.
 
 - [ ] **Step 2: Porter les animations sous garde-fou**
 
@@ -1414,15 +1415,13 @@ L'ouverture masque du contenu à l'état initial. Sans ce garde-fou, un visiteur
 mouvement réduit verrait une page vide. À l'état neutralisé, le contenu est
 visible immédiatement, sans transition.
 
-- [ ] **Step 3: Écrire `src/scripts/intro.ts`**
+L'animation d'ouverture est intégralement pilotée en CSS : `animation-delay`
+et `animation-fill-mode: both` suffisent à séquencer le rideau et les éléments
+du hero au chargement, sans aucun script — un déclencheur en JavaScript
+n'aurait aucun sélecteur CSS à activer, la garde-fou vivant déjà dans la media
+query ci-dessus.
 
-Le script se contente d'ajouter une classe sur `<body>` au chargement pour
-déclencher la séquence. Il commence par lire
-`matchMedia('(prefers-reduced-motion: reduce)')` et ne fait rien si la préférence
-est active. Le bouton « Rejouer l'ouverture » du design n'est pas porté : c'est
-un outil de revue de maquette.
-
-- [ ] **Step 4: Vérifier dans les deux états**
+- [ ] **Step 3: Vérifier dans les deux états**
 
 ```bash
 pnpm build && pnpm test
@@ -1431,10 +1430,10 @@ pnpm build && pnpm test
 Puis, manuellement, recharger la page avec le mouvement réduit activé au niveau
 du système et vérifier que tout le contenu du hero est visible immédiatement.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add src/components/sections/Hero.astro src/scripts/intro.ts src/pages/index.astro
+git add src/components/sections/Hero.astro src/pages/index.astro
 git commit -m "feat(hero): port hero section and opening animation with reduced-motion guard"
 ```
 
@@ -1447,7 +1446,7 @@ git commit -m "feat(hero): port hero section and opening animation with reduced-
 - Modify: `src/pages/index.astro`
 
 **Interfaces:**
-- Consumes: `getSection('soins')`, `getSection('tarifs')`, `getSoins()`, `getForfaits()`, `<Accordeon>`, `<EnTeteSection>`.
+- Consumes: `getSection('soins')`, `getSection('tarifs')`, `getSoins()`, `<Accordeon>`, `<EnTeteSection>`.
 - Produit: `<Soins />` et `<Tarifs />`, sans prop.
 
 **Source:** lignes 182-361 (soins) et 362-371 (tarifs).
@@ -1462,8 +1461,16 @@ le traitement à fond vert.
 
 - [ ] **Step 2: Porter la section tarifs**
 
-Les quatre forfaits de `getForfaits()`, avec le prix barré et le prix courant.
-La mention d'économie est calculée : `max(prixBarre - prix)` sur l'ensemble.
+Le design ne publie **aucun tableau de forfaits**. La section `#tarifs`
+(lignes 362-371) contient une amorce et un paragraphe, rien d'autre : « Si
+l'envie de revenir se confirme, on peut prévoir trois ou cinq séances ensemble.
+Le tarif s'allège, et rien ne presse […] Il suffit de m'en parler. » La
+praticienne a délibérément choisi de discuter les forfaits de vive voix plutôt
+que d'afficher une grille.
+
+Rendre donc `getSection('tarifs')` : l'amorce et le paragraphe, séparés par la
+frise ornementale. Ne pas inventer de grille tarifaire, ne pas afficher de prix
+barré, ne pas calculer d'économie.
 
 - [ ] **Step 3: Vérifier que les prix affichés viennent bien du contenu**
 
@@ -1582,7 +1589,7 @@ import { getAvis } from '../../lib/content';
 const avis = await getAvis();
 ---
 {avis.length > 0 && (
-  <section id="avis" data-anchor="avis" data-surface="light">
+  <section id="avis" data-anchor="avis">
     <!-- en-tête et cartes -->
   </section>
 )}
@@ -1628,8 +1635,7 @@ git commit -m "feat(sections): port FAQ and conditional reviews section"
 - Produit: `<Contact />` et `<PiedDePage />`, sans prop.
 
 **Source:** lignes 595-713. **Le formulaire n'est pas porté** (spec, section 1) :
-seuls le titre, l'accroche, les deux boutons de contact, les horaires et le
-délai de réponse le sont.
+seuls le surtitre, le titre, l'accroche et les liens de contact le sont.
 
 - [ ] **Step 1: Porter la section contact**
 
@@ -1637,9 +1643,9 @@ Surtitre, titre et accroche lus depuis `getSection('contact')` — l'accroche y 
 déjà été reformulée en tâche 3 pour inviter à appeler ou écrire, puisque le
 formulaire n'est pas porté.
 Deux boutons : `tel:` avec `cabinet.telephoneAffiche` en libellé, et `mailto:`
-avec `cabinet.email`. Sous les boutons, la ligne horaires + délai de réponse,
-lue depuis `getCabinet()`. Fond `--vert-profond` : marquer
-`data-surface="dark"`.
+avec `cabinet.email`. La section contact du design ne porte **ni horaires ni délai de réponse** :
+sa mention finale est « Aucun paiement en ligne · réponse au plus vite ». Ne pas
+en inventer. Fond `--vert-profond`.
 
 - [ ] **Step 2: Porter le pied de page**
 
@@ -1677,119 +1683,26 @@ git commit -m "feat(contact): port contact section without form, add footer"
 
 ---
 
-### Task 12: Barre CTA collante, en déclaratif
+### Task 12: ~~Barre CTA collante~~ — RETIRÉE
 
-**Files:**
-- Create: `src/components/StickyCta.astro`, `src/scripts/sticky-cta.ts`, `src/lib/surface.ts`
-- Modify: `src/layouts/Base.astro`
-- Test: `tests/unit/surface.test.ts`
+Cette tâche décrivait une barre d'appel flottante dont les couleurs s'inversaient
+selon la section survolée. **Elle n'existe pas dans le design.** Vérifié :
+`probeBg`, `data-sticky-cta`, `barBg`, `barFg` et `onDark` apparaissent zéro fois
+dans `design/accueil-page-vert-or.dc.html`, qui ne contient aucun élément en
+`position:fixed`.
 
-**Interfaces:**
-- Consumes: `getCabinet()`, et l'attribut `data-surface` posé sur les sections aux tâches 7 à 11.
-- Produit: `surfaceCourante(entrees: { surface: 'dark' | 'light'; visible: boolean }[]): 'dark' | 'light'`, dans `src/lib/surface.ts`.
+Elle venait du fichier de **scène** du projet Claude Design — celui qui encadre
+la page dans des cadres mobile et desktop pour la revue, et qui superpose une
+barre CTA au cadre mobile pour démontrer une interaction. Le bouton « Rejouer
+l'ouverture », exclu dès la spec comme artefact de maquette, vient du même
+fichier et de la même classe de logique.
 
-**Source:** lignes 715-1080, méthode `probeBg`. Le design y scanne les nœuds sous
-la barre, lit leur `backgroundColor` calculé et en dérive une luminance. C'est
-fragile — cela casse dès qu'une section reçoit une image de fond, un dégradé ou
-un wrapper intermédiaire — et intestable sans DOM réel. On le remplace par du
-déclaratif à rendu identique.
+L'attribut `data-surface`, posé sur les huit sections au fil de leur
+construction, n'existait que pour alimenter cette barre. Il a été retiré avec
+elle : du markup que rien ne lit est un défaut, pas une réserve pour plus tard.
 
-- [ ] **Step 1: Écrire le test qui échoue**
+Ne pas restaurer depuis ce plan.
 
-Fichier `tests/unit/surface.test.ts` :
-
-```ts
-import { describe, it, expect } from 'vitest';
-import { surfaceCourante } from '../../src/lib/surface';
-
-describe('surfaceCourante', () => {
-  it('retourne la surface de la section visible', () => {
-    expect(surfaceCourante([
-      { surface: 'dark', visible: true },
-      { surface: 'light', visible: false },
-    ])).toBe('dark');
-  });
-
-  it('retourne la dernière visible quand plusieurs le sont', () => {
-    expect(surfaceCourante([
-      { surface: 'dark', visible: true },
-      { surface: 'light', visible: true },
-    ])).toBe('light');
-  });
-
-  it('retombe sur light quand rien nest visible', () => {
-    expect(surfaceCourante([
-      { surface: 'dark', visible: false },
-    ])).toBe('light');
-  });
-
-  it('retombe sur light sur une liste vide', () => {
-    expect(surfaceCourante([])).toBe('light');
-  });
-});
-```
-
-- [ ] **Step 2: Lancer le test, constater l'échec**
-
-```bash
-pnpm test tests/unit/surface.test.ts
-```
-
-Attendu : ÉCHEC avec « Cannot find module '../../src/lib/surface' ».
-
-- [ ] **Step 3: Écrire `src/lib/surface.ts`**
-
-```ts
-export type Surface = 'dark' | 'light';
-
-export function surfaceCourante(
-  entrees: { surface: Surface; visible: boolean }[],
-): Surface {
-  const visibles = entrees.filter((e) => e.visible);
-  return visibles.length > 0 ? visibles[visibles.length - 1].surface : 'light';
-}
-```
-
-- [ ] **Step 4: Lancer le test, vérifier qu'il passe**
-
-```bash
-pnpm test tests/unit/surface.test.ts
-```
-
-Attendu : PASS, quatre assertions vertes.
-
-- [ ] **Step 5: Écrire `src/scripts/sticky-cta.ts`**
-
-Un `IntersectionObserver` sur `[data-surface]` avec un `rootMargin` qui ne
-retient que la bande où se trouve la barre. À chaque changement, appeler
-`surfaceCourante()` et poser l'attribut `data-sur` correspondant sur la barre.
-La barre apparaît au-delà de 75 % de la hauteur de fenêtre défilée, et se
-rétracte quand la section `#contact` entre dans le champ — inutile de proposer
-d'appeler quand le bloc de contact est déjà à l'écran.
-
-- [ ] **Step 6: Écrire `src/components/StickyCta.astro`**
-
-Un lien `tel:` unique, dont les couleurs basculent via `[data-sur="dark"]` et
-`[data-sur="light"]` en CSS. La transition d'apparition passe sous
-`@media (prefers-reduced-motion: no-preference)`.
-
-- [ ] **Step 7: Vérifier**
-
-```bash
-pnpm check && pnpm lint && pnpm test && pnpm build
-```
-
-Attendu : quatre commandes en code de sortie 0.
-
-- [ ] **Step 8: Commit**
-
-```bash
-git add src/components/StickyCta.astro src/scripts/sticky-cta.ts \
-  src/lib/surface.ts src/layouts/Base.astro tests/unit/surface.test.ts
-git commit -m "feat(cta): replace luminance probing with declarative surface detection"
-```
-
----
 
 ### Task 13: Pages légales et 404
 
@@ -1923,8 +1836,9 @@ en excluant la règle.
 pnpm build && du -ch dist/_astro/*.js | tail -1
 ```
 
-Attendu : le total reste modeste. Trois scripts seulement doivent exister —
-menu, intro, sticky-cta. Si un quatrième apparaît, comprendre d'où il vient
+Attendu : le total reste modeste. **Un seul script doit exister — `menu.ts`.**
+L'ouverture est entièrement en CSS et la barre CTA n'existe pas dans le design.
+Si un deuxième apparaît, comprendre d’où il vient
 avant d'aller plus loin.
 
 - [ ] **Step 5: Ajouter le test d'accessibilité à la CI**
@@ -1940,7 +1854,7 @@ Dans `.github/workflows/ci.yml`, après l'étape `pnpm build` :
 
 ```bash
 git add playwright.config.ts tests/a11y/axe.spec.ts .github/workflows/ci.yml package.json pnpm-lock.yaml
-git commit -m "test: enforce zero axe violations across all pages in CI"
+git commit -m "test(a11y): enforce zero axe violations across all pages in CI"
 ```
 
 - [ ] **Step 7: Premier déploiement**

@@ -1,0 +1,650 @@
+---
+import Bouton from './ui/Bouton.astro';
+import { getCabinet } from '../lib/content';
+
+interface Props {
+  // `hero` reproduit le design (lignes 142-162) : superposée au hero, sans
+  // fond ni bouton. Elle défile donc avec lui et n'est plus atteignable une
+  // fois passé le premier écran. `barre` est le repli des pages sans hero,
+  // où une nav transparente sur fond crème serait illisible.
+  variante?: 'hero' | 'barre';
+}
+
+const { variante = 'barre' } = Astro.props;
+
+const cabinet = await getCabinet();
+
+// Préfixés par "/" : ces liens doivent aussi fonctionner depuis les pages
+// secondaires (mentions légales, confidentialité, 404), qui n'ont pas ces
+// ancres. Un navigateur qui suit "/#soins" depuis "/" ne recharge que le
+// fragment (même document) ; depuis une autre page, il revient à l'accueil
+// puis défile jusqu'à l'ancre.
+const liens = [
+  { href: '/#soins', label: 'Soins & tarifs' },
+  { href: '/#parcours', label: 'Qui suis-je' },
+  { href: '/#cabinet', label: 'Le cabinet' },
+  { href: '/#faq', label: 'FAQ' },
+];
+---
+
+<header class:list={['entete', `entete--${variante}`]}>
+  {/* Le design superpose deux barres sur l'accueil : celle-ci, transparente,
+      posée sur le hero et emportée par le défilement, puis la barre crème qui
+      redescend une fois le hero passé. Leur balisage se répète plutôt que de
+      passer par un composant : `.marque` et `.barre-hamburger` servent aussi
+      au panneau mobile, et les déplacer le priverait de ses styles. */}
+  {
+    variante === 'hero' && (
+      <div class="barre barre--hero">
+        <a href="/#hero" aria-label="Retour en haut de page" class="marque">
+          <span class="marque-nom">Caroline</span>
+          <span aria-hidden="true" class="marque-separateur" />
+          <span class="marque-baseline">
+            Massage
+            <br />
+            Sur-Mesure
+          </span>
+        </a>
+
+        <nav class="liens-desktop" aria-label="Navigation principale">
+          <ul class="liste-liens">
+            {liens.map((lien) => (
+              <li>
+                <a href={lien.href}>{lien.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <button
+          type="button"
+          class="bouton-menu"
+          data-nav-toggle
+          aria-expanded="false"
+          aria-controls="menu-mobile"
+          aria-label="Ouvrir le menu"
+        >
+          <span aria-hidden="true" class="barre-hamburger" />
+          <span aria-hidden="true" class="barre-hamburger" />
+        </button>
+      </div>
+    )
+  }
+
+  <div class="enveloppe-solide">
+    <div class="barre barre--solide" data-barre-solide>
+      <a href="/#hero" aria-label="Retour en haut de page" class="marque">
+        <span class="marque-nom">Caroline</span>
+        <span aria-hidden="true" class="marque-separateur"></span>
+        <span class="marque-baseline">Massage<br />Sur-Mesure</span>
+      </a>
+
+      <nav class="liens-desktop" aria-label={variante === 'hero' ? 'Navigation secondaire' : 'Navigation principale'}>
+        <ul class="liste-liens">
+          {
+            liens.map((lien) => (
+              <li>
+                <a href={lien.href}>{lien.label}</a>
+              </li>
+            ))
+          }
+          <li>
+            <Bouton href="/#contact" variante="vert">Réserver</Bouton>
+          </li>
+        </ul>
+      </nav>
+
+      <button
+        type="button"
+        class="bouton-menu"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="menu-mobile"
+        aria-label="Ouvrir le menu"
+      >
+        <span aria-hidden="true" class="barre-hamburger"></span>
+        <span aria-hidden="true" class="barre-hamburger"></span>
+      </button>
+    </div>
+  </div>
+
+  <dialog id="menu-mobile" class="panneau" data-nav-dialog aria-label="Menu">
+    <div class="panneau-entete">
+      <a href="/#hero" aria-label="Retour en haut de page" class="marque marque--panneau">
+        <span class="marque-nom">Caroline</span>
+        <span aria-hidden="true" class="marque-separateur"></span>
+        <span class="marque-baseline">Massage<br />Sur-Mesure</span>
+      </a>
+      {/* Reprend les deux barres du bouton d'ouverture, à la même place : le
+          panneau étant dans le top layer, celui de la barre passe dessous et
+          devient inerte, alors le design montre un seul bouton qui pivote. */}
+      <button type="button" class="bouton-fermer" data-nav-close aria-label="Fermer le menu" autofocus>
+        <span aria-hidden="true" class="barre-hamburger barre-croix-1"></span>
+        <span aria-hidden="true" class="barre-hamburger barre-croix-2"></span>
+      </button>
+    </div>
+
+    {/* Un intitulé distinct de la barre : deux repères de même rôle portant le
+        même nom sont indiscernables dans la liste que dresse un lecteur
+        d'écran. */}
+    <nav class="liens-mobile" aria-label="Menu principal">
+      <ul class="liste-liens-mobile">
+        {
+          liens.map((lien) => (
+            <li>
+              <a href={lien.href}>{lien.label}</a>
+            </li>
+          ))
+        }
+        {/* Le design fait composer le numéro depuis ce panneau plutôt que
+            défiler jusqu'au contact : il n'existe qu'en dessous de 900px,
+            là où l'appel est à portée de pouce. */}
+        <li class="element-cta" style="--bouton-hauteur: 56px; --bouton-marge-h: 24px">
+          <Bouton href={`tel:${cabinet.telephone}`} variante="creme">Réserver</Bouton>
+        </li>
+      </ul>
+    </nav>
+  </dialog>
+</header>
+
+<script src="../scripts/menu.ts"></script>
+
+<style>
+  /* Hors accueil, la barre occupe sa place et suit le défilement depuis le
+     départ ; `sticky` porte donc sur l'en-tête, qui est bien dans le flux. */
+  .entete--barre {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .barre {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 62px;
+  }
+
+  .barre--solide {
+    padding: 9px max(clamp(20px, 5.5cqw, 80px), calc((100% - var(--largeur-contenu)) / 2));
+    background: var(--creme);
+    border-bottom: 1px solid var(--sable);
+  }
+
+  /* Sur l'accueil elle se superpose au contenu au lieu de le pousser : le hero
+     occupe déjà tout l'écran, et elle n'entre en scène qu'une fois dépassé.
+     `fixed` plutôt que `sticky` : l'en-tête ne mesure rien ici — la barre du
+     hero est hors flux — et un élément collant n'agit que dans les limites de
+     son parent, donc il n'aurait eu aucune plage pour opérer. */
+  .entete--hero .enveloppe-solide {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 20;
+  }
+
+  /* Sur le hero, la barre transparente se cale sur le cadre décoratif, qui
+     emploie les mêmes clamp(). Aucun ancêtre positionné : le bloc conteneur
+     est le document, donc elle défile avec la page. */
+  .barre--hero {
+    position: absolute;
+    top: clamp(15px, 2.6cqw, 34px);
+    right: clamp(15px, 2.6cqw, 34px);
+    left: clamp(15px, 2.6cqw, 34px);
+    z-index: 2;
+    padding: 10px clamp(16px, 3cqw, 34px);
+  }
+
+  /* Hors de l'accueil il n'y a pas de hero à quitter : la barre est là d'emblée.
+     Sur l'accueil elle attend au-dessus de la fenêtre, et `visibility` la retire
+     de l'ordre de tabulation tant qu'elle est absente — `opacity` seule l'aurait
+     laissée atteignable au clavier alors qu'on ne la voit pas. */
+  .entete--hero .barre--solide {
+    transform: translateY(-110%);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .entete--hero .barre--solide.visible {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--vert-profond) 10%, transparent);
+  }
+
+  .marque {
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 2.6cqw, 16px);
+    min-height: 44px;
+    color: var(--encre);
+    text-decoration: none;
+  }
+
+  .marque:hover {
+    opacity: 0.72;
+  }
+
+  /* L'anneau de focus change d'or selon le fond qu'il touche : `--or` mesure
+     2,05:1 sur `--creme` et `--or-lien` 1,99:1 sur `--vert-profond`, chacun
+     sous le plancher de 3:1 du SC 1.4.11, qui couvre les indicateurs de focus.
+     Barre claire → `--or-lien` ; panneau vert → `--or`. */
+  .marque:focus-visible {
+    outline: 2px solid var(--or-lien);
+    outline-offset: 6px;
+  }
+
+  .marque-nom {
+    font: 400 clamp(22px, 5.6cqw, 26px) / 1 var(--font-titre), serif;
+    letter-spacing: -0.02em;
+  }
+
+  .marque-separateur {
+    width: 1px;
+    height: clamp(22px, 5cqw, 26px);
+    background: var(--or);
+  }
+
+  .marque-baseline {
+    font: 500 clamp(8px, 2cqw, 9px) / 1.5 var(--font-texte), sans-serif;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .liens-desktop {
+    display: none;
+  }
+
+  .liste-liens {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2cqw, 30px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .liste-liens a {
+    font: 500 15px / 1 var(--font-texte), sans-serif;
+    letter-spacing: 0.02em;
+    color: var(--encre);
+    text-decoration: none;
+  }
+
+  .liste-liens a:hover {
+    color: var(--or-lien);
+  }
+
+  .liste-liens a:focus-visible {
+    outline: 2px solid var(--or-lien);
+    outline-offset: 3px;
+  }
+
+  /* Sur le vert du hero, l'or clair repasse au-dessus du plancher de 3:1 du
+     SC 1.4.11 là où `--or-lien`, calibré pour le fond crème, restait sous la
+     barre. Même logique que le panneau mobile plus bas. */
+  .barre--hero .marque,
+  .barre--hero .bouton-menu {
+    color: var(--creme);
+  }
+
+  .barre--hero .liste-liens a {
+    color: var(--creme-surface);
+  }
+
+  .barre--hero .liste-liens a:hover {
+    color: var(--or-clair);
+  }
+
+  .barre--hero .marque:focus-visible,
+  .barre--hero .liste-liens a:focus-visible,
+  .barre--hero .bouton-menu:focus-visible {
+    outline-color: var(--or);
+  }
+
+  .bouton-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    margin: -10px;
+    background: none;
+    border: 0;
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  .bouton-menu:hover {
+    opacity: 0.7;
+  }
+
+  .bouton-menu:focus-visible {
+    outline: 2px solid var(--or-lien);
+    outline-offset: 3px;
+  }
+
+  .barre-hamburger {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: currentColor;
+  }
+
+  /* `display` reste conditionné à [open]. La feuille de style du navigateur
+     porte `dialog:not([open]) { display: none }` (HTML Standard, § Rendering,
+     "Flow content") : une déclaration `display` d'auteur sur `.panneau` la
+     supplante — origine auteur > origine UA — et le panneau recouvrirait la
+     page en permanence, fermé comme ouvert. */
+  .panneau[open] {
+    display: flex;
+  }
+
+  .panneau {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    background: color-mix(in srgb, var(--vert-profond) 97%, transparent);
+    border: 0;
+    text-align: left;
+    /* touch-action: none deliberately absent — the design needed it against a
+       plain positioned overlay with a live document behind it, but showModal()
+       already renders everything outside this <dialog> inert, and keeping it
+       would risk blocking touch-scroll on .liens-mobile's overflow-y: auto. */
+    overscroll-behavior: contain;
+  }
+
+  .panneau::backdrop {
+    background: transparent;
+  }
+
+  @supports (backdrop-filter: blur(6px)) {
+    .panneau {
+      backdrop-filter: blur(6px);
+    }
+  }
+
+  /* Reprend trait pour trait la boîte de `.entete--hero .barre` — mêmes
+     retraits, même hauteur minimale, même rembourrage. Sans quoi le bouton se
+     décale de quelques pixels à l'ouverture et la croix n'a plus l'air de
+     naître du hamburger. */
+  .panneau-entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 62px;
+    margin: clamp(15px, 2.6cqw, 34px) clamp(15px, 2.6cqw, 34px) 0;
+    padding: 10px clamp(16px, 3cqw, 34px);
+  }
+
+  .marque--panneau {
+    color: var(--creme);
+  }
+
+  .marque--panneau:hover {
+    opacity: 0.75;
+  }
+
+  .marque--panneau:focus-visible {
+    outline-color: var(--or);
+  }
+
+  /* Même boîte que `.bouton-menu` pour que le bouton ne se déplace pas d'un
+     pixel quand le panneau s'ouvre. */
+  .bouton-fermer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    margin: -10px;
+    background: none;
+    border: 0;
+    color: var(--creme);
+    cursor: pointer;
+  }
+
+  /* La croix est l'état de repos : sans animation — sous `reduce` comme au
+     premier rendu — le bouton doit déjà se lire comme une fermeture. */
+  .barre-croix-1 {
+    transform: translateY(3.25px) rotate(45deg);
+  }
+
+  .barre-croix-2 {
+    transform: translateY(-3.25px) rotate(-45deg);
+  }
+
+  .bouton-fermer:hover {
+    opacity: 0.7;
+  }
+
+  .bouton-fermer:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 3px;
+  }
+
+  .liens-mobile {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 calc(clamp(15px, 2.6cqw, 34px) + clamp(16px, 3cqw, 34px)) clamp(24px, 6cqw, 40px);
+    overflow-y: auto;
+  }
+
+  .liste-liens-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .liste-liens-mobile li:not(:last-child) {
+    border-bottom: 1px solid color-mix(in srgb, var(--sable) 22%, transparent);
+  }
+
+  .liste-liens-mobile a {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    padding: 16px 0;
+    font: 400 clamp(28px, 7.4cqw, 34px) / 1.1 var(--font-titre), serif;
+    color: var(--creme);
+    text-decoration: none;
+  }
+
+  .liste-liens-mobile a:hover {
+    color: var(--or-clair);
+  }
+
+  .liste-liens-mobile a:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 4px;
+  }
+
+  .element-cta {
+    margin-top: clamp(22px, 5cqw, 30px);
+  }
+
+  /* Seul bouton crème que le design fait virer à l'or clair au survol
+     (ligne 123) ; ailleurs il se soulève sans changer de fond. */
+  .element-cta :global(.bouton:hover) {
+    background: var(--or-clair);
+    box-shadow: none;
+    transform: none;
+  }
+
+  @media (min-width: 900px) {
+    .liens-desktop {
+      display: flex;
+    }
+
+    .bouton-menu {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .marque,
+    .liste-liens a,
+    .bouton-menu,
+    .bouton-fermer,
+    .liste-liens-mobile a {
+      transition: opacity 0.2s ease, color 0.2s ease;
+    }
+
+    /* La barre redescend au lieu d'apparaître d'un coup (design ligne 79).
+       `visibility` se transitionne de façon discrète : sans délai à la sortie,
+       elle basculerait dès la première image et emporterait le fondu. */
+    .entete--hero .barre--solide {
+      transition:
+        transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
+        opacity 0.45s ease,
+        visibility 0s linear 0.45s;
+    }
+
+    .entete--hero .barre--solide.visible {
+      transition:
+        transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
+        opacity 0.45s ease,
+        visibility 0s linear;
+    }
+
+    /* Le panneau s'ouvre en cercle depuis le bouton qui l'a déclenché, en haut
+       à droite, puis ses entrées montent l'une après l'autre. La sortie rejoue
+       la même chorégraphie à l'envers — ordre des liens inversé, courbe
+       symétrique — d'où le `data-fermeture` que le script pose le temps de
+       l'animation avant de refermer le dialogue. */
+    .panneau[open] {
+      animation: ovIn 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    }
+
+    .panneau[open][data-fermeture] {
+      animation: ovOut 0.5s cubic-bezier(0.7, 0, 0.8, 0.3) 0.14s both;
+    }
+
+    .panneau[open] .liste-liens-mobile li {
+      animation: ovLinkIn 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    }
+
+    .panneau[open][data-fermeture] .liste-liens-mobile li {
+      animation: ovLinkOut 0.34s cubic-bezier(0.7, 0, 0.8, 0.3) both;
+    }
+
+    .panneau[open] .liste-liens-mobile li:nth-child(1) { animation-delay: 0.12s }
+    .panneau[open] .liste-liens-mobile li:nth-child(2) { animation-delay: 0.165s }
+    .panneau[open] .liste-liens-mobile li:nth-child(3) { animation-delay: 0.21s }
+    .panneau[open] .liste-liens-mobile li:nth-child(4) { animation-delay: 0.255s }
+    .panneau[open] .liste-liens-mobile li:nth-child(5) { animation-delay: 0.3s }
+
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(1) { animation-delay: 0.18s }
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(2) { animation-delay: 0.135s }
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(3) { animation-delay: 0.09s }
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(4) { animation-delay: 0.045s }
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(5) { animation-delay: 0s }
+
+    /* Les barres partent de l'horizontale et pivotent en croix, décalées de
+       40ms l'une sur l'autre ; à la fermeture elles repartent à l'horizontale
+       sur la courbe inverse, la seconde ouvrant la marche. */
+    .panneau[open] .barre-croix-1 {
+      animation: barreEnCroix1 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) 0.08s both;
+    }
+
+    .panneau[open] .barre-croix-2 {
+      animation: barreEnCroix2 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) 0.12s both;
+    }
+
+    .panneau[open][data-fermeture] .barre-croix-1 {
+      animation: barreEnCroix1 0.34s cubic-bezier(0.7, 0, 0.8, 0.3) 0.04s reverse both;
+    }
+
+    .panneau[open][data-fermeture] .barre-croix-2 {
+      animation: barreEnCroix2 0.34s cubic-bezier(0.7, 0, 0.8, 0.3) reverse both;
+    }
+
+    @keyframes barreEnCroix1 {
+      from {
+        transform: none;
+      }
+      to {
+        transform: translateY(3.25px) rotate(45deg);
+      }
+    }
+
+    @keyframes barreEnCroix2 {
+      from {
+        transform: none;
+      }
+      to {
+        transform: translateY(-3.25px) rotate(-45deg);
+      }
+    }
+
+    /* Le point d'origine suit le bouton : 44px de large, à 60px du haut. */
+    @keyframes ovIn {
+      from {
+        opacity: 0;
+        clip-path: circle(0% at calc(100% - 44px) 60px);
+      }
+      40% {
+        opacity: 1;
+      }
+      to {
+        opacity: 1;
+        clip-path: circle(145% at calc(100% - 44px) 60px);
+      }
+    }
+
+    @keyframes ovOut {
+      from {
+        opacity: 1;
+        clip-path: circle(145% at calc(100% - 44px) 60px);
+      }
+      60% {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+        clip-path: circle(0% at calc(100% - 44px) 60px);
+      }
+    }
+
+    @keyframes ovLinkIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes ovLinkOut {
+      from {
+        opacity: 1;
+        transform: none;
+      }
+      to {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+    }
+  }
+</style>

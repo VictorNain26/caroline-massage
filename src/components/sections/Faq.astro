@@ -1,0 +1,190 @@
+---
+import { getCabinet, getFaq, getSection } from '../../lib/content';
+import EnTeteSection from '../ui/EnTeteSection.astro';
+import Accordeon from '../ui/Accordeon.astro';
+
+const section = await getSection('faq');
+const questions = await getFaq();
+const cabinet = await getCabinet();
+
+// Le contenu stocke la phrase telle qu'affichée dans le design ; les deux
+// segments d'appel à l'action deviennent des liens tel:/mailto:, mêmes
+// coordonnées que le pied de page (tâche 13), pas une nouvelle donnée.
+const texte = section.paragraphes[0] ?? '';
+const [avantAppel, resteApresAppel] = texte.split('Appelez-moi');
+const [avantEcrit, apresEcrit] = (resteApresAppel ?? '').split('écrivez-moi');
+
+// Le design rend le numéro et l'adresse cliquables au fil des réponses
+// (ligne 589). Les motifs sortent de `cabinet.yaml` plutôt que d'être écrits
+// ici : le jour où une coordonnée change, les liens suivent le contenu.
+const coordonnees = [
+  { motif: cabinet.telephoneAffiche, href: `tel:${cabinet.telephone}` },
+  { motif: cabinet.email, href: `mailto:${cabinet.email}` },
+].filter((c) => c.motif);
+
+interface Segment {
+  texte: string;
+  href?: string;
+}
+
+function segmenter(reponse: string): Segment[] {
+  return coordonnees.reduce<Segment[]>(
+    (segments, { motif, href }) =>
+      segments.flatMap((segment) => {
+        if (segment.href || !segment.texte.includes(motif)) return segment;
+        const morceaux = segment.texte.split(motif);
+        return morceaux.flatMap((morceau, rang) =>
+          rang === 0 ? [{ texte: morceau }] : [{ texte: motif, href }, { texte: morceau }],
+        );
+      }),
+    [{ texte: reponse }],
+  ).filter((segment) => segment.texte !== '');
+}
+---
+
+<section id="faq" data-anchor="faq" class="faq">
+  <div class="colonne-intro">
+    <EnTeteSection surtitre={section.surtitre ?? ''} titre={section.titre} />
+    {
+      resteApresAppel !== undefined && apresEcrit !== undefined ? (
+        <p class="amorce">
+          {avantAppel}
+          <a href={`tel:${cabinet.telephone}`} class="lien">
+            Appelez-moi
+          </a>
+          {avantEcrit}
+          <a href={`mailto:${cabinet.email}`} class="lien-texte">
+            écrivez-moi
+          </a>
+          {apresEcrit}
+        </p>
+      ) : (
+        <p class="amorce">{texte}</p>
+      )
+    }
+  </div>
+
+  <div class="liste">
+    {
+      questions.map((q) => (
+        <Accordeon titre={q.question}>
+          <p class="reponse">
+            {segmenter(q.reponse).map((segment) =>
+              segment.href ? (
+                <a href={segment.href} class="lien-texte">
+                  {segment.texte}
+                </a>
+              ) : (
+                segment.texte
+              ),
+            )}
+          </p>
+        </Accordeon>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .faq {
+    scroll-margin-top: 90px;
+    background: var(--creme);
+    padding: clamp(96px, 17cqw, 156px) clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+    max-width: var(--largeur-contenu);
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(28px, 4.5cqw, 72px);
+    align-items: flex-start;
+  }
+
+  .colonne-intro {
+    flex: 1 1 300px;
+    min-width: min(100%, 280px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(16px, 3cqw, 22px);
+  }
+
+  .amorce {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(17px, 4.4cqw, 19px);
+    line-height: 1.75;
+    color: var(--encre-douce);
+    text-wrap: pretty;
+  }
+
+  .lien,
+  .lien-texte {
+    /* --or-lien : la valeur de la maquette, --or-bronze #96742c (l. 555 du
+       design), mesurait 4.07:1 sur --creme, sous le plancher AA de 4.5:1.
+       Arbitré par la propriétaire — ne pas restaurer #96742c depuis la
+       maquette. Le filet --sable reste inchangé : il est décoratif. */
+    color: var(--or-lien);
+    text-decoration: none;
+    border-bottom: 1px solid var(--sable);
+  }
+
+  /* Seul « Appelez-moi » est dimensionné en cible tactile (design l. 555) : les
+     liens pris dans une phrase relèvent de l'exception « inline » du SC 2.5.8,
+     et les étirer à 44px disloquerait l'interligne du paragraphe. */
+  .lien {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .liste {
+    flex: 1.618 1 400px;
+    min-width: min(100%, 280px);
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--sable);
+    --accordeon-titre-police: var(--font-texte), sans-serif;
+    --accordeon-titre-poids: 700;
+    --accordeon-titre-taille: clamp(18px, 4.6cqw, 22px);
+    --accordeon-titre-interligne: 1.4;
+    --accordeon-icone-taille: 26px;
+    --accordeon-summary-gap: 18px;
+    --accordeon-summary-marge: clamp(18px, 3.6cqw, 24px) 0;
+    --accordeon-corps-bas: clamp(20px, 3.6cqw, 26px);
+  }
+
+  .reponse {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(17px, 4.4cqw, 19px);
+    line-height: 1.75;
+    color: var(--encre-douce);
+    max-width: 680px;
+    text-wrap: pretty;
+  }
+
+  /* Le titre et l'amorce restent en vue pendant qu'on parcourt les questions
+     (design ligne 550, `position: sticky; top: 90px` hors mobile). Même
+     traitement que la colonne image de Parcours. */
+  @media (min-width: 900px) {
+    .colonne-intro {
+      position: sticky;
+      top: 90px;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lien,
+    .lien-texte {
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+  }
+
+  @media (hover: hover) {
+    .lien:hover,
+    .lien-texte:hover {
+      color: var(--encre);
+      border-color: var(--encre);
+    }
+  }
+</style>

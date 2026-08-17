@@ -1,0 +1,94 @@
+---
+interface Props {
+  href: string;
+  variante?: 'vert' | 'creme';
+}
+
+const { href, variante = 'vert' } = Astro.props;
+---
+
+<a href={href} class={`bouton ${variante}`}><slot /></a>
+
+<style>
+  /*
+   * --bouton-hauteur is the extension point for min-height, since the
+   * design uses a different one per site (nav, mobile menu, hero) — same
+   * pattern as OrnementCoin's custom properties. Default matches the nav.
+   */
+  .bouton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--bouton-hauteur, 48px);
+    /* Garde-fou de reflow (WCAG 2.1 SC 1.4.10) : un libellé insécable — le
+       courriel de la section contact — imposait 377px de largeur minimale et
+       débordait la fenêtre à 320px. `anywhere`, et non `break-word`, parce que
+       seul lui « [introduces] soft wrap opportunities [...] considered when
+       calculating min-content intrinsic sizes » (MDN, overflow-wrap) : c'est
+       la taille intrinsèque qu'il faut faire céder. Sans effet au-delà. */
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-align: center;
+    /* `border-box` pour que la bordure tienne dans `--bouton-hauteur` : le
+       design dessine ce filet avec un `box-shadow: inset`, qui n'épaissit pas
+       la boîte, et le projet n'a pas de remise à zéro globale. */
+    box-sizing: border-box;
+    padding: 0 var(--bouton-marge-h, 30px);
+    border-radius: var(--rayon);
+    font-weight: 700;
+    font-size: clamp(0.875rem, 3.7cqw, 0.9375rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .vert {
+    background: var(--vert-profond);
+    color: var(--creme);
+    border: 1px solid color-mix(in srgb, var(--or-clair) 32%, transparent);
+  }
+  .vert:hover {
+    background: var(--vert-clair);
+    color: var(--creme);
+  }
+  .creme {
+    background: var(--creme);
+    color: var(--vert-profond);
+    border: 1px solid color-mix(in srgb, var(--or) 45%, transparent);
+  }
+  /* Le bouton crème ne change pas de fond au survol : il se soulève et projette
+     une ombre (design lignes 170 et 665). Le virage vers l'or clair n'appartient
+     qu'au bouton du menu mobile, qui le rétablit de son côté. */
+  .creme:hover {
+    color: var(--vert-profond);
+    box-shadow: 0 14px 28px color-mix(in srgb, var(--vert-profond) 26%, transparent);
+  }
+  /* L'anneau se pose à 3px hors du bouton, donc sur le fond de la section et
+     non sur le bouton. La variante encode déjà ce fond — un bouton vert ne
+     s'emploie que sur fond clair, un bouton crème que sur fond sombre — d'où
+     l'or par variante : `--or` mesure 2,05:1 sur `--creme` et `--or-lien`
+     1,99:1 sur `--vert-profond`, tous deux sous le plancher de 3:1 du
+     SC 1.4.11, qui couvre les indicateurs de focus. */
+  .bouton:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 3px;
+  }
+  .vert:focus-visible {
+    outline-color: var(--or-lien);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bouton {
+      transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.24s ease,
+        transform 0.24s cubic-bezier(0.2, 0.7, 0.3, 1);
+    }
+    .bouton:active {
+      transform: scale(0.985);
+    }
+    .creme:hover {
+      transform: translateY(-2px);
+    }
+  }
+</style>

@@ -1,0 +1,252 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCabinet } from '../lib/content';
+
+const cabinet = await getCabinet();
+
+// Renseignées par la cliente ; tant qu'un champ est vide, on affiche un
+// repère visible plutôt qu'un silence — un SIRET manquant doit se remarquer
+// à la relecture, pas passer inaperçu (design, ligne 706 : "[SIRET]").
+// Liste et ordre des mentions obligatoires pour une entreprise individuelle :
+// entreprendre.service-public.gouv.fr/vosdroits/F31228.
+const champsObligatoires = [
+  { libelle: 'Nom et prénom', valeur: cabinet.nom },
+  { libelle: 'Statut juridique', valeur: cabinet.statutJuridique },
+  { libelle: 'Numéro SIRET', valeur: cabinet.siret },
+  { libelle: 'Numéro RCS', valeur: cabinet.rcs },
+  { libelle: 'Numéro de TVA intracommunautaire', valeur: cabinet.tva },
+  {
+    libelle: "Adresse déclarée de l'éditrice (mention légale)",
+    valeur: cabinet.adresse,
+  },
+];
+---
+
+<Base
+  title="Mentions légales | Caroline, massage sur-mesure"
+  description="Mentions légales du site de Caroline, massage sur-mesure : éditrice, hébergement et directeur de la publication."
+>
+  <main id="contenu" class="page">
+    <div class="conteneur">
+      <header class="entete">
+        <span class="surtitre">Informations légales</span>
+        <h1 class="titre">Mentions légales</h1>
+        <p class="intro">
+          En application de l'article 6 de la loi n° 2004-575 du 21 juin 2004
+          pour la confiance dans l'économie numérique, les informations
+          suivantes sont mises à la disposition des utilisatrices et
+          utilisateurs de ce site. La liste des mentions obligatoires pour
+          une entreprise individuelle suit celle publiée par
+          <a href="https://entreprendre.service-public.gouv.fr/vosdroits/F31228" target="_blank" rel="noopener">entreprendre.service-public.gouv.fr (fiche F31228)</a>.
+        </p>
+      </header>
+
+      <div class="corps">
+        <section class="bloc">
+          <h2>Éditrice du site</h2>
+          <p>
+            Le site est édité par Caroline, exerçant sous le nom commercial «
+            Caroline, Massage Sur-Mesure », pour une activité de massage
+            bien-être basée à {cabinet.ville}.
+          </p>
+          <dl class="champs">
+            {
+              champsObligatoires.map((champ) => (
+                <div class="champ">
+                  <dt>{champ.libelle}</dt>
+                  <dd>
+                    {champ.valeur || <span class="a-completer">à compléter</span>}
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+          <dl class="champs">
+            <div class="champ">
+              <dt>Téléphone</dt>
+              <dd><a href={`tel:${cabinet.telephone}`}>{cabinet.telephoneAffiche}</a></dd>
+            </div>
+            <div class="champ">
+              <dt>E-mail</dt>
+              <dd><a href={`mailto:${cabinet.email}`}>{cabinet.email}</a></dd>
+            </div>
+            <div class="champ">
+              <dt>Lieu de réception de la clientèle (information commerciale)</dt>
+              <dd>Cabinet privé à {cabinet.ville}. Adresse exacte communiquée à la confirmation du rendez-vous.</dd>
+            </div>
+          </dl>
+          <p class="note">
+            Ce lieu de réception ne remplace pas l'adresse déclarée de
+            l'éditrice exigée ci-dessus : la première est une information
+            commerciale (où la clientèle est reçue), la seconde une mention
+            légale d'identification, distincte même lorsque les deux
+            coïncident.
+          </p>
+        </section>
+
+        <section class="bloc">
+          <h2>Hébergement</h2>
+          <p>
+            Le site est hébergé par Cloudflare, Inc., 101 Townsend St, San
+            Francisco, CA 94107, États-Unis, sur son offre Cloudflare
+            Workers (hébergement d'actifs statiques). Adresse confirmée par
+            la
+            <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">politique de confidentialité de Cloudflare</a>
+            (section 19, « Contact Information »).
+          </p>
+          <dl class="champs">
+            <div class="champ">
+              <dt>Téléphone de l'hébergeur</dt>
+              <dd><span class="a-completer">à compléter</span></dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="bloc">
+          <h2>Informations complémentaires</h2>
+          <p class="note">
+            Les deux mentions suivantes ne figurent pas dans la liste des
+            mentions obligatoires pour une entreprise individuelle citée
+            ci-dessus ; elles sont données à titre d'information.
+          </p>
+          <dl class="champs">
+            <div class="champ">
+              <dt>Assurance responsabilité civile professionnelle</dt>
+              <dd>
+                {cabinet.assuranceRcPro || <span class="a-completer">à compléter</span>}
+              </dd>
+            </div>
+          </dl>
+          <p>
+            La direction de la publication est assurée par Caroline
+            {cabinet.nom || <span class="a-completer">à compléter</span>},
+            éditrice du site.
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .page {
+    background: var(--creme);
+    padding: clamp(56px, 12cqw, 100px) clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+  }
+
+  .conteneur {
+    max-width: var(--largeur-contenu);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(36px, 5.5cqw, 56px);
+  }
+
+  .entete {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 66ch;
+  }
+
+  .surtitre {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: clamp(13px, 3.2cqw, 15px);
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--or-lien);
+  }
+
+  .titre {
+    margin: 0;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(30px, 7.6cqw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .intro {
+    margin: 8px 0 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.65;
+    color: var(--encre-douce);
+  }
+
+  .corps {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(28px, 4.5cqw, 40px);
+    max-width: 66ch;
+  }
+
+  .bloc h2 {
+    margin: 0 0 12px;
+    font-family: var(--font-titre), Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(21px, 5cqw, 26px);
+    line-height: 1.2;
+  }
+
+  .bloc p {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.65;
+    color: var(--encre);
+  }
+
+  .bloc p + p {
+    margin-top: 16px;
+  }
+
+  .bloc p.note {
+    color: var(--encre-douce);
+    font-size: clamp(14px, 3.8cqw, 15px);
+  }
+
+  .champs {
+    display: grid;
+    gap: clamp(12px, 2cqw, 16px);
+    margin: 16px 0 0;
+  }
+
+  .champ {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .champ dt {
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--or-lien);
+  }
+
+  .champ dd {
+    margin: 0;
+    font-family: var(--font-texte), sans-serif;
+    font-size: clamp(16px, 4.2cqw, 18px);
+    line-height: 1.6;
+    color: var(--encre);
+  }
+
+  .a-completer {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--corail);
+    color: var(--encre);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+</style>

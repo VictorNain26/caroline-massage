@@ -1,0 +1,10 @@
+nom: "Massage découverte"
+sousTitre: "idéal pour débuter"
+description: >-
+  Vous ne savez pas par où commencer ? En 30 minutes, je parcours l’ensemble du
+  corps pour repérer vos zones de tension et vous offrir un premier moment de
+  détente. Le point de départ idéal avant un soin plus profond.
+tarifs:
+  - { duree: 30, prix: 45 }
+signature: false
+ordre: 1

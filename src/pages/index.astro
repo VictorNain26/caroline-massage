@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/sections/Hero.astro';
+import Soins from '../components/sections/Soins.astro';
+import Tarifs from '../components/sections/Tarifs.astro';
+import Parcours from '../components/sections/Parcours.astro';
+import Cabinet from '../components/sections/Cabinet.astro';
+import Avis from '../components/sections/Avis.astro';
+import Faq from '../components/sections/Faq.astro';
+import Contact from '../components/sections/Contact.astro';
+import Frise from '../components/ui/Frise.astro';
+import { getAvis } from '../lib/content';
+
+// Le design place la frise décorative dans le même sc-if que les avis
+// (lignes 475-477 du design) : elle n'existe que si la section avis existe.
+const avis = await getAvis();
+---
+<Base
+  title="Massage thaï à l’huile & Deep Tissue à Carquefou | Caroline, massage sur-mesure"
+  description="Massages sur-mesure : thaï à l’huile, Deep Tissue, massage ciblé ou des pieds. Cabinet calme, clientèle mixte, soins strictement bien-être."
+  nav="hero"
+>
+  <main id="contenu">
+    <Hero />
+    <Soins />
+    <Tarifs />
+    <Frise />
+    <Parcours />
+    <Cabinet />
+    {avis.length > 0 && <Frise />}
+    <Avis />
+    <Faq />
+    <Contact />
+    <Frise />
+  </main>
+</Base>

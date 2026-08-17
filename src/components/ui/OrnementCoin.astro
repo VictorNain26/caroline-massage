@@ -1,0 +1,58 @@
+---
+import { Image } from 'astro:assets';
+import coin from '../../assets/images/caro-ornement-coin.png';
+
+interface Props {
+  position: 'haut-gauche' | 'haut-droite' | 'bas-gauche' | 'bas-droite';
+}
+
+const { position } = Astro.props;
+---
+
+<Image
+  src={coin}
+  alt=""
+  width={104}
+  height={104}
+  densities={[1, 2]}
+  class={`ornement ${position}`}
+/>
+
+<style>
+  /*
+   * Extension points, set by the consuming section on its own container —
+   * do not add props for these, the design uses a different value per
+   * section (hero, parcours, contact) and props would just relay inline
+   * styles three times over:
+   *   --orn-taille   width of the ornament
+   *   --orn-retrait  inset from the edge it hugs
+   *   --orn-opacite  opacity
+   * Defaults below match the parcours section, the most common case.
+   */
+  .ornement {
+    position: absolute;
+    width: var(--orn-taille, clamp(48px, 8cqw, 96px));
+    height: auto;
+    opacity: var(--orn-opacite, 0.85);
+    pointer-events: none;
+  }
+  .haut-gauche {
+    top: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    left: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+  }
+  .haut-droite {
+    top: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    right: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    transform: scaleX(-1);
+  }
+  .bas-gauche {
+    bottom: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    left: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    transform: scaleY(-1);
+  }
+  .bas-droite {
+    bottom: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    right: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    transform: rotate(180deg);
+  }
+</style>
