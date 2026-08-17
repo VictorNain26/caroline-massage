@@ -452,6 +452,10 @@ const liens = [
     justify-content: center;
     padding: 0 calc(clamp(15px, 2.6cqw, 34px) + clamp(16px, 3cqw, 34px)) clamp(24px, 6cqw, 40px);
     overflow-y: auto;
+    /* `scrollbar-color` s'hérite : sans cette reprise, ce panneau vert
+       recevrait la barre claire de la page. Or et vert clair mesurent 4,2:1
+       l'un contre l'autre. */
+    scrollbar-color: var(--or) var(--vert-clair);
   }
 
   .liste-liens-mobile {

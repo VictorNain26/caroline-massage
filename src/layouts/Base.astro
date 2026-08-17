@@ -60,6 +60,21 @@ const jsonLd = construireJsonLd(cabinet, soins);
     }
   }
 
+  /* Barre de défilement accordée à la page : curseur bronze sur piste sable
+     clair, les deux tirés des tokens. `scrollbar-color` attend le curseur
+     puis la piste, dans cet ordre, et les deux teintes mesurent 3,5:1 l'une
+     contre l'autre, au-dessus du plancher de 3:1 que demande la technique
+     G183 du WCAG pour distinguer un contrôle de son fond.
+     `scrollbar-width` reste sur `auto` : `thin` affinerait le trait mais
+     rétrécirait d'autant la zone à saisir à la souris.
+     `color-scheme` empêche le navigateur de repeindre la barre en sombre
+     chez un visiteur dont le système est en thème sombre, alors que la page,
+     elle, resterait claire. */
+  html {
+    color-scheme: light;
+    scrollbar-color: var(--or-bronze) var(--creme-surface);
+  }
+
   body {
     margin: 0;
     background: var(--creme);
