@@ -13,6 +13,22 @@ if (rideau && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     racine.style.overflow = positionInitiale;
   };
 
+  // Les entrées du hero durent moins longtemps que la pose du rideau : jouées
+  // à l'ouverture de la page, elles seraient finies derrière lui et le hero
+  // apparaîtrait déjà installé. Le design les relance quand la levée démarre
+  // (`replayHeroAnims`), et `animationstart` tombe précisément à cet instant,
+  // le délai étant déjà écoulé.
+  rideau.addEventListener('animationstart', function surDebut(evenement) {
+    if (evenement.target !== rideau) return;
+    rideau.removeEventListener('animationstart', surDebut);
+    document.querySelectorAll<HTMLElement>('[data-hero-anim]').forEach((element) => {
+      element.getAnimations().forEach((animation) => {
+        animation.cancel();
+        animation.play();
+      });
+    });
+  });
+
   // Seule la fin de `curtainLift`, portée par le rideau lui-même, compte :
   // `animationend` remonte aussi depuis la marque et le filet, qui terminent
   // bien avant lui — s'y fier rendait la page défilable pendant que le rideau

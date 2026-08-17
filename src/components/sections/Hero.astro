@@ -19,29 +19,29 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
     <span class="rideau-trait"></span>
   </div>
 
-  <div aria-hidden="true" class="lueur"></div>
-  <div aria-hidden="true" class="cadre"></div>
+  <div aria-hidden="true" class="lueur" data-hero-anim></div>
+  <div aria-hidden="true" class="cadre" data-hero-anim></div>
 
-  <div class="orn orn-bas-gauche" style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(clamp(15px, 2.6cqw, 34px) + 14px); --orn-opacite: .75">
+  <div class="orn orn-bas-gauche" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(clamp(15px, 2.6cqw, 34px) + 14px); --orn-opacite: .75">
     <OrnementCoin position="bas-gauche" />
   </div>
-  <div class="orn orn-bas-droite" style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(clamp(15px, 2.6cqw, 34px) + 14px); --orn-opacite: .75">
+  <div class="orn orn-bas-droite" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(clamp(15px, 2.6cqw, 34px) + 14px); --orn-opacite: .75">
     <OrnementCoin position="bas-droite" />
   </div>
 
   <div class="contenu">
-    <span class="eyebrow">{section.surtitre}</span>
-    <h1 class="titre">{titrePlain}{aAccent && <em class="titre-accent">{accent}</em>}</h1>
-    <p class="accroche">{section.paragraphes[0]}</p>
-    <div class="cta" style="--bouton-hauteur: clamp(58px, 9.4cqw, 62px)">
+    <span class="eyebrow" data-hero-anim>{section.surtitre}</span>
+    <h1 class="titre" data-hero-anim>{titrePlain}{aAccent && <em class="titre-accent" data-hero-anim>{accent}</em>}</h1>
+    <p class="accroche" data-hero-anim>{section.paragraphes[0]}</p>
+    <div class="cta" data-hero-anim style="--bouton-hauteur: clamp(58px, 9.4cqw, 62px)">
       <Bouton href="#contact" variante="creme">Réserver</Bouton>
     </div>
   </div>
 
-  <div class="indice-bloc">
+  <div class="indice-bloc" data-hero-anim>
     <a href="#soins" class="indice">
       <span class="indice-texte">Découvrir les soins</span>
-      <span aria-hidden="true" class="indice-cercle">
+      <span aria-hidden="true" class="indice-cercle" data-hero-anim>
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v13M6 12l6 6 6-6"></path>
         </svg>
@@ -248,8 +248,12 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
   }
 
   @media (prefers-reduced-motion: no-preference) {
+    /* 1,15s de pose puis 0,9s de levée, les durées du design (INTRO_HOLD,
+       INTRO_LIFT). Le script relance les animations du hero au début de la
+       levée : sans cela elles se consument derrière le rideau et le visiteur
+       découvre un hero déjà en place. */
     .rideau {
-      animation: curtainLift 0.8s cubic-bezier(0.2, 0.7, 0.3, 1) 1.9s both;
+      animation: curtainLift 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) 1.15s both;
     }
     .rideau-marque {
       animation:
