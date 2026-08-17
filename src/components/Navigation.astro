@@ -76,8 +76,12 @@ const liens = [
         <span aria-hidden="true" class="marque-separateur"></span>
         <span class="marque-baseline">Massage<br />Sur-Mesure</span>
       </a>
+      {/* Reprend les deux barres du bouton d'ouverture, à la même place : le
+          panneau étant dans le top layer, celui de la barre passe dessous et
+          devient inerte, alors le design montre un seul bouton qui pivote. */}
       <button type="button" class="bouton-fermer" data-nav-close aria-label="Fermer le menu" autofocus>
-        <span aria-hidden="true" class="icone-fermer"></span>
+        <span aria-hidden="true" class="barre-hamburger barre-croix-1"></span>
+        <span aria-hidden="true" class="barre-hamburger barre-croix-2"></span>
       </button>
     </div>
 
@@ -300,13 +304,18 @@ const liens = [
     }
   }
 
+  /* Reprend trait pour trait la boîte de `.entete--hero .barre` — mêmes
+     retraits, même hauteur minimale, même rembourrage. Sans quoi le bouton se
+     décale de quelques pixels à l'ouverture et la croix n'a plus l'air de
+     naître du hamburger. */
   .panneau-entete {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    padding: calc(clamp(15px, 2.6cqw, 34px) + 10px)
-      calc(clamp(15px, 2.6cqw, 34px) + clamp(16px, 3cqw, 34px)) 10px;
+    min-height: 62px;
+    margin: clamp(15px, 2.6cqw, 34px) clamp(15px, 2.6cqw, 34px) 0;
+    padding: 10px clamp(16px, 3cqw, 34px);
   }
 
   .marque--panneau {
@@ -321,11 +330,13 @@ const liens = [
     outline-color: var(--or);
   }
 
+  /* Même boîte que `.bouton-menu` pour que le bouton ne se déplace pas d'un
+     pixel quand le panneau s'ouvre. */
   .bouton-fermer {
-    position: relative;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    gap: 5px;
     width: 44px;
     height: 44px;
     padding: 10px;
@@ -336,6 +347,16 @@ const liens = [
     cursor: pointer;
   }
 
+  /* La croix est l'état de repos : sans animation — sous `reduce` comme au
+     premier rendu — le bouton doit déjà se lire comme une fermeture. */
+  .barre-croix-1 {
+    transform: translateY(3.25px) rotate(45deg);
+  }
+
+  .barre-croix-2 {
+    transform: translateY(-3.25px) rotate(-45deg);
+  }
+
   .bouton-fermer:hover {
     opacity: 0.7;
   }
@@ -343,33 +364,6 @@ const liens = [
   .bouton-fermer:focus-visible {
     outline: 2px solid var(--or);
     outline-offset: 3px;
-  }
-
-  .icone-fermer {
-    position: relative;
-    display: block;
-    width: 22px;
-    height: 22px;
-  }
-
-  .icone-fermer::before,
-  .icone-fermer::after {
-    content: '';
-    position: absolute;
-    top: 10px;
-    left: 0;
-    display: block;
-    width: 22px;
-    height: 1.5px;
-    background: currentColor;
-  }
-
-  .icone-fermer::before {
-    transform: rotate(45deg);
-  }
-
-  .icone-fermer::after {
-    transform: rotate(-45deg);
   }
 
   .liens-mobile {
@@ -468,6 +462,43 @@ const liens = [
     .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(3) { animation-delay: 0.09s }
     .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(4) { animation-delay: 0.045s }
     .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(5) { animation-delay: 0s }
+
+    /* Les barres partent de l'horizontale et pivotent en croix, décalées de
+       40ms l'une sur l'autre ; à la fermeture elles repartent à l'horizontale
+       sur la courbe inverse, la seconde ouvrant la marche. */
+    .panneau[open] .barre-croix-1 {
+      animation: barreEnCroix1 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) 0.08s both;
+    }
+
+    .panneau[open] .barre-croix-2 {
+      animation: barreEnCroix2 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) 0.12s both;
+    }
+
+    .panneau[open][data-fermeture] .barre-croix-1 {
+      animation: barreEnCroix1 0.34s cubic-bezier(0.7, 0, 0.8, 0.3) 0.04s reverse both;
+    }
+
+    .panneau[open][data-fermeture] .barre-croix-2 {
+      animation: barreEnCroix2 0.34s cubic-bezier(0.7, 0, 0.8, 0.3) reverse both;
+    }
+
+    @keyframes barreEnCroix1 {
+      from {
+        transform: none;
+      }
+      to {
+        transform: translateY(3.25px) rotate(45deg);
+      }
+    }
+
+    @keyframes barreEnCroix2 {
+      from {
+        transform: none;
+      }
+      to {
+        transform: translateY(-3.25px) rotate(-45deg);
+      }
+    }
 
     /* Le point d'origine suit le bouton : 44px de large, à 60px du haut. */
     @keyframes ovIn {

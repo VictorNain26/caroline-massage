@@ -53,6 +53,12 @@ Le champ `reviews` facture au SKU Enterprise + Atmosphere, le plus cher.
 - `design/accueil-page-vert-or.dc.html` est la source de vérité **visuelle**,
   jamais du code à recopier. Sa syntaxe (`{{ }}`, `style-hover=`, `<dc-import>`)
   est propriétaire et n'a pas d'équivalent HTML.
+- **Deux divergences assumées, à ne pas « corriger » comme des oublis :** la
+  section contact propose deux liens `tel:` et `mailto:` là où le design dessine
+  un formulaire — le site est statique et n'a aucun service d'envoi, et le
+  design lui-même n'envoie rien (« Aucun envoi reel tant qu'aucun service n'est
+  branche ») ; et la navigation prend la variante `barre` hors accueil, le
+  design ne prévoyant qu'une page.
 - Aucun composant n'appelle `getCollection()`. Tout passe par `src/lib/content.ts`.
 - Aucune police, aucun script, aucune image servis depuis un domaine tiers.
 - Le prop `isMobile` du design ne doit exister nulle part : une seule
