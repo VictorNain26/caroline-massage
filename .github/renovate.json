@@ -9,7 +9,7 @@
     "helpers:pinGitHubActionDigests"
   ],
   "timezone": "Europe/Paris",
-  "schedule": ["at any time"],
+  "schedule": ["before 9am on monday"],
   "labels": ["dependencies"],
   "rangeStrategy": "bump",
   "rebaseWhen": "conflicted",
@@ -62,8 +62,13 @@
     {
       "matchManagers": ["github-actions"],
       "groupName": "github-actions",
-      "pinDigests": true,
-      "commitMessagePrefix": "chore(ci)"
+      "pinDigests": true
+    },
+    {
+      "description": "Pinning a mutable action tag guards against a re-pointed release; pinning the runtime only delays Node's own security patches behind a PR.",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["node"],
+      "enabled": false
     },
     {
       "description": "The Node types track the runtime major, so the bump is only mergeable once the workflows move with it.",
