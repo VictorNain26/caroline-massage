@@ -13,6 +13,33 @@ const cabinet = await getCabinet();
 const texte = section.paragraphes[0] ?? '';
 const [avantAppel, resteApresAppel] = texte.split('Appelez-moi');
 const [avantEcrit, apresEcrit] = (resteApresAppel ?? '').split('écrivez-moi');
+
+// Le design rend le numéro et l'adresse cliquables au fil des réponses
+// (ligne 589). Les motifs sortent de `cabinet.yaml` plutôt que d'être écrits
+// ici : le jour où une coordonnée change, les liens suivent le contenu.
+const coordonnees = [
+  { motif: cabinet.telephoneAffiche, href: `tel:${cabinet.telephone}` },
+  { motif: cabinet.email, href: `mailto:${cabinet.email}` },
+].filter((c) => c.motif);
+
+interface Segment {
+  texte: string;
+  href?: string;
+}
+
+function segmenter(reponse: string): Segment[] {
+  return coordonnees.reduce<Segment[]>(
+    (segments, { motif, href }) =>
+      segments.flatMap((segment) => {
+        if (segment.href || !segment.texte.includes(motif)) return segment;
+        const morceaux = segment.texte.split(motif);
+        return morceaux.flatMap((morceau, rang) =>
+          rang === 0 ? [{ texte: morceau }] : [{ texte: motif, href }, { texte: morceau }],
+        );
+      }),
+    [{ texte: reponse }],
+  ).filter((segment) => segment.texte !== '');
+}
 ---
 
 <section id="faq" data-anchor="faq" class="faq">
@@ -41,7 +68,17 @@ const [avantEcrit, apresEcrit] = (resteApresAppel ?? '').split('écrivez-moi');
     {
       questions.map((q) => (
         <Accordeon titre={q.question}>
-          <p class="reponse">{q.reponse}</p>
+          <p class="reponse">
+            {segmenter(q.reponse).map((segment) =>
+              segment.href ? (
+                <a href={segment.href} class="lien">
+                  {segment.texte}
+                </a>
+              ) : (
+                segment.texte
+              ),
+            )}
+          </p>
         </Accordeon>
       ))
     }

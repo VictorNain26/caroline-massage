@@ -1,3 +1,28 @@
+// Les avis défilent horizontalement en dessous de 900px ; les puces disent où
+// l'on en est. Elles sont rendues côté serveur et restent justes sans ce
+// script — seule leur mise à jour au défilement se joue ici.
+const carrouselAvis = document.querySelector<HTMLElement>('.avis .liste');
+const pucesAvis = document.querySelector<HTMLElement>('[data-avis-puces]');
+if (carrouselAvis && pucesAvis) {
+  const puces = [...pucesAvis.children];
+  let derniereActive = 0;
+
+  carrouselAvis.addEventListener(
+    'scroll',
+    () => {
+      // Une carte occupe toute la largeur utile du carrousel : le rapport entre
+      // le défilement et cette largeur donne directement son rang.
+      const largeurCarte = carrouselAvis.scrollWidth / puces.length;
+      const rang = Math.min(puces.length - 1, Math.round(carrouselAvis.scrollLeft / largeurCarte));
+      if (rang === derniereActive) return;
+      puces[derniereActive]?.classList.remove('actif');
+      puces[rang]?.classList.add('actif');
+      derniereActive = rang;
+    },
+    { passive: true },
+  );
+}
+
 // Le rideau d'intro couvre l'écran ; tant qu'il est là, la page ne défile pas,
 // sinon on devine le contenu glisser derrière lui. Le blocage est posé ici et
 // non dans la feuille de style : si ce script ne s'exécute pas, la page reste

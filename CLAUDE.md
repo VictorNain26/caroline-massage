@@ -53,7 +53,11 @@ Le champ `reviews` facture au SKU Enterprise + Atmosphere, le plus cher.
 - `design/accueil-page-vert-or.dc.html` est la source de vérité **visuelle**,
   jamais du code à recopier. Sa syntaxe (`{{ }}`, `style-hover=`, `<dc-import>`)
   est propriétaire et n'a pas d'équivalent HTML.
-- **Deux divergences assumées, à ne pas « corriger » comme des oublis :** la
+- **Le titre de Parcours reste un `<h2>`.** Le design en fait un `<h3>` en
+  Alegreya 23px dans la colonne de droite et ne place aucun `<h2>` dans la
+  section : s'y conformer priverait la page d'un niveau de titre, au détriment
+  des lecteurs d'écran et du référencement. Arbitré en faveur du `<h2>`.
+- **Deux autres divergences assumées, à ne pas « corriger » comme des oublis :** la
   section contact propose deux liens `tel:` et `mailto:` là où le design dessine
   un formulaire — le site est statique et n'a aucun service d'envoi, et le
   design lui-même n'envoie rien (« Aucun envoi reel tant qu'aucun service n'est
