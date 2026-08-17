@@ -28,45 +28,84 @@ const liens = [
 ---
 
 <header class:list={['entete', `entete--${variante}`]}>
-  <div class="barre">
-    <a href="/#hero" aria-label="Retour en haut de page" class="marque">
-      <span class="marque-nom">Caroline</span>
-      <span aria-hidden="true" class="marque-separateur"></span>
-      <span class="marque-baseline">Massage<br />Sur-Mesure</span>
-    </a>
+  {/* Le design superpose deux barres sur l'accueil : celle-ci, transparente,
+      posée sur le hero et emportée par le défilement, puis la barre crème qui
+      redescend une fois le hero passé. Leur balisage se répète plutôt que de
+      passer par un composant : `.marque` et `.barre-hamburger` servent aussi
+      au panneau mobile, et les déplacer le priverait de ses styles. */}
+  {
+    variante === 'hero' && (
+      <div class="barre barre--hero">
+        <a href="/#hero" aria-label="Retour en haut de page" class="marque">
+          <span class="marque-nom">Caroline</span>
+          <span aria-hidden="true" class="marque-separateur" />
+          <span class="marque-baseline">
+            Massage
+            <br />
+            Sur-Mesure
+          </span>
+        </a>
 
-    <nav class="liens-desktop" aria-label="Navigation principale">
-      <ul class="liste-liens">
-        {
-          liens.map((lien) => (
-            <li>
-              <a href={lien.href}>{lien.label}</a>
-            </li>
-          ))
-        }
-        {
-          variante === 'barre' && (
-            <li>
-              <Bouton href="/#contact" variante="vert">
-                Réserver
-              </Bouton>
-            </li>
-          )
-        }
-      </ul>
-    </nav>
+        <nav class="liens-desktop" aria-label="Navigation principale">
+          <ul class="liste-liens">
+            {liens.map((lien) => (
+              <li>
+                <a href={lien.href}>{lien.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-    <button
-      type="button"
-      class="bouton-menu"
-      data-nav-toggle
-      aria-expanded="false"
-      aria-controls="menu-mobile"
-      aria-label="Ouvrir le menu"
-    >
-      <span aria-hidden="true" class="barre-hamburger"></span>
-      <span aria-hidden="true" class="barre-hamburger"></span>
-    </button>
+        <button
+          type="button"
+          class="bouton-menu"
+          data-nav-toggle
+          aria-expanded="false"
+          aria-controls="menu-mobile"
+          aria-label="Ouvrir le menu"
+        >
+          <span aria-hidden="true" class="barre-hamburger" />
+          <span aria-hidden="true" class="barre-hamburger" />
+        </button>
+      </div>
+    )
+  }
+
+  <div class="enveloppe-solide">
+    <div class="barre barre--solide" data-barre-solide>
+      <a href="/#hero" aria-label="Retour en haut de page" class="marque">
+        <span class="marque-nom">Caroline</span>
+        <span aria-hidden="true" class="marque-separateur"></span>
+        <span class="marque-baseline">Massage<br />Sur-Mesure</span>
+      </a>
+
+      <nav class="liens-desktop" aria-label={variante === 'hero' ? 'Navigation secondaire' : 'Navigation principale'}>
+        <ul class="liste-liens">
+          {
+            liens.map((lien) => (
+              <li>
+                <a href={lien.href}>{lien.label}</a>
+              </li>
+            ))
+          }
+          <li>
+            <Bouton href="/#contact" variante="vert">Réserver</Bouton>
+          </li>
+        </ul>
+      </nav>
+
+      <button
+        type="button"
+        class="bouton-menu"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="menu-mobile"
+        aria-label="Ouvrir le menu"
+      >
+        <span aria-hidden="true" class="barre-hamburger"></span>
+        <span aria-hidden="true" class="barre-hamburger"></span>
+      </button>
+    </div>
   </div>
 
   <dialog id="menu-mobile" class="panneau" data-nav-dialog aria-label="Menu">
@@ -111,21 +150,12 @@ const liens = [
 <script src="../scripts/menu.ts"></script>
 
 <style>
+  /* Hors accueil, la barre occupe sa place et suit le défilement depuis le
+     départ ; `sticky` porte donc sur l'en-tête, qui est bien dans le flux. */
   .entete--barre {
     position: sticky;
     top: 0;
     z-index: 20;
-  }
-
-  /* Aucun ancêtre positionné : le bloc conteneur est le document, donc ces
-     décalages placent la nav sur le premier écran, alignée sur le cadre
-     décoratif du hero, qui utilise les mêmes clamp(). */
-  .entete--hero {
-    position: absolute;
-    top: clamp(15px, 2.6cqw, 34px);
-    right: clamp(15px, 2.6cqw, 34px);
-    left: clamp(15px, 2.6cqw, 34px);
-    z-index: 2;
   }
 
   .barre {
@@ -136,14 +166,52 @@ const liens = [
     min-height: 62px;
   }
 
-  .entete--barre .barre {
+  .barre--solide {
     padding: 9px max(clamp(20px, 5.5cqw, 80px), calc((100% - var(--largeur-contenu)) / 2));
     background: var(--creme);
     border-bottom: 1px solid var(--sable);
   }
 
-  .entete--hero .barre {
+  /* Sur l'accueil elle se superpose au contenu au lieu de le pousser : le hero
+     occupe déjà tout l'écran, et elle n'entre en scène qu'une fois dépassé.
+     `fixed` plutôt que `sticky` : l'en-tête ne mesure rien ici — la barre du
+     hero est hors flux — et un élément collant n'agit que dans les limites de
+     son parent, donc il n'aurait eu aucune plage pour opérer. */
+  .entete--hero .enveloppe-solide {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 20;
+  }
+
+  /* Sur le hero, la barre transparente se cale sur le cadre décoratif, qui
+     emploie les mêmes clamp(). Aucun ancêtre positionné : le bloc conteneur
+     est le document, donc elle défile avec la page. */
+  .barre--hero {
+    position: absolute;
+    top: clamp(15px, 2.6cqw, 34px);
+    right: clamp(15px, 2.6cqw, 34px);
+    left: clamp(15px, 2.6cqw, 34px);
+    z-index: 2;
     padding: 10px clamp(16px, 3cqw, 34px);
+  }
+
+  /* Hors de l'accueil il n'y a pas de hero à quitter : la barre est là d'emblée.
+     Sur l'accueil elle attend au-dessus de la fenêtre, et `visibility` la retire
+     de l'ordre de tabulation tant qu'elle est absente — `opacity` seule l'aurait
+     laissée atteignable au clavier alors qu'on ne la voit pas. */
+  .entete--hero .barre--solide {
+    transform: translateY(-110%);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .entete--hero .barre--solide.visible {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--vert-profond) 10%, transparent);
   }
 
   .marque {
@@ -217,22 +285,22 @@ const liens = [
   /* Sur le vert du hero, l'or clair repasse au-dessus du plancher de 3:1 du
      SC 1.4.11 là où `--or-lien`, calibré pour le fond crème, restait sous la
      barre. Même logique que le panneau mobile plus bas. */
-  .entete--hero .marque,
-  .entete--hero .bouton-menu {
+  .barre--hero .marque,
+  .barre--hero .bouton-menu {
     color: var(--creme);
   }
 
-  .entete--hero .liste-liens a {
+  .barre--hero .liste-liens a {
     color: var(--creme-surface);
   }
 
-  .entete--hero .liste-liens a:hover {
+  .barre--hero .liste-liens a:hover {
     color: var(--or-clair);
   }
 
-  .entete--hero .marque:focus-visible,
-  .entete--hero .liste-liens a:focus-visible,
-  .entete--hero .bouton-menu:focus-visible {
+  .barre--hero .marque:focus-visible,
+  .barre--hero .liste-liens a:focus-visible,
+  .barre--hero .bouton-menu:focus-visible {
     outline-color: var(--or);
   }
 
@@ -439,6 +507,23 @@ const liens = [
     .bouton-fermer,
     .liste-liens-mobile a {
       transition: opacity 0.2s ease, color 0.2s ease;
+    }
+
+    /* La barre redescend au lieu d'apparaître d'un coup (design ligne 79).
+       `visibility` se transitionne de façon discrète : sans délai à la sortie,
+       elle basculerait dès la première image et emporterait le fondu. */
+    .entete--hero .barre--solide {
+      transition:
+        transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
+        opacity 0.45s ease,
+        visibility 0s linear 0.45s;
+    }
+
+    .entete--hero .barre--solide.visible {
+      transition:
+        transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1),
+        opacity 0.45s ease,
+        visibility 0s linear;
     }
 
     /* Le panneau s'ouvre en cercle depuis le bouton qui l'a déclenché, en haut

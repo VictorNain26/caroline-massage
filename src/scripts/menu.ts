@@ -67,15 +67,36 @@ if (rideau && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
   setTimeout(liberer, 5000);
 }
 
-const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+// La barre crème redescend une fois le hero quitté. Le seuil est celui du
+// design : 92% de la hauteur de fenêtre, avec un plancher de 300px pour les
+// écrans très bas, où le hero occupe moins de place qu'on ne le croit.
+const barreSolide = document.querySelector<HTMLElement>('[data-barre-solide]');
+if (barreSolide?.closest('.entete--hero')) {
+  const basculer = () => {
+    const seuil = Math.max(innerHeight * 0.92, 300);
+    barreSolide.classList.toggle('visible', scrollY > seuil);
+  };
+  addEventListener('scroll', basculer, { passive: true });
+  basculer();
+}
+
+// Deux barres portent chacune leur bouton de menu sur l'accueil : celui du
+// hero et celui de la barre crème. Un seul est visible à la fois, mais tous
+// doivent ouvrir le panneau et refléter son état.
+const toggles = [...document.querySelectorAll<HTMLButtonElement>('[data-nav-toggle]')];
+const toggle = toggles[0];
 const dialog = document.querySelector<HTMLDialogElement>('[data-nav-dialog]');
 const closeButton = document.querySelector<HTMLButtonElement>('[data-nav-close]');
 
 if (toggle && dialog && closeButton) {
-  toggle.addEventListener('click', () => {
-    dialog.showModal();
-    toggle.setAttribute('aria-expanded', 'true');
-    toggle.setAttribute('aria-label', 'Fermer le menu');
+  toggles.forEach((bouton) => {
+    bouton.addEventListener('click', () => {
+      dialog.showModal();
+      toggles.forEach((autre) => {
+        autre.setAttribute('aria-expanded', 'true');
+        autre.setAttribute('aria-label', 'Fermer le menu');
+      });
+    });
   });
 
   // Refermer immédiatement escamoterait l'animation de sortie : le dialogue
@@ -115,8 +136,14 @@ if (toggle && dialog && closeButton) {
   // (le <dialog> natif ferme sur Echap et emet `close`, pas besoin de gerer
   // le clavier a la main).
   dialog.addEventListener('close', () => {
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-label', 'Ouvrir le menu');
-    toggle.focus();
+    toggles.forEach((bouton) => {
+      bouton.setAttribute('aria-expanded', 'false');
+      bouton.setAttribute('aria-label', 'Ouvrir le menu');
+    });
+    // Rendre le focus au bouton réellement à l'écran : selon qu'on a quitté le
+    // hero ou non, ce n'est pas le même des deux. `visibility` plutôt que
+    // `offsetParent`, qui reste renseigné sur un élément seulement masqué.
+    const visible = toggles.find((bouton) => getComputedStyle(bouton).visibility !== 'hidden');
+    (visible ?? toggle).focus();
   });
 }
