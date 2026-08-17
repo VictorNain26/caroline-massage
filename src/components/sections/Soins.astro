@@ -79,7 +79,7 @@ const icones: Record<string, string> = {
     flex-direction: column;
     gap: clamp(28px, 4.5cqw, 48px);
     background: var(--creme-surface);
-    padding: clamp(96px, 17cqw, 156px) clamp(20px, 5.5cqw, 80px) 0;
+    padding: var(--section-haut) var(--gouttiere) 0;
   }
 
   /* Le bloc titre porte la même limite que la liste (design ligne 182) : sans
@@ -222,7 +222,7 @@ const icones: Record<string, string> = {
     }
 
     .description {
-      font-size: clamp(16px, 4.2cqw, 18px);
+      font-size: var(--texte-corps);
     }
   }
 

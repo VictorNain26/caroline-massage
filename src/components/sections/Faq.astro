@@ -89,7 +89,7 @@ function segmenter(reponse: string): Segment[] {
   .faq {
     scroll-margin-top: 90px;
     background: var(--creme);
-    padding: clamp(96px, 17cqw, 156px) clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+    padding: var(--section-haut) var(--gouttiere) var(--section-bas);
     max-width: var(--largeur-contenu);
     margin: 0 auto;
     display: flex;
@@ -117,10 +117,7 @@ function segmenter(reponse: string): Segment[] {
 
   .lien,
   .lien-texte {
-    /* --or-lien : la valeur de la maquette, --or-bronze #96742c (l. 555 du
-       design), mesurait 4.07:1 sur --creme, sous le plancher AA de 4.5:1.
-       Arbitré par la propriétaire — ne pas restaurer #96742c depuis la
-       maquette. Le filet --sable reste inchangé : il est décoratif. */
+    /* Le filet garde --sable : il est décoratif, pas du texte. */
     color: var(--or-lien);
     text-decoration: none;
     border-bottom: 1px solid var(--sable);

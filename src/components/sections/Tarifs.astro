@@ -26,7 +26,7 @@ const section = await getSection('tarifs');
     gap: clamp(10px, 1.8cqw, 14px);
     background: var(--creme-surface);
     padding: calc(clamp(28px, 4.5cqw, 48px) + clamp(18px, 3cqw, 34px))
-      clamp(20px, 5.5cqw, 80px) clamp(80px, 14cqw, 120px);
+      var(--gouttiere) var(--section-bas);
   }
 
   .amorce,
@@ -57,7 +57,7 @@ const section = await getSection('tarifs');
   .texte {
     margin: 0;
     font-family: var(--font-texte), sans-serif;
-    font-size: clamp(16px, 4.2cqw, 18px);
+    font-size: var(--texte-corps);
     line-height: 1.7;
     color: var(--encre-douce);
     text-wrap: pretty;

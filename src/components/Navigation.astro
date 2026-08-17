@@ -167,7 +167,7 @@ const liens = [
   }
 
   .barre--solide {
-    padding: 9px max(clamp(20px, 5.5cqw, 80px), calc((100% - var(--largeur-contenu)) / 2));
+    padding: 9px max(var(--gouttiere), calc((100% - var(--largeur-contenu)) / 2));
     background: var(--creme);
     border-bottom: 1px solid var(--sable);
   }
@@ -198,9 +198,9 @@ const liens = [
      est le document, donc elle défile avec la page. */
   .barre--hero {
     position: absolute;
-    top: clamp(15px, 2.6cqw, 34px);
-    right: clamp(15px, 2.6cqw, 34px);
-    left: clamp(15px, 2.6cqw, 34px);
+    top: var(--cadre-retrait);
+    right: var(--cadre-retrait);
+    left: var(--cadre-retrait);
     z-index: 2;
     padding: 10px clamp(16px, 3cqw, 34px);
   }
@@ -393,7 +393,7 @@ const liens = [
     justify-content: space-between;
     gap: 20px;
     min-height: 62px;
-    margin: clamp(15px, 2.6cqw, 34px) clamp(15px, 2.6cqw, 34px) 0;
+    margin: var(--cadre-retrait) var(--cadre-retrait) 0;
     padding: 10px clamp(16px, 3cqw, 34px);
   }
 
@@ -450,7 +450,7 @@ const liens = [
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 calc(clamp(15px, 2.6cqw, 34px) + clamp(16px, 3cqw, 34px)) clamp(24px, 6cqw, 40px);
+    padding: 0 calc(var(--cadre-retrait) + clamp(16px, 3cqw, 34px)) clamp(24px, 6cqw, 40px);
     overflow-y: auto;
   }
 

@@ -37,22 +37,22 @@ const { position } = Astro.props;
     pointer-events: none;
   }
   .haut-gauche {
-    top: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
-    left: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    top: var(--orn-retrait, var(--ornement-retrait));
+    left: var(--orn-retrait, var(--ornement-retrait));
   }
   .haut-droite {
-    top: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
-    right: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    top: var(--orn-retrait, var(--ornement-retrait));
+    right: var(--orn-retrait, var(--ornement-retrait));
     transform: scaleX(-1);
   }
   .bas-gauche {
-    bottom: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
-    left: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    bottom: var(--orn-retrait, var(--ornement-retrait));
+    left: var(--orn-retrait, var(--ornement-retrait));
     transform: scaleY(-1);
   }
   .bas-droite {
-    bottom: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
-    right: var(--orn-retrait, clamp(12px, 2.6cqw, 26px));
+    bottom: var(--orn-retrait, var(--ornement-retrait));
+    right: var(--orn-retrait, var(--ornement-retrait));
     transform: rotate(180deg);
   }
 </style>

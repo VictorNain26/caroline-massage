@@ -22,10 +22,10 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
   <div aria-hidden="true" class="lueur" data-hero-anim></div>
   <div aria-hidden="true" class="cadre" data-hero-anim></div>
 
-  <div class="orn orn-bas-gauche" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(clamp(15px, 2.6cqw, 34px) + 14px); --orn-opacite: .75">
+  <div class="orn orn-bas-gauche" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(var(--cadre-retrait) + 14px); --orn-opacite: .75">
     <OrnementCoin position="bas-gauche" />
   </div>
-  <div class="orn orn-bas-droite" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(clamp(15px, 2.6cqw, 34px) + 14px); --orn-opacite: .75">
+  <div class="orn orn-bas-droite" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(var(--cadre-retrait) + 14px); --orn-opacite: .75">
     <OrnementCoin position="bas-droite" />
   </div>
 
@@ -128,10 +128,10 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
 
   .cadre {
     position: absolute;
-    top: clamp(15px, 2.6cqw, 34px);
-    left: clamp(15px, 2.6cqw, 34px);
-    right: clamp(15px, 2.6cqw, 34px);
-    bottom: clamp(15px, 2.6cqw, 34px);
+    top: var(--cadre-retrait);
+    left: var(--cadre-retrait);
+    right: var(--cadre-retrait);
+    bottom: var(--cadre-retrait);
     border: 1px solid color-mix(in srgb, var(--or) 26%, transparent);
     pointer-events: none;
   }
@@ -201,7 +201,7 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
     position: absolute;
     left: 0;
     right: 0;
-    bottom: calc(clamp(15px, 2.6cqw, 34px) + clamp(20px, 2.6cqw, 30px));
+    bottom: calc(var(--cadre-retrait) + clamp(20px, 2.6cqw, 30px));
     z-index: 2;
     display: flex;
     justify-content: center;

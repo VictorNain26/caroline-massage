@@ -33,20 +33,12 @@ const { surtitre, titre } = Astro.props;
     background: var(--or);
   }
   .surtitre {
-    /*
-     * --or-lien, not the design's --or-bronze: #96742c measured 4.07:1 on
-     * --creme and 3.51:1 on --creme-surface, under the 4.5:1 floor for
-     * normal-size text, and axe flagged all four eyebrows. Substitution
-     * approved by the project owner — do not restore #96742c from the design.
-     *
-     * --entete-couleur-surtitre stays the escape hatch for a dark section:
-     * --or-lien is 1.99:1 on the dark green (--or-bronze was 2.90:1, no
-     * better). A dark section must set it to var(--sable) (6.48:1), as the
-     * design does at contact.
-     */
+    /* Une section sombre doit poser `--entete-couleur-surtitre: var(--sable)`,
+       comme le fait contact : l'or du texte ne passe pas sur le vert profond
+       (voir le choix de `--or-lien` dans tokens.css). */
     font-family: var(--font-texte), sans-serif;
     font-weight: 500;
-    font-size: clamp(13px, 3.2cqw, 15px);
+    font-size: var(--texte-surtitre);
     line-height: 1;
     letter-spacing: 0.16em;
     text-transform: uppercase;
