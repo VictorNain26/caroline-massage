@@ -37,6 +37,11 @@ const jsonLd = construireJsonLd(cabinet, soins);
     <slot name="head" />
   </head>
   <body>
+    {/* Les repères (header, nav, main, footer) satisfont déjà le SC 2.4.1 pour
+        qui navigue au lecteur d'écran ; ce lien couvre l'autre moitié du
+        public, au clavier sans lecteur d'écran, qui traverserait sinon toute
+        la navigation. Il ne se montre qu'une fois atteint au clavier. */}
+    <a href="#contenu" class="lien-evitement">Aller au contenu</a>
     <Navigation variante={nav} />
     <slot />
     <PiedDePage />
@@ -60,6 +65,32 @@ const jsonLd = construireJsonLd(cabinet, soins);
     background: var(--creme);
     color: var(--encre);
     font-family: var(--font-texte), system-ui, sans-serif;
+  }
+
+  /* Hors flux tant qu'il n'a pas le focus, jamais `display: none` ni
+     `visibility: hidden`, qui le retireraient de l'ordre de tabulation et le
+     rendraient inatteignable — donc inutile. */
+  .lien-evitement {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 200;
+  }
+
+  .lien-evitement:focus {
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 24px;
+    background: var(--creme);
+    color: var(--vert-profond);
+    border-radius: 0 0 var(--rayon) var(--rayon);
+    outline: 2px solid var(--or-lien);
+    outline-offset: -4px;
+    font-weight: 700;
+    text-decoration: none;
   }
   h1, h2, h3 {
     font-family: var(--font-titre), Georgia, serif;

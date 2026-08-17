@@ -85,7 +85,10 @@ const liens = [
       </button>
     </div>
 
-    <nav class="liens-mobile" aria-label="Navigation principale">
+    {/* Un intitulé distinct de la barre : deux repères de même rôle portant le
+        même nom sont indiscernables dans la liste que dresse un lecteur
+        d'écran. */}
+    <nav class="liens-mobile" aria-label="Menu principal">
       <ul class="liste-liens-mobile">
         {
           liens.map((lien) => (
