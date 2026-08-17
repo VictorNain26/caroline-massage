@@ -103,7 +103,9 @@ const icones: Record<string, string> = {
     background: var(--creme);
     border-radius: 18px;
     padding: 0 20px;
-    --accordeon-couleur-bordure: transparent;
+    --accordeon-bordure: none;
+    --accordeon-summary-gap: 14px;
+    --accordeon-summary-marge: 18px 0;
   }
 
   .item.signature {
@@ -201,7 +203,9 @@ const icones: Record<string, string> = {
        part ; en bordure du bloc de tarifs il ne coûte pas de nœud vide. */
     .tarifs {
       margin-top: 20px;
-      padding-top: 20px;
+      /* 14px sous le filet, l'écart interne des cartes du design (ligne 292),
+         là où les 20px du dessus valent ce même écart plus la marge de 6px. */
+      padding-top: 14px;
       border-top: 1px solid var(--sable);
     }
 

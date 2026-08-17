@@ -53,7 +53,7 @@ function segmenter(reponse: string): Segment[] {
             Appelez-moi
           </a>
           {avantEcrit}
-          <a href={`mailto:${cabinet.email}`} class="lien">
+          <a href={`mailto:${cabinet.email}`} class="lien-texte">
             écrivez-moi
           </a>
           {apresEcrit}
@@ -71,7 +71,7 @@ function segmenter(reponse: string): Segment[] {
           <p class="reponse">
             {segmenter(q.reponse).map((segment) =>
               segment.href ? (
-                <a href={segment.href} class="lien">
+                <a href={segment.href} class="lien-texte">
                   {segment.texte}
                 </a>
               ) : (
@@ -115,10 +115,8 @@ function segmenter(reponse: string): Segment[] {
     text-wrap: pretty;
   }
 
-  .lien {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
+  .lien,
+  .lien-texte {
     /* --or-lien : la valeur de la maquette, --or-bronze #96742c (l. 555 du
        design), mesurait 4.07:1 sur --creme, sous le plancher AA de 4.5:1.
        Arbitré par la propriétaire — ne pas restaurer #96742c depuis la
@@ -126,6 +124,15 @@ function segmenter(reponse: string): Segment[] {
     color: var(--or-lien);
     text-decoration: none;
     border-bottom: 1px solid var(--sable);
+  }
+
+  /* Seul « Appelez-moi » est dimensionné en cible tactile (design l. 555) : les
+     liens pris dans une phrase relèvent de l'exception « inline » du SC 2.5.8,
+     et les étirer à 44px disloquerait l'interligne du paragraphe. */
+  .lien {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 
   .liste {
@@ -139,6 +146,9 @@ function segmenter(reponse: string): Segment[] {
     --accordeon-titre-taille: clamp(18px, 4.6cqw, 22px);
     --accordeon-titre-interligne: 1.4;
     --accordeon-icone-taille: 26px;
+    --accordeon-summary-gap: 18px;
+    --accordeon-summary-marge: clamp(18px, 3.6cqw, 24px) 0;
+    --accordeon-corps-bas: clamp(20px, 3.6cqw, 26px);
   }
 
   .reponse {
@@ -162,7 +172,8 @@ function segmenter(reponse: string): Segment[] {
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .lien {
+    .lien,
+    .lien-texte {
       transition:
         color 0.2s ease,
         border-color 0.2s ease;
@@ -170,7 +181,8 @@ function segmenter(reponse: string): Segment[] {
   }
 
   @media (hover: hover) {
-    .lien:hover {
+    .lien:hover,
+    .lien-texte:hover {
       color: var(--encre);
       border-color: var(--encre);
     }

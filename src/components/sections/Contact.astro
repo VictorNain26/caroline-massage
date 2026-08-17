@@ -23,7 +23,7 @@ const cabinet = await getCabinet();
 
     <p class="accroche">{section.paragraphes[0]}</p>
 
-    <div class="cta" style="--bouton-hauteur: clamp(56px, 9cqw, 62px)">
+    <div class="cta" style="--bouton-hauteur: 62px">
       <Bouton href={`tel:${cabinet.telephone}`} variante="creme">{cabinet.telephoneAffiche}</Bouton>
       <Bouton href={`mailto:${cabinet.email}`} variante="creme">{cabinet.email}</Bouton>
     </div>
@@ -115,8 +115,13 @@ const cabinet = await getCabinet();
     margin-top: 4px;
   }
 
+  /* Le design coiffe le bloc d'appel à l'action d'un filet (ligne 664) ; le
+     formulaire a disparu, la mention qu'il souligne est restée, et ce filet
+     l'assoit sous les deux boutons. */
   .mention {
     margin: 0;
+    padding-top: clamp(16px, 2.6cqw, 22px);
+    border-top: 1px solid color-mix(in srgb, var(--or-clair) 28%, transparent);
     font-family: var(--font-texte), sans-serif;
     font-size: 15px;
     line-height: 1.5;

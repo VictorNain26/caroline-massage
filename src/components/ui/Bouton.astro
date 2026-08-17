@@ -29,10 +29,14 @@ const { href, variante = 'vert' } = Astro.props;
     max-width: 100%;
     overflow-wrap: anywhere;
     text-align: center;
-    padding: 0 24px;
+    /* `border-box` pour que la bordure tienne dans `--bouton-hauteur` : le
+       design dessine ce filet avec un `box-shadow: inset`, qui n'épaissit pas
+       la boîte, et le projet n'a pas de remise à zéro globale. */
+    box-sizing: border-box;
+    padding: 0 var(--bouton-marge-h, 30px);
     border-radius: var(--rayon);
     font-weight: 700;
-    font-size: 0.875rem;
+    font-size: clamp(0.875rem, 3.7cqw, 0.9375rem);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;

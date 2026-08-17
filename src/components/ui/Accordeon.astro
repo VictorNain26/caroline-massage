@@ -59,14 +59,19 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = As
    * same as Soins.astro's `.description`, not to Accordeon's own `.corps`
    * wrapper.
    */
+  /* Le filet en entier plutôt que sa seule couleur : les cartes de soins n'en
+     ont aucun dans le design, et un `transparent` laissait malgré tout 1px
+     sous chacune. */
   .accordeon {
-    border-bottom: 1px solid var(--accordeon-couleur-bordure, var(--sable));
+    border-bottom: var(--accordeon-bordure, 1px solid var(--sable));
   }
+  /* Espacements paramétrés : le design donne plus d'air aux questions de la FAQ
+     qu'aux cartes de soins repliées, alors que le composant est le même. */
   summary {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 20px 0;
+    gap: var(--accordeon-summary-gap, 16px);
+    padding: var(--accordeon-summary-marge, 20px 0);
     cursor: pointer;
     list-style: none;
   }
@@ -128,14 +133,18 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = As
     align-items: center;
     justify-content: center;
   }
+  /* Sans taille propre, le « + » héritait du 16px du corps de page là où le
+     design le pose à 18px dans sa pastille. */
   .marque::before {
     content: '+';
+    font-size: var(--accordeon-marque-taille, 18px);
+    line-height: 1;
   }
   details[open] .marque {
     transform: rotate(45deg);
   }
   .corps {
-    padding-bottom: 20px;
+    padding-bottom: var(--accordeon-corps-bas, 20px);
     color: var(--accordeon-couleur-corps, var(--encre-douce));
     line-height: 1.6;
   }

@@ -198,6 +198,21 @@ const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop
     border-bottom: 1px solid var(--sable);
   }
 
+  /* Le design fait virer le filet avec le texte (ligne 698) ; sans cette
+     règle, le soulignement restait sable sous un libellé devenu encre. */
+  .contact-liens a:hover {
+    border-bottom-color: var(--encre);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .contact-liens a,
+    .legal-liens a {
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+  }
+
   .puce {
     width: 1px;
     height: 14px;
