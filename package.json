@@ -2,6 +2,7 @@
   "name": "caroline-massage",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@11.5.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
