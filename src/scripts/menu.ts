@@ -13,10 +13,16 @@ if (rideau && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     racine.style.overflow = positionInitiale;
   };
 
-  // `.rideau` ne porte qu'une animation, `curtainLift` : sa fin est donc le
-  // signal exact, sans dupliquer ici la durée écrite dans le CSS. Le délai
-  // n'est qu'un filet, au cas où l'animation ne démarrerait pas du tout.
-  rideau.addEventListener('animationend', liberer, { once: true });
+  // Seule la fin de `curtainLift`, portée par le rideau lui-même, compte :
+  // `animationend` remonte aussi depuis la marque et le filet, qui terminent
+  // bien avant lui — s'y fier rendait la page défilable pendant que le rideau
+  // couvrait encore l'écran. Le délai n'est qu'un filet, au cas où l'animation
+  // ne démarrerait pas du tout.
+  rideau.addEventListener('animationend', function surFin(evenement) {
+    if (evenement.target !== rideau) return;
+    rideau.removeEventListener('animationend', surFin);
+    liberer();
+  });
   setTimeout(liberer, 5000);
 }
 
