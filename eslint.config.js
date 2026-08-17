@@ -3,19 +3,11 @@ import ts from 'typescript-eslint';
 import astro from 'eslint-plugin-astro';
 
 export default [
-  // Tous des artefacts : `dist`/`.astro` du build, `design` la maquette,
+  // Tous des artefacts : `dist`/`.astro` du build, `design` la maquette, et
   // `.wrangler` le bundle workerd que `wrangler dev` écrit sous la racine —
-  // il porte du code généré non lintable — et `test-results`/`playwright-report`
-  // les traces de Playwright.
+  // il porte du code généré non lintable.
   {
-    ignores: [
-      'dist/**',
-      '.astro/**',
-      'design/**',
-      '.wrangler/**',
-      'test-results/**',
-      'playwright-report/**',
-    ],
+    ignores: ['dist/**', '.astro/**', 'design/**', '.wrangler/**'],
   },
   js.configs.recommended,
   ...ts.configs.recommended,

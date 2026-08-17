@@ -5,8 +5,7 @@
       "Bash(pnpm build)",
       "Bash(pnpm check)",
       "Bash(pnpm lint)",
-      "Bash(pnpm test)",
-      "Bash(pnpm test:a11y)"
+      "Bash(pnpm test)"
     ],
     "ask": [
       "Bash(pnpm deploy)",

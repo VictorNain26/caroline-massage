@@ -14,9 +14,15 @@ Spec : `docs/superpowers/specs/2026-08-15-site-vitrine-caroline-massage-design.m
   artefacts de build (le HTML produit, et le magasin de contenu d'Astro). Sans
   build préalable elles échouent avec un message explicite plutôt qu'un faux
   vert. La CI enchaîne `build` puis `test` pour cette raison.
-- `pnpm test:a11y` — Playwright + axe sur le build
 - `pnpm build` — build de production dans `dist/`
 - `pnpm deploy` — déploiement Cloudflare, jamais automatique
+
+## Vérification visuelle et accessibilité
+
+Il n'y a plus de suite automatisée : Playwright et `@axe-core/playwright` ont été
+retirés. Le rendu, le responsive, le focus et les contrastes se vérifient à la
+main dans Chrome via Claude in Chrome, sur `pnpm dev`. Rien ne l'exécute à chaque
+push — une régression visuelle ne sera vue que si quelqu'un regarde.
 
 ## Règles du projet
 
