@@ -12,11 +12,6 @@ jobs:
         with:
           runtime: node@24
           cache: true
-          # L'install de l'action s'appuie sur la détection d'environnement CI
-          # pour geler le lock. On l'écrit à la main : un lock désynchronisé
-          # doit faire échouer la CI, pas être réparé en silence.
-          install: false
-      - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm lint
       - run: pnpm build

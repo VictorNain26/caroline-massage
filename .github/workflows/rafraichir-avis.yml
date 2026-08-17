@@ -20,8 +20,6 @@ jobs:
         with:
           runtime: node@24
           cache: true
-          install: false
-      - run: pnpm install --frozen-lockfile
       - run: pnpm build
         env:
           GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
