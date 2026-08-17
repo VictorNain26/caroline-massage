@@ -60,20 +60,57 @@ const jsonLd = construireJsonLd(cabinet, soins);
     }
   }
 
-  /* Curseur vert profond sur piste sable : `scrollbar-color` attend le curseur
-     d'abord, la piste ensuite. Le vert de la marque, et non un doré discret —
-     la page est presque entièrement crème, si bien qu'un curseur clair sur une
-     piste claire s'y effaçait au lieu de s'en détacher. Ici le couple mesure
-     10:1, très au-dessus du plancher de 3:1 de la technique G183 du WCAG, et
-     la piste elle-même se démarque du fond de page.
-     `scrollbar-width` reste sur `auto` : `thin` affinerait le trait mais
-     rétrécirait d'autant la zone à saisir à la souris.
-     `color-scheme` empêche le navigateur de repeindre la barre en sombre
-     chez un visiteur dont le système est en thème sombre, alors que la page,
-     elle, resterait claire. */
   html {
+    /* Empêche un navigateur en thème sombre de repeindre la barre en sombre
+       alors que la page, elle, reste claire. */
     color-scheme: light;
-    scrollbar-color: var(--vert-profond) var(--sable);
+  }
+
+  /* Barre de défilement aux couleurs de la page. Deux écritures, et surtout
+     pas les deux à la fois : dès que `scrollbar-color` vaut autre chose que
+     `auto`, il l'emporte sur les pseudo-éléments WebKit et n'en laisse rien
+     passer.
+     Chrome, Edge et Safari prennent donc la version détaillée, seule à donner
+     la main sur la largeur et les angles. Poser cette largeur a un effet
+     décisif : « when you set the width or height of ::-webkit-scrollbar, an
+     overlay scrollbar is always displayed, effectively turning it into a
+     classic scrollbar » (developer.chrome.com/docs/css-ui/scrollbar-styling).
+     Sans elle, un système réglé sur les barres superposées dessine la piste
+     mais escamote le curseur — la barre perd alors ce qui fait son utilité,
+     dire où l'on se trouve dans la page.
+     12px laisse de quoi l'attraper à la souris, là où les 8 à 10px habituels
+     deviennent ingrats pour un pointage imprécis. */
+  @supports selector(::-webkit-scrollbar) {
+    html::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    html::-webkit-scrollbar-track {
+      background: var(--sable);
+    }
+
+    html::-webkit-scrollbar-thumb {
+      background: var(--vert-profond);
+      border-radius: 999px;
+      /* Bordure de la couleur de la piste : elle amincit le curseur sans
+         réduire la surface réellement cliquable. */
+      border: 3px solid var(--sable);
+    }
+
+    html::-webkit-scrollbar-thumb:hover {
+      background: var(--vert-clair);
+    }
+  }
+
+  /* Firefox, qui ne connaît pas ces pseudo-éléments. Le curseur d'abord, la
+     piste ensuite : les deux teintes mesurent 6,5:1 l'une contre l'autre, au-
+     dessus du plancher de 3:1 que demande la technique G183 du WCAG pour
+     distinguer un contrôle de son fond. */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-color: var(--vert-profond) var(--sable);
+    }
   }
 
   body {

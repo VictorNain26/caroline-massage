@@ -452,10 +452,32 @@ const liens = [
     justify-content: center;
     padding: 0 calc(clamp(15px, 2.6cqw, 34px) + clamp(16px, 3cqw, 34px)) clamp(24px, 6cqw, 40px);
     overflow-y: auto;
-    /* `scrollbar-color` s'hérite : sans cette reprise, ce panneau vert
-       recevrait la barre claire de la page. Or et vert clair mesurent 4,2:1
-       l'un contre l'autre. */
-    scrollbar-color: var(--or) var(--vert-clair);
+  }
+
+  /* Ce panneau est vert : sans reprise, il hériterait de la barre claire de la
+     page. Même partage qu'ailleurs — les pseudo-éléments pour WebKit, la
+     propriété standard pour Firefox, jamais les deux, la seconde annulant les
+     premiers. Or sur vert clair mesure 4,2:1. */
+  @supports selector(::-webkit-scrollbar) {
+    .liens-mobile::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    .liens-mobile::-webkit-scrollbar-track {
+      background: var(--vert-clair);
+    }
+
+    .liens-mobile::-webkit-scrollbar-thumb {
+      background: var(--or);
+      border-radius: 999px;
+      border: 3px solid var(--vert-clair);
+    }
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    .liens-mobile {
+      scrollbar-color: var(--or) var(--vert-clair);
+    }
   }
 
   .liste-liens-mobile {
