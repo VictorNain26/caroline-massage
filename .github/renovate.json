@@ -1,0 +1,25 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "description": "Une seule PR pour les mises à jour sans rupture, le projet est petit",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "mises a jour mineures"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    },
+    {
+      "description": "TypeScript 7 casse astro check et pnpm lint, cf. .claude/rules/dependances.md",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
+    },
+    {
+      "description": "Les types Node suivent la majeure du runtime, pas la derniere publiee",
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "<25"
+    }
+  ]
+}

@@ -7,12 +7,15 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v2
         with:
-          node-version: 22
-          cache: pnpm
+          runtime: node@24
+          cache: true
+          # L'install de l'action s'appuie sur la détection d'environnement CI
+          # pour geler le lock. On l'écrit à la main : un lock désynchronisé
+          # doit faire échouer la CI, pas être réparé en silence.
+          install: false
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm lint
