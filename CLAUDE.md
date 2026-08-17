@@ -8,6 +8,9 @@ Spec : `docs/superpowers/specs/2026-08-15-site-vitrine-caroline-massage-design.m
 ## Commandes
 
 - `pnpm dev` — serveur de développement
+- `pnpm peers check` — bornes déclarées par les paquets. La CI le lance en
+  premier : c'est ce qui tient TypeScript en 6.x, cf.
+  `.claude/rules/dependances.md`
 - `pnpm check` — typecheck Astro
 - `pnpm lint` — ESLint, zéro warning toléré
 - `pnpm test` — Vitest. **Lancer `pnpm build` d'abord** : deux suites lisent des
