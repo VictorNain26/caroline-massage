@@ -82,7 +82,11 @@ const [avantEcrit, apresEcrit] = (resteApresAppel ?? '').split('écrivez-moi');
     min-height: 44px;
     display: inline-flex;
     align-items: center;
-    color: var(--or-bronze);
+    /* --or-lien : la valeur de la maquette, --or-bronze #96742c (l. 555 du
+       design), mesurait 4.07:1 sur --creme, sous le plancher AA de 4.5:1.
+       Arbitré par la propriétaire — ne pas restaurer #96742c depuis la
+       maquette. Le filet --sable reste inchangé : il est décoratif. */
+    color: var(--or-lien);
     text-decoration: none;
     border-bottom: 1px solid var(--sable);
   }

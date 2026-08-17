@@ -172,7 +172,10 @@ const blocs = section.blocs ?? [];
     font-size: 12px;
     line-height: 1;
     letter-spacing: 0.14em;
-    color: var(--or-bronze);
+    /* --or-lien : la valeur de la maquette, --or-bronze #96742c, mesurait
+       4.07:1 sur --creme, sous le plancher AA de 4.5:1. Arbitré par la
+       propriétaire — ne pas restaurer #96742c depuis la maquette. */
+    color: var(--or-lien);
   }
 
   .titre-bloc {
