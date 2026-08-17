@@ -9,7 +9,7 @@
     "helpers:pinGitHubActionDigests"
   ],
   "timezone": "Europe/Paris",
-  "schedule": ["before 9am on monday"],
+  "schedule": ["at any time"],
   "labels": ["dependencies"],
   "rangeStrategy": "bump",
   "rebaseWhen": "conflicted",
