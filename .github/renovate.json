@@ -1,23 +1,77 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":dependencyDashboard",
+    "group:recommended",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "timezone": "Europe/Paris",
+  "schedule": ["before 9am on monday"],
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "rebaseWhen": "conflicted",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": ["at any time"],
+    "labels": ["dependencies", "security"],
+    "prCreation": "immediate",
+    "minimumReleaseAge": null,
+    "automerge": false,
+    "commitMessagePrefix": "fix(security)"
+  },
+  "osvVulnerabilityAlerts": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 9am on the first day of the month"],
+    "automerge": true,
+    "automergeType": "pr",
+    "automergeStrategy": "merge-commit",
+    "commitMessageAction": "Refresh",
+    "commitMessageTopic": "lockfile"
+  },
   "packageRules": [
     {
-      "description": "Une seule PR pour les mises à jour sans rupture, le projet est petit",
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "mises a jour mineures"
+      "description": "Auto-merge minor + patch once CI is green. The 3-day minimumReleaseAge leaves time for a freshly-published bug or supply-chain compromise to surface.",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "platformAutomerge": true,
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Majors always need a human reviewer.",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["major"]
+    },
+    {
+      "description": "Group the Astro toolchain.",
+      "matchPackageNames": ["astro", "@astrojs/**"],
+      "groupName": "astro"
+    },
+    {
+      "description": "Group the lint toolchain.",
+      "matchPackageNames": ["eslint", "@eslint/**", "typescript-eslint", "eslint-plugin-astro"],
+      "groupName": "eslint"
     },
     {
       "matchManagers": ["github-actions"],
-      "groupName": "github actions"
+      "groupName": "github-actions",
+      "pinDigests": true,
+      "commitMessagePrefix": "chore(ci)"
     },
     {
-      "description": "TypeScript 7 casse astro check et pnpm lint, cf. .claude/rules/dependances.md",
+      "description": "TypeScript 7 breaks astro check and pnpm lint, cf. .claude/rules/dependances.md",
       "matchPackageNames": ["typescript"],
       "allowedVersions": "<7"
     },
     {
-      "description": "Les types Node suivent la majeure du runtime, pas la derniere publiee",
+      "description": "The Node types track the runtime major used in CI, not the latest published.",
       "matchPackageNames": ["@types/node"],
       "allowedVersions": "<25"
     }
