@@ -58,21 +58,31 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
   .hero {
     scroll-margin-top: 90px;
     position: relative;
+    /* Plein écran, jamais plus : `box-sizing` fait tenir le rembourrage dans
+       les 100cqh au lieu de s'y ajouter, et le rembourrage vertical se mesure
+       sur la hauteur du viewport — sur la largeur, un grand écran le poussait
+       à 344px et repoussait le bouton sous la ligne de flottaison. Reste en
+       `min-height` : si le texte grandit, la section s'étire plutôt que de
+       masquer sa propre fin. */
+    box-sizing: border-box;
     min-height: 100cqh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    padding: clamp(100px, 16cqw, 160px) clamp(30px, 7cqw, 80px) clamp(132px, 18cqw, 184px);
+    padding: clamp(88px, 14cqh, 150px) clamp(30px, 7cqw, 80px) clamp(110px, 18cqh, 180px);
     background: var(--vert-profond);
     text-align: center;
   }
 
+  /* `fixed`, pas `absolute` : le rideau doit couvrir l'écran entier, pas
+     seulement la boîte du hero, sans quoi la page se devine sous lui pendant
+     l'intro. */
   .rideau {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    z-index: 40;
+    z-index: 100;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -429,5 +429,89 @@ const liens = [
     .liste-liens-mobile a {
       transition: opacity 0.2s ease, color 0.2s ease;
     }
+
+    /* Le panneau s'ouvre en cercle depuis le bouton qui l'a déclenché, en haut
+       à droite, puis ses entrées montent l'une après l'autre. La sortie rejoue
+       la même chorégraphie à l'envers — ordre des liens inversé, courbe
+       symétrique — d'où le `data-fermeture` que le script pose le temps de
+       l'animation avant de refermer le dialogue. */
+    .panneau[open] {
+      animation: ovIn 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    }
+
+    .panneau[open][data-fermeture] {
+      animation: ovOut 0.5s cubic-bezier(0.7, 0, 0.8, 0.3) 0.14s both;
+    }
+
+    .panneau[open] .liste-liens-mobile li {
+      animation: ovLinkIn 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    }
+
+    .panneau[open][data-fermeture] .liste-liens-mobile li {
+      animation: ovLinkOut 0.34s cubic-bezier(0.7, 0, 0.8, 0.3) both;
+    }
+
+    .panneau[open] .liste-liens-mobile li:nth-child(1) { animation-delay: 0.12s }
+    .panneau[open] .liste-liens-mobile li:nth-child(2) { animation-delay: 0.165s }
+    .panneau[open] .liste-liens-mobile li:nth-child(3) { animation-delay: 0.21s }
+    .panneau[open] .liste-liens-mobile li:nth-child(4) { animation-delay: 0.255s }
+    .panneau[open] .liste-liens-mobile li:nth-child(5) { animation-delay: 0.3s }
+
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(1) { animation-delay: 0.18s }
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(2) { animation-delay: 0.135s }
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(3) { animation-delay: 0.09s }
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(4) { animation-delay: 0.045s }
+    .panneau[open][data-fermeture] .liste-liens-mobile li:nth-child(5) { animation-delay: 0s }
+
+    /* Le point d'origine suit le bouton : 44px de large, à 60px du haut. */
+    @keyframes ovIn {
+      from {
+        opacity: 0;
+        clip-path: circle(0% at calc(100% - 44px) 60px);
+      }
+      40% {
+        opacity: 1;
+      }
+      to {
+        opacity: 1;
+        clip-path: circle(145% at calc(100% - 44px) 60px);
+      }
+    }
+
+    @keyframes ovOut {
+      from {
+        opacity: 1;
+        clip-path: circle(145% at calc(100% - 44px) 60px);
+      }
+      60% {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+        clip-path: circle(0% at calc(100% - 44px) 60px);
+      }
+    }
+
+    @keyframes ovLinkIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes ovLinkOut {
+      from {
+        opacity: 1;
+        transform: none;
+      }
+      to {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+    }
   }
 </style>
