@@ -6,26 +6,26 @@ paths:
 
 # Dépendances
 
-## TypeScript reste en 6.x
+## TypeScript reste en 6.x tant que `pnpm peers check` le dit
 
-TypeScript 7 est publié et `pnpm outdated` le proposera. **Ne pas le prendre** :
-`astro check` et `pnpm lint` le refusent tous les deux, essayé et vérifié.
+`astro check` et `pnpm lint` refusent TS 7, et ils le déclarent eux-mêmes en
+`peerDependencies`. La CI lance `pnpm peers check`, qui lit ces bornes et sort
+en erreur quand elles sont violées — plutôt qu'une version interdite recopiée à
+la main quelque part, qui bloquerait encore le jour où la contrainte tombe.
 
-Avant de retenter, vérifier que les deux tickets sont clos, puis lancer
-`pnpm check` et `pnpm lint` avant de committer. Les `peerDependencies` seules ne
-suffisent pas à trancher : c'est un garde-fou explicite dans le code des deux
-outils qui bloque.
-
-- [withastro/roadmap#1321](https://github.com/withastro/roadmap/discussions/1321)
-- [typescript-eslint#10940](https://github.com/typescript-eslint/typescript-eslint/issues/10940)
+Donc rien à surveiller : le jour où les deux outils élargissent leur borne, la
+PR de mise à jour passe au vert d'elle-même. Suivi amont, si le contexte est
+utile : [withastro/roadmap#1321](https://github.com/withastro/roadmap/discussions/1321),
+[typescript-eslint#10940](https://github.com/typescript-eslint/typescript-eslint/issues/10940).
 
 ## `@types/node` suit le runtime
 
-Borné à la majeure de Node utilisée en CI (`runtime:` dans les workflows), pas à
-la dernière publiée : typechecker contre des API qu'aucun runtime du projet
-n'expose est un faux filet de sécurité. `pnpm outdated` le signalera donc en
-retard, volontairement. Les deux versions bougent ensemble, avec la borne posée
-dans `.github/renovate.json`.
+Aligné sur la majeure de Node utilisée en CI (`runtime:` dans les workflows),
+pas sur la dernière publiée : typechecker contre des API qu'aucun runtime du
+projet n'expose est un faux filet de sécurité. Aucune peer dependency ne
+l'impose, donc c'est la seule contrainte du projet que personne ne vérifie —
+la majeure passe par approbation sur le dashboard Renovate, et se prend en même
+temps que le `runtime:` des workflows.
 
 ## Le reste
 

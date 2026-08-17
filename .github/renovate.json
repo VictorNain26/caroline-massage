@@ -66,14 +66,12 @@
       "commitMessagePrefix": "chore(ci)"
     },
     {
-      "description": "TypeScript 7 breaks astro check and pnpm lint, cf. .claude/rules/dependances.md",
-      "matchPackageNames": ["typescript"],
-      "allowedVersions": "<7"
-    },
-    {
-      "description": "The Node types track the runtime major used in CI, not the latest published.",
+      "description": "The Node types track the runtime major, so the bump is only mergeable once the workflows move with it.",
       "matchPackageNames": ["@types/node"],
-      "allowedVersions": "<25"
+      "matchUpdateTypes": ["major"],
+      "prBodyNotes": [
+        ":warning: Move `runtime:` in `.github/workflows/` to the matching Node major first — otherwise the typecheck validates against APIs the CI runtime does not have."
+      ]
     }
   ]
 }

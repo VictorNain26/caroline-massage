@@ -12,6 +12,7 @@ jobs:
         with:
           runtime: node@24
           cache: true
+      - run: pnpm peers check
       - run: pnpm check
       - run: pnpm lint
       - run: pnpm build
