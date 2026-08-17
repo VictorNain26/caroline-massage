@@ -89,8 +89,15 @@ const dialog = document.querySelector<HTMLDialogElement>('[data-nav-dialog]');
 const closeButton = document.querySelector<HTMLButtonElement>('[data-nav-close]');
 
 if (toggle && dialog && closeButton) {
+  // Le bouton qui a ouvert le panneau récupère le focus à la fermeture. Le
+  // déduire de la mise en page ne marche pas : celui du hero reste « visible »
+  // au sens CSS une fois défilé hors écran, et lui rendre le focus renvoyait
+  // le visiteur en haut de la page.
+  let declencheur = toggles[0];
+
   toggles.forEach((bouton) => {
     bouton.addEventListener('click', () => {
+      declencheur = bouton;
       dialog.showModal();
       toggles.forEach((autre) => {
         autre.setAttribute('aria-expanded', 'true');
@@ -140,10 +147,8 @@ if (toggle && dialog && closeButton) {
       bouton.setAttribute('aria-expanded', 'false');
       bouton.setAttribute('aria-label', 'Ouvrir le menu');
     });
-    // Rendre le focus au bouton réellement à l'écran : selon qu'on a quitté le
-    // hero ou non, ce n'est pas le même des deux. `visibility` plutôt que
-    // `offsetParent`, qui reste renseigné sur un élément seulement masqué.
-    const visible = toggles.find((bouton) => getComputedStyle(bouton).visibility !== 'hidden');
-    (visible ?? toggle).focus();
+    // `preventScroll` : le panneau se ferme là où on l'a ouvert, la page ne
+    // doit pas bouger sous les pieds du visiteur.
+    declencheur.focus({ preventScroll: true });
   });
 }

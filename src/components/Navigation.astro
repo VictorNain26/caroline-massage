@@ -183,6 +183,14 @@ const liens = [
     right: 0;
     left: 0;
     z-index: 20;
+    /* L'enveloppe couvre toute la largeur en haut de fenêtre : sans cela elle
+       intercepterait les clics destinés au bouton de menu du hero, qui passe
+       dessous. Seule la barre, une fois entrée, redevient cliquable. */
+    pointer-events: none;
+  }
+
+  .entete--hero .barre--solide.visible {
+    pointer-events: auto;
   }
 
   /* Sur le hero, la barre transparente se cale sur le cadre décoratif, qui
