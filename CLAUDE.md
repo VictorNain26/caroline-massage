@@ -26,27 +26,11 @@ push — une régression visuelle ne sera vue que si quelqu'un regarde.
 
 ## Avis Google
 
-`src/lib/avis-google.ts` lit les avis au build via Place Details (New), derrière
-`GOOGLE_PLACES_API_KEY` et `GOOGLE_PLACE_ID`. **Sans ces deux variables, zéro
-avis, et la section ne se rend pas** — c'est l'état par défaut. La clé est une
-clé de service : elle ne doit jamais partir côté client
-([api-security-best-practices](https://developers.google.com/maps/api-security-best-practices)).
+`GOOGLE_PLACES_API_KEY` est une clé de service : elle ne doit jamais partir côté
+client ([api-security-best-practices](https://developers.google.com/maps/api-security-best-practices)).
 
-Trois contraintes viennent des
-[règles Places](https://developers.google.com/maps/documentation/places/web-service/policies)
-et ne se négocient pas :
-
-- **Cinq avis au maximum** par appel, l'API n'en renvoie pas davantage.
-- **Créditer l'auteur** : avatar, nom et lien de profil. Les avatars passent par
-  `image.remotePatterns` et sont donc rapatriés au build, pour ne pas servir
-  d'image tierce ni contredire `politique-confidentialite.astro`, qui promet
-  qu'aucune ressource tierce n'est chargée.
-- **Ne pas conserver** le contenu Places ; seul le `place_id` est stockable.
-  Un build statique fige pourtant les avis dans le HTML : c'est une tension
-  assumée, bornée par `.github/workflows/rafraichir-avis.yml`, qui redéploie
-  chaque semaine. Ne pas désactiver ce workflow sans changer d'approche.
-
-Le champ `reviews` facture au SKU Enterprise + Atmosphere, le plus cher.
+Les contraintes des règles Places sont dans `.claude/rules/avis-google.md`, qui
+se charge en touchant `src/lib/avis-google.ts` ou la section `Avis`.
 
 ## Règles du projet
 
