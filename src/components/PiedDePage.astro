@@ -95,11 +95,9 @@ const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop
     text-decoration: none;
   }
 
-  .logotype:hover {
-    color: inherit;
-    opacity: 0.72;
-  }
-
+  /* Pas d'état de survol : le design ne rend pas ce logotype interactif, et il
+     doit garder exactement son apparence. Le focus, lui, reste indispensable
+     puisqu'il est devenu le retour en haut de page. */
   .logotype:focus-visible {
     outline: 2px solid var(--or-lien);
     outline-offset: 6px;
@@ -227,6 +225,13 @@ const identifiantInstagram = cabinet.instagram.replace(/\/$/, '').split('/').pop
     font-size: 13px;
     line-height: 1.6;
     color: var(--encre-douce);
+  }
+
+  /* Le design pose le copyright à droite, face aux mentions légales. Celles-ci
+     ne se rendent que si la cliente a fourni son SIRET : sans elles, le
+     `space-between` n'a plus qu'un enfant et le rejetterait à gauche. */
+  .copyright {
+    margin-left: auto;
   }
 
   .puce-legale {

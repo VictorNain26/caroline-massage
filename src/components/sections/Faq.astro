@@ -114,6 +114,16 @@ const [avantEcrit, apresEcrit] = (resteApresAppel ?? '').split('écrivez-moi');
     text-wrap: pretty;
   }
 
+  /* Le titre et l'amorce restent en vue pendant qu'on parcourt les questions
+     (design ligne 550, `position: sticky; top: 90px` hors mobile). Même
+     traitement que la colonne image de Parcours. */
+  @media (min-width: 900px) {
+    .colonne-intro {
+      position: sticky;
+      top: 90px;
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .lien {
       transition:

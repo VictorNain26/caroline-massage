@@ -411,6 +411,14 @@ const liens = [
     margin-top: clamp(22px, 5cqw, 30px);
   }
 
+  /* Seul bouton crème que le design fait virer à l'or clair au survol
+     (ligne 123) ; ailleurs il se soulève sans changer de fond. */
+  .element-cta :global(.bouton:hover) {
+    background: var(--or-clair);
+    box-shadow: none;
+    transform: none;
+  }
+
   @media (min-width: 900px) {
     .liens-desktop {
       display: flex;

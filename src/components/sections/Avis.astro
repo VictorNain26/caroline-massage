@@ -12,7 +12,9 @@ const noteAffichee = Number.isInteger(note) ? String(note) : note.toFixed(1);
 const formateurRelatif = new Intl.RelativeTimeFormat('fr', { numeric: 'always' });
 function depuis(date: string): string {
   const mois = Math.round((new Date(date).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
-  return formateurRelatif.format(mois, 'month');
+  // Un avis de moins de deux semaines s'arrondit à zéro et se lirait « il y a
+  // 0 mois » ; le design ne prévoit que des mois, donc on plancher à un.
+  return formateurRelatif.format(Math.min(mois, -1), 'month');
 }
 ---
 

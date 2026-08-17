@@ -40,6 +40,7 @@ const icones: Record<string, string> = {
             sousTitre={soin.sousTitre}
             sousTitreComplement={` · dès ${prixMin(soin)} €`}
             variante="carte-desktop"
+            groupe="soins"
           >
             <Fragment slot="icone">
               <svg
@@ -166,6 +167,14 @@ const icones: Record<string, string> = {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
       gap: clamp(14px, 2.4cqw, 24px);
+    }
+
+    /* La carte dépliée du design donne plus d'air aux pastilles que la carte
+       repliée du mobile (ligne 294 contre 190). */
+    .tarif {
+      min-height: 40px;
+      padding: 0 15px;
+      font-size: clamp(15px, 4.2cqw, 17px);
     }
 
     .item {

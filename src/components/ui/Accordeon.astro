@@ -9,12 +9,17 @@ interface Props {
      de wording, sans qu'aucune des deux formulations soit inventée. */
   sousTitreComplement?: string;
   variante?: 'liste' | 'carte-desktop';
+  /* Nom de groupe HTML : les `<details>` qui le partagent ne s'ouvrent qu'un à
+     la fois, « opening one will cause another to close » (MDN, élément
+     details, attribut name). C'est l'accordéon exclusif du design, sans une
+     ligne de script. Sans groupe, chaque panneau reste indépendant. */
+  groupe?: string;
 }
 
-const { titre, sousTitre, sousTitreComplement, variante = 'liste' } = Astro.props;
+const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = Astro.props;
 ---
 
-<details class:list={['accordeon', variante]}>
+<details class:list={['accordeon', variante]} name={groupe}>
   <summary>
     <span class="icone" aria-hidden="true"><slot name="icone" /></span>
     <span class="titre-groupe">
@@ -64,6 +69,13 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste' } = Astro.prop
     padding: 20px 0;
     cursor: pointer;
     list-style: none;
+  }
+
+  /* Le design dore le titre au survol (lignes 560 et suivantes) : c'est le seul
+     retour visuel avant le clic. `--or-bronze` tient le plancher de 3:1 des
+     grands textes, la question étant en gras d'au moins 18px. */
+  summary:hover .titre {
+    color: var(--or-bronze);
   }
   summary::-webkit-details-marker {
     display: none;
@@ -131,6 +143,9 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste' } = Astro.prop
   @media (prefers-reduced-motion: no-preference) {
     .marque {
       transition: transform 0.25s ease;
+    }
+    .titre {
+      transition: color 0.22s ease;
     }
   }
 

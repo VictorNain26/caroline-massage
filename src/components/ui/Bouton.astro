@@ -51,9 +51,12 @@ const { href, variante = 'vert' } = Astro.props;
     color: var(--vert-profond);
     border: 1px solid color-mix(in srgb, var(--or) 45%, transparent);
   }
+  /* Le bouton crème ne change pas de fond au survol : il se soulève et projette
+     une ombre (design lignes 170 et 665). Le virage vers l'or clair n'appartient
+     qu'au bouton du menu mobile, qui le rétablit de son côté. */
   .creme:hover {
-    background: var(--or-clair);
     color: var(--vert-profond);
+    box-shadow: 0 14px 28px color-mix(in srgb, var(--vert-profond) 26%, transparent);
   }
   /* L'anneau se pose à 3px hors du bouton, donc sur le fond de la section et
      non sur le bouton. La variante encode déjà ce fond — un bouton vert ne
@@ -74,10 +77,14 @@ const { href, variante = 'vert' } = Astro.props;
         background 0.25s ease,
         color 0.25s ease,
         border-color 0.25s ease,
-        transform 0.25s ease;
+        box-shadow 0.24s ease,
+        transform 0.24s cubic-bezier(0.2, 0.7, 0.3, 1);
     }
     .bouton:active {
       transform: scale(0.985);
+    }
+    .creme:hover {
+      transform: translateY(-2px);
     }
   }
 </style>
