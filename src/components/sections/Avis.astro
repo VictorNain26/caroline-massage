@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { getAvis, getCabinet, getSection } from '../../lib/content';
 import EnTeteSection from '../ui/EnTeteSection.astro';
 
@@ -41,11 +42,30 @@ function depuis(date: string): string {
               <span class="lettre-g carte-g" aria-hidden="true">
                 G
               </span>
-              <div class="avatar" aria-hidden="true">
-                {a.auteur.charAt(0)}
-              </div>
+              {a.avatar ? (
+                <Image
+                  src={a.avatar}
+                  alt=""
+                  width={52}
+                  height={52}
+                  densities={[1, 2]}
+                  class="avatar avatar-photo"
+                />
+              ) : (
+                <div class="avatar" aria-hidden="true">
+                  {a.auteur.charAt(0)}
+                </div>
+              )}
               <div class="identite">
-                <div class="auteur">{a.auteur}</div>
+                <div class="auteur">
+                  {a.profil ? (
+                    <a href={a.profil} class="lien-profil" target="_blank" rel="noopener">
+                      {a.auteur}
+                    </a>
+                  ) : (
+                    a.auteur
+                  )}
+                </div>
                 <div class="meta">
                   <span role="img" aria-label={`${a.note} étoiles sur 5`} class="etoiles">
                     {'★'.repeat(a.note)}
@@ -198,12 +218,33 @@ function depuis(date: string): string {
     gap: 3px;
   }
 
+  /* L'initiale sert de repli ; dès que Google fournit la photo, elle prend sa
+     place, l'attribution de l'auteur étant exigée par les règles Places. */
+  .avatar-photo {
+    object-fit: cover;
+  }
+
   .auteur {
     font-family: var(--font-texte), sans-serif;
     font-weight: 700;
     font-size: clamp(18px, 4.6cqw, 20px);
     line-height: 1.2;
     color: var(--encre);
+  }
+
+  .lien-profil {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .lien-profil:hover {
+    color: var(--or-lien);
+    text-decoration: underline;
+  }
+
+  .lien-profil:focus-visible {
+    outline: 2px solid var(--or-lien);
+    outline-offset: 3px;
   }
 
   .meta {

@@ -8,6 +8,15 @@ export default defineConfig({
   build: { inlineStylesheets: 'auto' },
   vite: { plugins: [yaml()] },
 
+  // Les avatars des avis Google. Les autoriser ici les fait télécharger et
+  // optimiser au build : le visiteur les reçoit depuis ce domaine, jamais
+  // depuis Google. C'est ce qui permet de tenir l'attribution exigée par les
+  // règles Places sans contredire la politique de confidentialité du site,
+  // qui promet qu'aucune ressource tierce n'est chargée.
+  image: {
+    remotePatterns: [{ protocol: 'https', hostname: '**.googleusercontent.com' }],
+  },
+
   fonts: [
     {
       provider: fontProviders.google(),
