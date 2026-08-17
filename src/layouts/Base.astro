@@ -44,6 +44,17 @@ const jsonLd = construireJsonLd(cabinet, soins);
 </html>
 
 <style is:global>
+  /* Le design fait défiler jusqu'aux ancres en douceur, et retombe sur un saut
+     sec quand le visiteur demande moins d'animation (`smooth` / `auto` selon
+     `reducedMotion()`). Ici la même règle tient en CSS, sans une ligne de
+     script. `scroll-margin-top` sur les sections écarte l'ancre de la barre
+     collante des pages secondaires. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   body {
     margin: 0;
     background: var(--creme);
