@@ -2,16 +2,16 @@ import { getCollection } from 'astro:content';
 import cabinetData from '../content/cabinet.yaml';
 import { recupererFicheGoogle, type FicheGoogle } from './avis-google';
 
-export interface Tarif { duree: number; prix: number }
+interface Tarif { duree: number; prix: number }
 export interface Soin { id: string; nom: string; sousTitre: string; description: string; tarifs: Tarif[]; signature: boolean; ordre: number }
 export interface Question { id: string; question: string; reponse: string; ordre: number }
 // avatar et profil ne sont renseignés que par l'API Places, qui impose de
 // créditer l'auteur ; les avis saisis à la main dans src/content/avis/ n'en
 // ont pas.
 export interface Avis { auteur: string; note: number; texte: string; date: string; url: string; avatar?: string; profil?: string }
-export interface Bloc { titre: string; texte: string }
-export interface Entree { libelle: string; texte: string }
-export interface Citation { texte: string; auteur: string }
+interface Bloc { titre: string; texte: string }
+interface Entree { libelle: string; texte: string }
+interface Citation { texte: string; auteur: string }
 export interface Section { id: string; surtitre?: string; titre: string; paragraphes: string[]; blocs?: Bloc[]; entrees?: Entree[]; citation?: Citation }
 export interface Cabinet {
   telephone: string; telephoneAffiche: string; email: string; ville: string;
