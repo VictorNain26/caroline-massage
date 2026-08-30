@@ -9,6 +9,7 @@ import Avis from '../components/sections/Avis.astro';
 import Faq from '../components/sections/Faq.astro';
 import Contact from '../components/sections/Contact.astro';
 import Frise from '../components/ui/Frise.astro';
+import CtaCollant from '../components/CtaCollant.astro';
 import { getAvis } from '../lib/content';
 
 // Le design place la frise décorative dans le même sc-if que les avis
@@ -33,4 +34,8 @@ const avis = await getAvis();
     <Contact />
     <Frise />
   </main>
+
+  {/* Hors du `main` : c'est un raccourci qui flotte au-dessus de la page, pas
+      une partie du contenu qu'on lit. */}
+  <CtaCollant />
 </Base>

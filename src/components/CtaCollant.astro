@@ -1,0 +1,108 @@
+---
+import { getCabinet } from '../lib/content';
+
+const cabinet = await getCabinet();
+---
+
+{/* L'appel à l'action que la maquette pose au bas du cadre mobile : il monte
+    une fois le hero dépassé, et se retire sur la section contact, où les deux
+    boutons disent déjà la même chose. `tel:` et non `#contact` — sur un
+    téléphone, l'action la plus courte est l'appel, et c'est le lien que la
+    maquette y met. */}
+<a href={`tel:${cabinet.telephone}`} class="cta-collant" data-cta-collant>
+  <span>Prendre rendez-vous</span>
+</a>
+
+<style>
+  .cta-collant {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: min(100% - 40px, 340px);
+    min-height: 58px;
+    margin: 0 auto 18px;
+    padding: 0 24px;
+    border: 1px solid var(--cta-collant-bordure);
+    border-radius: var(--rayon);
+    background: var(--cta-collant-fond);
+    color: var(--cta-collant-encre);
+    font-family: var(--font-texte), sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 14px 28px color-mix(in srgb, var(--vert-profond) 26%, transparent);
+
+    /* Au repos, sous le bord de l'écran. `visibility` et non `opacity` seule :
+       cachée, la barre doit sortir de l'ordre de tabulation autant que du
+       champ de vision — même raison que pour la barre solide de la
+       navigation. */
+    transform: translateY(110%);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* Sur fond sombre, il s'éclaircit ; sur fond clair, il fonce. `data-fond-bas`
+     et non `data-fond` : la sonde mesure ce qu'il y a sous lui, en bas de
+     l'écran, quand celle de la barre de défilement regarde le milieu. Les
+     contrastes tiennent des deux côtés — crème sur vert profond 11,8:1, vert
+     profond sur crème-surface 10,2:1. */
+  .cta-collant {
+    --cta-collant-fond: var(--vert-profond);
+    --cta-collant-encre: var(--creme);
+    --cta-collant-bordure: color-mix(in srgb, var(--or) 55%, transparent);
+  }
+
+  :global(html[data-fond-bas='sombre']) .cta-collant {
+    --cta-collant-fond: var(--creme-surface);
+    --cta-collant-encre: var(--vert-profond);
+    --cta-collant-bordure: var(--or);
+  }
+
+  .cta-collant.visible {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .cta-collant:focus-visible {
+    outline: 2px solid var(--or);
+    outline-offset: 3px;
+  }
+
+  :global(html[data-fond-bas='sombre']) .cta-collant:focus-visible {
+    outline-color: var(--or-lien);
+  }
+
+  /* La maquette ne le montre que dans son cadre mobile : au-delà, la barre
+     solide porte déjà un bouton « Réserver » en permanence. C'est le même
+     seuil que celui où la navigation passe en menu. */
+  @media (min-width: 900px) {
+    .cta-collant {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-collant {
+      transition:
+        transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1),
+        opacity 0.35s ease,
+        background 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease;
+    }
+
+    .cta-collant:active {
+      transform: scale(0.985);
+    }
+  }
+</style>

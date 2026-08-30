@@ -152,3 +152,82 @@ if (toggle && dialog && closeButton) {
     declencheur.focus({ preventScroll: true });
   });
 }
+
+// La barre de défilement et l'appel à l'action collant prennent la teinte du
+// fond qu'ils traversent. La sonde lit la couleur calculée de la bande qui
+// occupe le milieu de la fenêtre, plutôt qu'une liste d'identifiants tenue à
+// la main : une section qui change de fond emmène les deux avec elle sans que
+// rien ici n'ait à l'apprendre. C'est la méthode du design (`probeBg`), qui
+// mesure la luminance du fond sous sa barre.
+const bandes = [...document.querySelectorAll<HTMLElement>('main > *, footer')];
+
+if (bandes.length > 0) {
+  const racine = document.documentElement;
+  const ctaCollant = document.querySelector<HTMLElement>('[data-cta-collant]');
+  const contact = document.getElementById('contact');
+
+  // Les sections soins et tarifs ne peignent rien : leur fond appartient au
+  // bloc qui les enveloppe, comme dans le design. D'où la remontée.
+  const fondDe = (element: HTMLElement): string | null => {
+    let noeud: HTMLElement | null = element;
+    while (noeud) {
+      const couleur = getComputedStyle(noeud).backgroundColor;
+      if (couleur && couleur !== 'transparent' && !couleur.endsWith(', 0)')) return couleur;
+      noeud = noeud.parentElement;
+    }
+    return null;
+  };
+
+  // Le seuil de 110 sur 255 est celui du design. La formule est la luminance
+  // relative pondérée, sans linéarisation : il ne s'agit pas de mesurer un
+  // contraste mais de trancher entre deux teintes franches.
+  const estSombre = (couleur: string): boolean => {
+    const composantes = couleur.match(/[\d.]+/g);
+    if (!composantes || composantes.length < 3) return false;
+    const [rouge, vert, bleu] = composantes.slice(0, 3).map(Number);
+    return 0.2126 * rouge + 0.7152 * vert + 0.0722 * bleu < 110;
+  };
+
+  // Deux hauteurs, deux réponses : la barre de défilement traverse tout
+  // l'écran et suit donc la bande qui en occupe le milieu, tandis que l'appel
+  // à l'action ne connaît que le fond posé sous lui. Les confondre le peignait
+  // en clair au-dessus d'une section claire, dès que le milieu de l'écran
+  // tombait sur la citation.
+  const bandeA = (hauteur: number) =>
+    bandes.find((element) => {
+      const boite = element.getBoundingClientRect();
+      return boite.top <= hauteur && boite.bottom > hauteur;
+    });
+
+  const teinte = (hauteur: number) => {
+    const bande = bandeA(hauteur);
+    const couleur = bande && fondDe(bande);
+    return couleur && estSombre(couleur) ? 'sombre' : 'clair';
+  };
+
+  const sonder = () => {
+    racine.dataset.fond = teinte(innerHeight / 2);
+
+    if (!ctaCollant) return;
+
+    // La place qu'il occupe une fois monté, et non celle qu'il occupe à
+    // l'instant : au repos il est sous le bord de l'écran, où aucune bande ne
+    // répond, et il serait entré avec la mauvaise teinte avant de se corriger
+    // sous les yeux du visiteur. `offsetHeight` et la marge calculée ignorent
+    // le `translateY` qui le tient en bas.
+    const margeBas = parseFloat(getComputedStyle(ctaCollant).marginBottom) || 0;
+    racine.dataset.fondBas = teinte(innerHeight - margeBas - ctaCollant.offsetHeight / 2);
+    // Même seuil que le design : trois quarts de fenêtre, plancher à 300px.
+    // Il s'efface dès que la section contact paraît — elle porte déjà les deux
+    // mêmes boutons, en plus grand.
+    const passeLeHero = scrollY > Math.max(innerHeight * 0.75, 300);
+    const contactVisible = contact
+      ? contact.getBoundingClientRect().top < innerHeight && contact.getBoundingClientRect().bottom > 0
+      : false;
+    ctaCollant.classList.toggle('visible', passeLeHero && !contactVisible);
+  };
+
+  addEventListener('scroll', sonder, { passive: true });
+  addEventListener('resize', sonder);
+  sonder();
+}
