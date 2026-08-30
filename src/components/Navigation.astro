@@ -35,7 +35,7 @@ const liens = [
       au panneau mobile, et les déplacer le priverait de ses styles. */}
   {
     variante === 'hero' && (
-      <div class="barre barre--hero">
+      <div class="barre barre--hero" data-hero-anim>
         <a href="/#hero" aria-label="Retour en haut de page" class="marque">
           <span class="marque-nom">Caroline</span>
           <span aria-hidden="true" class="marque-separateur" />
@@ -88,7 +88,7 @@ const liens = [
               </li>
             ))
           }
-          <li>
+          <li style="--bouton-taille: 13px; --bouton-marge-h: 24px">
             <Bouton href="/#contact" variante="vert">Réserver</Bouton>
           </li>
         </ul>
@@ -139,7 +139,7 @@ const liens = [
         {/* Le design fait composer le numéro depuis ce panneau plutôt que
             défiler jusqu'au contact : il n'existe qu'en dessous de 900px,
             là où l'appel est à portée de pouce. */}
-        <li class="element-cta" style="--bouton-hauteur: 56px; --bouton-marge-h: 24px">
+        <li class="element-cta" style="--bouton-hauteur: 56px; --bouton-marge-h: 24px; --bouton-taille: 14px">
           <Bouton href={`tel:${cabinet.telephone}`} variante="creme">Réserver</Bouton>
         </li>
       </ul>
@@ -203,6 +203,29 @@ const liens = [
     left: var(--cadre-retrait);
     z-index: 2;
     padding: 10px clamp(16px, 3cqw, 34px);
+  }
+
+  /* Elle entre avec le hero, et non avant lui : le design la fait paraître en
+     fondu (`heroFade .9s ease .3s`) et lui pose `data-hero-anim`, si bien
+     qu'elle est relancée avec le reste à la levée du rideau. Sans cela, tout
+     le hero se compose devant un logo et des liens déjà installés depuis la
+     première image. Le nom est propre à ce composant plutôt qu'emprunté au
+     `heroFade` du hero : les `@keyframes` d'Astro ne sont pas cloisonnés par
+     composant, et dépendre de la feuille d'un autre casserait ici le jour où
+     il change le sien. */
+  @media (prefers-reduced-motion: no-preference) {
+    .barre--hero {
+      animation: barreHeroIn 0.9s ease 0.3s both;
+    }
+
+    @keyframes barreHeroIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
   }
 
   /* Hors de l'accueil il n'y a pas de hero à quitter : la barre est là d'emblée.
@@ -489,7 +512,11 @@ const liens = [
     padding: 0;
   }
 
-  .liste-liens-mobile li:not(:last-child) {
+  /* Les deux derniers items — le dernier lien et le bouton — n'ont pas de filet
+     dans le design : la liste se termine sur le lien, le trait ne sert qu'à
+     séparer. `nth-last-child` plutôt qu'une classe : le nombre de liens vient
+     du contenu, la règle doit tenir quel qu'il soit. */
+  .liste-liens-mobile li:not(:nth-last-child(-n + 2)) {
     border-bottom: 1px solid color-mix(in srgb, var(--sable) 22%, transparent);
   }
 

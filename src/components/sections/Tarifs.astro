@@ -18,7 +18,14 @@ const section = await getSection('tarifs');
      à #tarifs (design ligne 362) — la scission en deux sections a supprimé le
      premier, qui ne s'applique qu'entre frères d'un même conteneur flex. */
   .tarifs {
-    scroll-margin-top: 90px;
+    /* L'ancre vise le contenu, pas le rembourrage. Le design place son `id`
+       DANS le bloc qui porte le padding, si bien que le défilement amène le
+       surtitre à 90px de la barre ; ici l'`id` est sur la section, qui porte
+       les deux — on atterrissait 160px plus bas, sur une bande vide. Retirer
+       le rembourrage de la marge de défilement remet le surtitre où le design
+       le pose, et la soustraction lit la valeur à sa source : changer le
+       padding suffit, rien à reporter ici. */
+    scroll-margin-top: calc(90px - calc(clamp(28px, 4.5cqw, 48px) + clamp(18px, 3cqw, 34px)));
     display: flex;
     flex-direction: column;
     align-items: center;

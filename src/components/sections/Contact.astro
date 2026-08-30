@@ -5,6 +5,15 @@ import OrnementCoin from '../ui/OrnementCoin.astro';
 
 const section = await getSection('contact');
 const cabinet = await getCabinet();
+
+/* L'adresse est le seul libellé du site qu'aucune fenêtre étroite ne peut
+   tenir d'un bloc. Sans point de coupure déclaré, le `overflow-wrap: anywhere`
+   de Bouton — qui existe pour le reflow à 320px — la tranche n'importe où
+   (« ...SUR / MESURE.FR »). Un `<wbr>` donne au navigateur la seule coupure
+   qui se lit, et il la préfère : `anywhere` ne casse arbitrairement que
+   « if there are no otherwise-acceptable break points » (CSS Text 3,
+   overflow-wrap). Le domaine seul mesure 246px là où 360px en laisse 260. */
+const [partieLocale, domaine] = cabinet.email.split('@');
 ---
 
 <section id="contact" data-anchor="contact" class="contact">
@@ -25,7 +34,7 @@ const cabinet = await getCabinet();
 
     <div class="cta" style="--bouton-hauteur: 62px">
       <Bouton href={`tel:${cabinet.telephone}`} variante="creme">{cabinet.telephoneAffiche}</Bouton>
-      <Bouton href={`mailto:${cabinet.email}`} variante="creme">{cabinet.email}</Bouton>
+      <Bouton href={`mailto:${cabinet.email}`} variante="creme">{partieLocale}@<wbr />{domaine}</Bouton>
     </div>
 
     <p class="mention">Aucun paiement en ligne · réponse au plus vite</p>
@@ -34,7 +43,14 @@ const cabinet = await getCabinet();
 
 <style>
   .contact {
-    scroll-margin-top: 90px;
+    /* L'ancre vise le contenu, pas le rembourrage. Le design place son `id`
+       DANS le bloc qui porte le padding, si bien que le défilement amène le
+       surtitre à 90px de la barre ; ici l'`id` est sur la section, qui porte
+       les deux — on atterrissait 160px plus bas, sur une bande vide. Retirer
+       le rembourrage de la marge de défilement remet le surtitre où le design
+       le pose, et la soustraction lit la valeur à sa source : changer le
+       padding suffit, rien à reporter ici. */
+    scroll-margin-top: calc(90px - clamp(56px, 12cqw, 120px));
     position: relative;
     background: var(--vert-profond);
     color: var(--creme);
@@ -113,6 +129,18 @@ const cabinet = await getCabinet();
     justify-content: center;
     gap: 16px;
     margin-top: 4px;
+    /* Le domaine mesure 247px pour 248 disponibles à 360px : il déborde d'un
+       pixel, et d'un seul, parce que l'interlettrage du bouton compte aussi
+       après la dernière lettre. Six pixels de marge en moins l'accueillent
+       sans toucher au libellé ni à l'interlettrage, qui appartiennent à la
+       ligne graphique. Au-delà, la place ne manque plus. */
+    --bouton-marge-h: 24px;
+  }
+
+  @media (min-width: 420px) {
+    .cta {
+      --bouton-marge-h: 30px;
+    }
   }
 
   /* Le design coiffe le bloc d'appel à l'action d'un filet (ligne 664) ; le
@@ -120,6 +148,11 @@ const cabinet = await getCabinet();
      l'assoit sous les deux boutons. */
   .mention {
     margin: 0;
+    /* Le filet du design coiffe un bloc pleine largeur ; ici il est porté par
+       le paragraphe, qui dans une colonne `align-items: center` se rétracte à
+       la largeur de son texte. Le trait s'arrêtait donc bien avant les boutons
+       qu'il souligne. */
+    align-self: stretch;
     padding-top: clamp(16px, 2.6cqw, 22px);
     border-top: 1px solid color-mix(in srgb, var(--or-clair) 28%, transparent);
     font-family: var(--font-texte), sans-serif;

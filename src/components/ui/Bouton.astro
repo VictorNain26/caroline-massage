@@ -36,7 +36,12 @@ const { href, variante = 'vert' } = Astro.props;
     padding: 0 var(--bouton-marge-h, 30px);
     border-radius: var(--rayon);
     font-weight: 700;
-    font-size: clamp(0.875rem, 3.7cqw, 0.9375rem);
+    /* Le design ne donne pas une taille au bouton mais une par emplacement :
+       13px dans la barre, 14px dans le menu, clamp(14px,3.6cqw,15px) au hero.
+       Le repli est celui du bouton de contact, clamp(14px,3.7cqw,15px), le
+       seul que le design pose deux fois. Point d'extension plutôt que prop,
+       comme `--bouton-hauteur` : c'est la section qui connaît son emplacement. */
+    font-size: var(--bouton-taille, clamp(0.875rem, 3.7cqw, 0.9375rem));
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
@@ -46,9 +51,13 @@ const { href, variante = 'vert' } = Astro.props;
     color: var(--creme);
     border: 1px solid color-mix(in srgb, var(--or-clair) 32%, transparent);
   }
+  /* Le design lui donne les trois effets à la fois (ligne 92) : le fond
+     s'éclaircit, le bouton se soulève et projette la même ombre que le crème.
+     L'élévation vit dans le bloc `no-preference` plus bas, avec les autres. */
   .vert:hover {
     background: var(--vert-clair);
     color: var(--creme);
+    box-shadow: 0 14px 28px color-mix(in srgb, var(--vert-profond) 26%, transparent);
   }
   .creme {
     background: var(--creme);
@@ -87,7 +96,8 @@ const { href, variante = 'vert' } = Astro.props;
     .bouton:active {
       transform: scale(0.985);
     }
-    .creme:hover {
+    .creme:hover,
+    .vert:hover {
       transform: translateY(-2px);
     }
   }

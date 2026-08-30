@@ -66,50 +66,42 @@ const jsonLd = construireJsonLd(cabinet, soins);
     color-scheme: light;
   }
 
-  /* Barre de défilement aux couleurs de la page. Deux écritures, et surtout
-     pas les deux à la fois : dès que `scrollbar-color` vaut autre chose que
-     `auto`, il l'emporte sur les pseudo-éléments WebKit et n'en laisse rien
-     passer.
-     Chrome, Edge et Safari prennent donc la version détaillée, seule à donner
-     la main sur la largeur et les angles. Poser cette largeur a un effet
-     décisif : « when you set the width or height of ::-webkit-scrollbar, an
-     overlay scrollbar is always displayed, effectively turning it into a
-     classic scrollbar » (developer.chrome.com/docs/css-ui/scrollbar-styling).
-     Sans elle, un système réglé sur les barres superposées dessine la piste
-     mais escamote le curseur — la barre perd alors ce qui fait son utilité,
-     dire où l'on se trouve dans la page.
-     12px laisse de quoi l'attraper à la souris, là où les 8 à 10px habituels
-     deviennent ingrats pour un pointage imprécis. */
-  @supports selector(::-webkit-scrollbar) {
-    html::-webkit-scrollbar {
-      width: 12px;
-      height: 12px;
-    }
+  /* Barre de défilement : les propriétés standard seules, jamais les
+     pseudo-éléments `::-webkit-scrollbar`. Poser une largeur sur ceux-ci
+     coûtait le décalage de toute la page — « when you set the width or height
+     of ::-webkit-scrollbar, an overlay scrollbar is always displayed,
+     effectively turning it into a classic scrollbar »
+     (developer.chrome.com/docs/css-ui/scrollbar-styling). Sur un système à
+     barres superposées, la page perdait 12px d'un coup à la levée du rideau,
+     quand le script rend la main au défilement. `scrollbar-color` et
+     `scrollbar-width` laissent la barre superposée là où elle l'est.
 
-    html::-webkit-scrollbar-track {
-      background: var(--sable);
-    }
+     Piste transparente : la barre ne porte plus de rail sable en travers du
+     dégradé du hero, seul le curseur subsiste.
 
-    html::-webkit-scrollbar-thumb {
-      background: var(--vert-profond);
-      border-radius: 999px;
-      /* Bordure de la couleur de la piste : elle amincit le curseur sans
-         réduire la surface réellement cliquable. */
-      border: 3px solid var(--sable);
-    }
+     `scrollbar-gutter: stable` couvre l'autre moitié du problème, sur les
+     systèmes à barres classiques cette fois : la gouttière est réservée « even
+     if the box is not overflowing » (MDN, scrollbar-gutter), donc la bloquer
+     puis la libérer ne déplace plus rien. */
+  /* Le curseur suit le fond qu'il traverse, comme l'appel à l'action collant :
+     `--curseur-defilement` est réécrit par `data-fond`, que le script pose sur
+     la racine. Le repli vaut pour fond clair — la page l'est partout sauf sur
+     le hero et le contact, et c'est aussi ce qu'on voit si rien ne tourne. */
+  html {
+    --curseur-defilement: var(--vert-profond);
 
-    html::-webkit-scrollbar-thumb:hover {
-      background: var(--vert-clair);
-    }
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: var(--curseur-defilement) transparent;
   }
 
-  /* Firefox, qui ne connaît pas ces pseudo-éléments. Le curseur d'abord, la
-     piste ensuite : les deux teintes mesurent 6,5:1 l'une contre l'autre, au-
-     dessus du plancher de 3:1 que demande la technique G183 du WCAG pour
-     distinguer un contrôle de son fond. */
-  @supports not selector(::-webkit-scrollbar) {
+  html[data-fond='sombre'] {
+    --curseur-defilement: var(--sable);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
     html {
-      scrollbar-color: var(--vert-profond) var(--sable);
+      transition: scrollbar-color 0.3s ease;
     }
   }
 

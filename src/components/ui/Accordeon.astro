@@ -22,7 +22,7 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = As
 <details class:list={['accordeon', variante]} name={groupe}>
   <summary>
     <span class="icone" aria-hidden="true"><slot name="icone" /></span>
-    <span class="titre-groupe">
+    <h3 class="titre-groupe">
       <span class="titre">{titre}</span>
       {
         sousTitre && (
@@ -32,7 +32,7 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = As
           </span>
         )
       }
-    </span>
+    </h3>
     <span class="marque" aria-hidden="true"></span>
   </summary>
   <div class="corps"><slot /></div>
@@ -76,11 +76,15 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = As
     list-style: none;
   }
 
-  /* Le design dore le titre au survol (lignes 560 et suivantes) : c'est le seul
-     retour visuel avant le clic. `--or-bronze` tient le plancher de 3:1 des
-     grands textes, la question étant en gras d'au moins 18px. */
+  /* Le design ne dore au survol que les questions de la FAQ (ligne 560) ; la
+     section soins n'a aucun `style-hover`. L'appliquer partout coûtait deux
+     choses : sur la carte signature, fond vert profond, `--or-bronze` tombe à
+     2,9:1 ; et à partir de 768px la carte n'est plus un widget — son `summary`
+     passe en `cursor: default` — mais son titre se dorait quand même au
+     passage de la souris. D'où le point d'extension : c'est l'appelant qui
+     dit s'il a un survol, et lequel. */
   summary:hover .titre {
-    color: var(--or-bronze);
+    color: var(--accordeon-couleur-survol, inherit);
   }
   summary::-webkit-details-marker {
     display: none;
@@ -101,7 +105,16 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = As
   .icone:empty {
     display: none;
   }
+  /* Un titre, et non un `span` : sans lui, les six prestations et les neuf
+     questions n'existent pas dans la liste des titres d'un lecteur d'écran,
+     alors que ce sont les seuls repères de ces deux sections. `summary`
+     accepte « phrasing content, optionally intermixed with heading content »
+     (HTML Standard, l'élément summary), donc le niveau se pose ici sans
+     enrobage supplémentaire. Le sous-titre reste dedans : « idéal pour
+     débuter · dès 45 € » nomme la prestation autant que son nom. */
   .titre-groupe {
+    margin: 0;
+    font: inherit;
     flex: 1;
     min-width: 0;
     display: flex;
@@ -133,17 +146,21 @@ const { titre, sousTitre, sousTitreComplement, variante = 'liste', groupe } = As
     align-items: center;
     justify-content: center;
   }
-  /* Sans taille propre, le « + » héritait du 16px du corps de page là où le
-     design le pose à 18px dans sa pastille. */
+  /* Le design donne 16px au « + » des soins et 18px à celui de la FAQ, dans
+     des pastilles de 24 et 26px. Le repli est celui des soins, l'appelant FAQ
+     pose la sienne. */
   .marque::before {
     content: '+';
-    font-size: var(--accordeon-marque-taille, 18px);
+    font-size: var(--accordeon-marque-taille, 16px);
     line-height: 1;
   }
   details[open] .marque {
     transform: rotate(45deg);
   }
   .corps {
+    /* 2px dans le design (ligne 197), avant que la variante desktop ne passe
+       à 14px plus bas. */
+    padding-top: var(--accordeon-corps-haut, 2px);
     padding-bottom: var(--accordeon-corps-bas, 20px);
     color: var(--accordeon-couleur-corps, var(--encre-douce));
     line-height: 1.6;

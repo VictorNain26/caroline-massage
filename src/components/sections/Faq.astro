@@ -20,21 +20,33 @@ const [avantEcrit, apresEcrit] = (resteApresAppel ?? '').split('écrivez-moi');
 const coordonnees = [
   { motif: cabinet.telephoneAffiche, href: `tel:${cabinet.telephone}` },
   { motif: cabinet.email, href: `mailto:${cabinet.email}` },
+  // La ville aussi (design l. 585) : c'est le seul lien sortant de la page, et
+  // il répond à la question posée juste au-dessus — où se trouve le cabinet.
+  // Une recherche, pas une adresse : le lieu exact n'est donné qu'au
+  // rendez-vous confirmé.
+  {
+    motif: cabinet.ville,
+    href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cabinet.ville)}`,
+    externe: true,
+  },
 ].filter((c) => c.motif);
 
 interface Segment {
   texte: string;
   href?: string;
+  externe?: boolean;
 }
 
 function segmenter(reponse: string): Segment[] {
   return coordonnees.reduce<Segment[]>(
-    (segments, { motif, href }) =>
+    (segments, { motif, href, externe }) =>
       segments.flatMap((segment) => {
         if (segment.href || !segment.texte.includes(motif)) return segment;
         const morceaux = segment.texte.split(motif);
         return morceaux.flatMap((morceau, rang) =>
-          rang === 0 ? [{ texte: morceau }] : [{ texte: motif, href }, { texte: morceau }],
+          rang === 0
+            ? [{ texte: morceau }]
+            : [{ texte: motif, href, externe }, { texte: morceau }],
         );
       }),
     [{ texte: reponse }],
@@ -53,7 +65,7 @@ function segmenter(reponse: string): Segment[] {
             Appelez-moi
           </a>
           {avantEcrit}
-          <a href={`mailto:${cabinet.email}`} class="lien-texte">
+          <a href={`mailto:${cabinet.email}`} class="lien-amorce">
             écrivez-moi
           </a>
           {apresEcrit}
@@ -71,7 +83,12 @@ function segmenter(reponse: string): Segment[] {
           <p class="reponse">
             {segmenter(q.reponse).map((segment) =>
               segment.href ? (
-                <a href={segment.href} class="lien-texte">
+                <a
+                  href={segment.href}
+                  class="lien-texte"
+                  target={segment.externe ? '_blank' : undefined}
+                  rel={segment.externe ? 'noopener' : undefined}
+                >
                   {segment.texte}
                 </a>
               ) : (
@@ -87,7 +104,14 @@ function segmenter(reponse: string): Segment[] {
 
 <style>
   .faq {
-    scroll-margin-top: 90px;
+    /* L'ancre vise le contenu, pas le rembourrage. Le design place son `id`
+       DANS le bloc qui porte le padding, si bien que le défilement amène le
+       surtitre à 90px de la barre ; ici l'`id` est sur la section, qui porte
+       les deux — on atterrissait 160px plus bas, sur une bande vide. Retirer
+       le rembourrage de la marge de défilement remet le surtitre où le design
+       le pose, et la soustraction lit la valeur à sa source : changer le
+       padding suffit, rien à reporter ici. */
+    scroll-margin-top: calc(90px - var(--section-haut));
     background: var(--creme);
     padding: var(--section-haut) var(--gouttiere) var(--section-bas);
     max-width: var(--largeur-contenu);
@@ -116,10 +140,18 @@ function segmenter(reponse: string): Segment[] {
   }
 
   .lien,
+  .lien-amorce,
   .lien-texte {
-    /* Le filet garde --sable : il est décoratif, pas du texte. */
     color: var(--or-lien);
     text-decoration: none;
+  }
+
+  /* Le filet ne court que sous les deux liens de l'amorce (design l. 555). Les
+     liens pris dans une réponse n'en ont aucun : au fil d'un paragraphe, le
+     design les distingue par la seule couleur. Il garde `--sable` — il est
+     décoratif, pas du texte. */
+  .lien,
+  .lien-amorce {
     border-bottom: 1px solid var(--sable);
   }
 
@@ -143,6 +175,9 @@ function segmenter(reponse: string): Segment[] {
     --accordeon-titre-taille: clamp(18px, 4.6cqw, 22px);
     --accordeon-titre-interligne: 1.4;
     --accordeon-icone-taille: 26px;
+    --accordeon-marque-taille: 18px;
+    /* Le seul survol doré du design : il n'appartient qu'aux questions. */
+    --accordeon-couleur-survol: var(--or-bronze);
     --accordeon-summary-gap: 18px;
     --accordeon-summary-marge: clamp(18px, 3.6cqw, 24px) 0;
     --accordeon-corps-bas: clamp(20px, 3.6cqw, 26px);
@@ -179,6 +214,7 @@ function segmenter(reponse: string): Segment[] {
 
   @media (hover: hover) {
     .lien:hover,
+    .lien-amorce:hover,
     .lien-texte:hover {
       color: var(--encre);
       border-color: var(--encre);

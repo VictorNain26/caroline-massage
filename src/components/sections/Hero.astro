@@ -22,18 +22,18 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
   <div aria-hidden="true" class="lueur" data-hero-anim></div>
   <div aria-hidden="true" class="cadre" data-hero-anim></div>
 
-  <div class="orn orn-bas-gauche" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(var(--cadre-retrait) + 14px); --orn-opacite: .75">
-    <OrnementCoin position="bas-gauche" />
+  <div class="orn orn-bas-gauche" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(var(--cadre-retrait) + 14px); --orn-opacite: .85">
+    <OrnementCoin position="bas-gauche" chargement="eager" />
   </div>
-  <div class="orn orn-bas-droite" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(var(--cadre-retrait) + 14px); --orn-opacite: .75">
-    <OrnementCoin position="bas-droite" />
+  <div class="orn orn-bas-droite" data-hero-anim style="--orn-taille: clamp(72px, 8cqw, 92px); --orn-retrait: calc(var(--cadre-retrait) + 14px); --orn-opacite: .85">
+    <OrnementCoin position="bas-droite" chargement="eager" />
   </div>
 
   <div class="contenu">
     <span class="eyebrow" data-hero-anim>{section.surtitre}</span>
     <h1 class="titre" data-hero-anim>{titrePlain}{aAccent && <em class="titre-accent" data-hero-anim>{accent}</em>}</h1>
     <p class="accroche" data-hero-anim>{section.paragraphes[0]}</p>
-    <div class="cta" data-hero-anim style="--bouton-hauteur: clamp(58px, 9.4cqw, 62px)">
+    <div class="cta" data-hero-anim style="--bouton-hauteur: clamp(58px, 9.4cqw, 62px); --bouton-taille: clamp(14px, 3.6cqw, 15px); --bouton-marge-h: clamp(28px, 5.4cqw, 42px)">
       <Bouton href="#contact" variante="creme">Réserver</Bouton>
     </div>
   </div>
@@ -254,15 +254,22 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
        levée : sans cela elles se consument derrière le rideau et le visiteur
        découvre un hero déjà en place. */
     .rideau {
-      animation: curtainLift 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) 1.15s both;
+      animation: curtainLift 0.9s cubic-bezier(0.62, 0.02, 0.28, 1) 1.15s both;
     }
+    /* Durées et retards du design (markAnim, ruleAnim). La sortie part à 1,15s,
+       l'instant même où le rideau s'écarte : la marque et le trait quittent
+       l'écran avec lui au lieu de monter, figés, dans son sillage. Le design
+       les sort en `ease` court — 0,34s et 0,3s — là où l'entrée prend son
+       temps. */
     .rideau-marque {
       animation:
-        curtainMarkIn 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both,
-        curtainMarkOut 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) 1.3s both;
+        curtainMarkIn 1s cubic-bezier(0.2, 0.7, 0.3, 1) 0.1s both,
+        curtainMarkOut 0.34s ease 1.15s both;
     }
     .rideau-trait {
-      animation: curtainRuleIn 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) 0.3s both;
+      animation:
+        curtainRuleIn 0.8s cubic-bezier(0.2, 0.7, 0.3, 1) 0.5s both,
+        curtainMarkOut 0.3s ease 1.15s both;
     }
     .lueur {
       animation: glowIn 1.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
@@ -362,7 +369,11 @@ const titrePlain = aAccent ? section.titre.slice(0, -accent.length) : section.ti
         transform: scale(0.86);
       }
       to {
-        opacity: 0.85;
+        /* 1 et non .85 : l'opacité du design est portée par l'image, que
+           `--orn-opacite` règle déjà. Les deux se multipliaient — .85 sur le
+           conteneur par .85 sur l'image — et les coins finissaient un quart
+           trop pâles. Le conteneur ne fait plus que les amener. */
+        opacity: 1;
         transform: scale(1);
       }
     }

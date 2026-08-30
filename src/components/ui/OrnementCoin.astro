@@ -4,9 +4,15 @@ import coin from '../../assets/images/caro-ornement-coin.png';
 
 interface Props {
   position: 'haut-gauche' | 'haut-droite' | 'bas-gauche' | 'bas-droite';
+  /* Les deux coins du hero sont dans la fenêtre dès le premier rendu : les
+     charger paresseusement retarde leur apparition sans rien économiser
+     (« don't lazy load images that are in the first visible viewport »,
+     web.dev, Browser-level lazy loading). Ailleurs, la valeur par défaut
+     d'Astro reste la bonne. */
+  chargement?: 'lazy' | 'eager';
 }
 
-const { position } = Astro.props;
+const { position, chargement = 'lazy' } = Astro.props;
 ---
 
 <Image
@@ -15,6 +21,7 @@ const { position } = Astro.props;
   width={104}
   height={104}
   densities={[1, 2]}
+  loading={chargement}
   class={`ornement ${position}`}
 />
 
