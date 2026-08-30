@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { recupererAvisGoogle } from '../../src/lib/avis-google';
+import { recupererFicheGoogle } from '../../src/lib/avis-google';
 
 // Un avis tel que Place Details (New) le renvoie.
 const avisApi = {
@@ -28,12 +28,12 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-describe('recupererAvisGoogle', () => {
+describe('recupererFicheGoogle', () => {
   it('ne demande rien à Google tant que les identifiants manquent', async () => {
     const fetchEspion = repondre({});
     vi.stubGlobal('fetch', fetchEspion);
 
-    await expect(recupererAvisGoogle()).resolves.toEqual([]);
+    await expect(recupererFicheGoogle()).resolves.toEqual({ avis: [] });
     expect(fetchEspion).not.toHaveBeenCalled();
   });
 
@@ -43,12 +43,12 @@ describe('recupererAvisGoogle', () => {
     const fetchEspion = repondre({ reviews: [avisApi] });
     vi.stubGlobal('fetch', fetchEspion);
 
-    await recupererAvisGoogle();
+    await recupererFicheGoogle();
 
     const [url, options] = fetchEspion.mock.calls[0];
     expect(url).toBe('https://places.googleapis.com/v1/places/ChIJtest');
     expect(options.headers['X-Goog-Api-Key']).toBe('cle-test');
-    expect(options.headers['X-Goog-FieldMask']).toBe('reviews');
+    expect(options.headers['X-Goog-FieldMask']).toBe('reviews,rating,userRatingCount');
   });
 
   it("retient l'avatar et le lien de profil, que les règles Places imposent d'afficher", async () => {
@@ -56,7 +56,7 @@ describe('recupererAvisGoogle', () => {
     vi.stubEnv('GOOGLE_PLACE_ID', 'ChIJtest');
     vi.stubGlobal('fetch', repondre({ reviews: [avisApi] }));
 
-    const [avis] = await recupererAvisGoogle();
+    const [avis] = (await recupererFicheGoogle()).avis;
 
     expect(avis).toEqual({
       auteur: 'Claire D.',
@@ -75,7 +75,19 @@ describe('recupererAvisGoogle', () => {
     const sansTexte = { ...avisApi, text: undefined, originalText: undefined };
     vi.stubGlobal('fetch', repondre({ reviews: [sansTexte, avisApi] }));
 
-    await expect(recupererAvisGoogle()).resolves.toHaveLength(1);
+    await expect(recupererFicheGoogle()).resolves.toHaveProperty('avis.length', 1);
+  });
+
+  it('remonte la note de la fiche et son total, que les cinq avis ne disent pas', async () => {
+    vi.stubEnv('GOOGLE_PLACES_API_KEY', 'cle-test');
+    vi.stubEnv('GOOGLE_PLACE_ID', 'ChIJtest');
+    vi.stubGlobal('fetch', repondre({ reviews: [avisApi], rating: 4.8, userRatingCount: 42 }));
+
+    const fiche = await recupererFicheGoogle();
+
+    expect(fiche.note).toBe(4.8);
+    expect(fiche.total).toBe(42);
+    expect(fiche.avis).toHaveLength(1);
   });
 
   it('casse le build plutôt que de publier une section muette quand Google refuse', async () => {
@@ -83,6 +95,6 @@ describe('recupererAvisGoogle', () => {
     vi.stubEnv('GOOGLE_PLACE_ID', 'ChIJtest');
     vi.stubGlobal('fetch', repondre({}, false, 403));
 
-    await expect(recupererAvisGoogle()).rejects.toThrow('403');
+    await expect(recupererFicheGoogle()).rejects.toThrow('403');
   });
 });

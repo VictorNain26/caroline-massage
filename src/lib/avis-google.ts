@@ -4,7 +4,21 @@ import type { Avis } from './content';
 // répond une erreur — et n'admet aucune espace dans la liste.
 // https://developers.google.com/maps/documentation/places/web-service/place-details
 const ENDPOINT = 'https://places.googleapis.com/v1/places';
-const MASQUE = 'reviews';
+// `rating` et `userRatingCount` donnent la note de la fiche et son nombre
+// total d'avis — les deux nombres du bandeau, que la moyenne des cinq avis
+// rapatriés ne peut pas fournir. Ils appartiennent au SKU Enterprise quand
+// `reviews` relève d'Enterprise + Atmosphere, et « you are then billed at the
+// highest SKU applicable to your request » (usage-and-billing) : les ajouter
+// ne change donc pas la facture, déjà au tarif le plus haut.
+const MASQUE = 'reviews,rating,userRatingCount';
+
+export interface FicheGoogle {
+  avis: Avis[];
+  /** Note de la fiche, toutes contributions confondues. */
+  note?: number;
+  /** Nombre total d'avis reçus, dont l'API ne renvoie que les cinq derniers. */
+  total?: number;
+}
 
 interface AttributionGoogle {
   displayName?: string;
@@ -51,10 +65,10 @@ function convertir(avis: AvisApi): Avis | null {
  * En revanche, si les deux sont présents, un appel qui échoue casse le build
  * plutôt que de publier une page silencieusement amputée de ses avis.
  */
-export async function recupererAvisGoogle(): Promise<Avis[]> {
+export async function recupererFicheGoogle(): Promise<FicheGoogle> {
   const cle = import.meta.env.GOOGLE_PLACES_API_KEY;
   const fiche = import.meta.env.GOOGLE_PLACE_ID;
-  if (!cle || !fiche) return [];
+  if (!cle || !fiche) return { avis: [] };
 
   const reponse = await fetch(`${ENDPOINT}/${fiche}`, {
     headers: {
@@ -70,7 +84,12 @@ export async function recupererAvisGoogle(): Promise<Avis[]> {
     );
   }
 
-  const donnees: { reviews?: AvisApi[] } = await reponse.json();
-  // L'API en renvoie cinq au maximum.
-  return (donnees.reviews ?? []).map(convertir).filter((avis) => avis !== null);
+  const donnees: { reviews?: AvisApi[]; rating?: number; userRatingCount?: number } =
+    await reponse.json();
+  return {
+    // L'API en renvoie cinq au maximum.
+    avis: (donnees.reviews ?? []).map(convertir).filter((avis) => avis !== null),
+    note: donnees.rating,
+    total: donnees.userRatingCount,
+  };
 }

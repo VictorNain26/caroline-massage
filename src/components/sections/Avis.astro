@@ -1,12 +1,22 @@
 ---
 import { Image } from 'astro:assets';
-import { getAvis, getCabinet, getSection } from '../../lib/content';
+import { getFicheAvis, getCabinet, getSection } from '../../lib/content';
 import EnTeteSection from '../ui/EnTeteSection.astro';
 
-const avis = await getAvis();
+const fiche = await getFicheAvis();
+const avis = fiche.avis;
 const section = await getSection('avis');
 const cabinet = await getCabinet();
-const note = avis.length > 0 ? avis.reduce((total, a) => total + a.note, 0) / avis.length : 0;
+
+/* Le bandeau annonce la fiche, pas l'échantillon : Places ne rend que les cinq
+   derniers avis, et en tirer une moyenne dirait « 4,8 · 5 avis » d'une fiche
+   qui en compte quarante. `rating` et `userRatingCount` portent les deux vrais
+   nombres. On retombe sur le calcul local quand ils manquent — c'est le cas
+   des avis de `src/content/avis/`, qui ne viennent pas d'une fiche. */
+const moyenneLocale =
+  avis.length > 0 ? avis.reduce((somme, a) => somme + a.note, 0) / avis.length : 0;
+const note = fiche.note ?? moyenneLocale;
+const nombreAvis = fiche.total ?? avis.length;
 const noteAffichee = Number.isInteger(note) ? String(note) : note.toFixed(1);
 
 const formateurRelatif = new Intl.RelativeTimeFormat('fr', { numeric: 'always' });
@@ -28,11 +38,12 @@ function depuis(date: string): string {
             G
           </span>
           <span class="nom-google">Avis Google</span>
-          <span role="img" aria-label="5 étoiles sur 5" class="etoiles">
-            ★★★★★
+          <span role="img" aria-label={`${noteAffichee} étoiles sur 5`} class="etoiles">
+            {'★'.repeat(Math.round(note))}
+            {'☆'.repeat(5 - Math.round(note))}
           </span>
           <span>
-            {noteAffichee} · {avis.length} avis
+            {noteAffichee} · {nombreAvis} avis
           </span>
         </div>
       </div>
@@ -92,20 +103,23 @@ function depuis(date: string): string {
 
       {(cabinet.googleAvisUrl || avis.length > 1) && (
         <div class="pied">
-          {cabinet.googleAvisUrl && (
-            <a href={cabinet.googleAvisUrl} class="lien-tous" target="_blank" rel="noopener">
-              Voir tous les avis sur Google →
-            </a>
-          )}
           {/* Repère de position du carrousel, qui n'existe qu'en mobile. Purement
               décoratif : la liste elle-même reste parcourable au clavier et
-              annoncée telle quelle. */}
+              annoncée telle quelle. Il vient avant le lien, comme dans le
+              design : dans un `space-between`, les puces tiennent la gauche et
+              le lien la droite. Les deux coexistent sous 900px — les mettre
+              dans l'autre ordre donnait l'image miroir de la maquette. */}
           {avis.length > 1 && (
             <div class="puces" aria-hidden="true" data-avis-puces>
               {avis.map((_, rang) => (
                 <span class:list={['puce', { actif: rang === 0 }]} />
               ))}
             </div>
+          )}
+          {cabinet.googleAvisUrl && (
+            <a href={cabinet.googleAvisUrl} class="lien-tous" target="_blank" rel="noopener">
+              Voir tous les avis sur Google →
+            </a>
           )}
         </div>
       )}
@@ -115,7 +129,14 @@ function depuis(date: string): string {
 
 <style>
   .avis {
-    scroll-margin-top: 90px;
+    /* L'ancre vise le contenu, pas le rembourrage. Le design place son `id`
+       DANS le bloc qui porte le padding, si bien que le défilement amène le
+       surtitre à 90px de la barre ; ici l'`id` est sur la section, qui porte
+       les deux — on atterrissait 160px plus bas, sur une bande vide. Retirer
+       le rembourrage de la marge de défilement remet le surtitre où le design
+       le pose, et la soustraction lit la valeur à sa source : changer le
+       padding suffit, rien à reporter ici. */
+    scroll-margin-top: calc(90px - var(--section-haut));
     display: flex;
     flex-direction: column;
     gap: clamp(24px, 4cqw, 40px);
@@ -162,7 +183,7 @@ function depuis(date: string): string {
     font-weight: 500;
     font-size: 16px;
     line-height: 1;
-    color: var(--or-bronze);
+    color: var(--or-lien);
   }
 
   .nom-google {
@@ -171,7 +192,7 @@ function depuis(date: string): string {
   }
 
   .etoiles {
-    color: var(--or-bronze);
+    color: var(--or-lien);
     letter-spacing: 0.08em;
   }
 
@@ -331,7 +352,7 @@ function depuis(date: string): string {
     font-weight: 500;
     font-size: 16px;
     line-height: 1.4;
-    color: var(--or-bronze);
+    color: var(--or-lien);
     text-decoration: none;
     border-bottom: 1px solid var(--sable);
     padding-bottom: 2px;
@@ -356,8 +377,9 @@ function depuis(date: string): string {
   }
 
   /* Le design met ce lien face aux puces du carrousel dans un `space-between`
-     (ligne 535) ; les puces n'existant qu'en mobile, il reste seul et se cale
-     donc à gauche, aligné sur le titre de section. */
+     (ligne 535). Les puces n'existent qu'en mobile : au-delà de 900px le lien
+     reste donc seul et se cale à gauche, aligné sur le titre de section ; en
+     dessous, les puces le repoussent à droite, comme dans la maquette. */
   .pied {
     box-sizing: border-box;
     padding: 0 var(--gouttiere);
@@ -379,7 +401,7 @@ function depuis(date: string): string {
     font-weight: 500;
     font-size: clamp(16px, 4.2cqw, 17px);
     line-height: 1.4;
-    color: var(--or-bronze);
+    color: var(--or-lien);
     text-decoration: none;
     border-bottom: 2px solid var(--or-bronze);
     padding-bottom: 3px;
