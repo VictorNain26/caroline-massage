@@ -21,11 +21,11 @@
     "@eslint/js": "^10.0.1",
     "@rollup/plugin-yaml": "^5.0.0",
     "@types/node": "^24.13.4",
-    "eslint": "^10.9.1",
+    "eslint": "^10.10.0",
     "eslint-plugin-astro": "^3.1.0",
     "sharp": "^0.35.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.69.0",
+    "typescript-eslint": "^8.70.0",
     "vitest": "^4.1.11",
     "wrangler": "^4.129.0",
     "yaml": "^2.9.0"
